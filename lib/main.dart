@@ -1,11 +1,9 @@
+import 'package:akropolis/routes/routes.dart';
+import 'package:akropolis/theme/themes.dart';
 import 'package:flutter/material.dart';
-
-import 'login.dart';
 
 void main() {
   runApp(const AkropolisApplication());
-
-
 }
 
 class AkropolisApplication extends StatelessWidget {
@@ -14,11 +12,11 @@ class AkropolisApplication extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: lightTheme,
       debugShowCheckedModeBanner: false,
-      home: LoginScreen(),
+      initialRoute: AppRoutes.splashScreen.path,
       routes: {
-        '/login': (context) => LoginPage(),
-        '/signup': (context) => SignUpPage(),
+        for (var r in AppRoutes.values) r.path: (_) => r.page,
       },
     );
   }
