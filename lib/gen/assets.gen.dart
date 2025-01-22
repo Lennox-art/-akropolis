@@ -19,12 +19,13 @@ class Assets {
       AssetGenImage('assets/background.png');
   static const AssetGenImage connectionPeople =
       AssetGenImage('assets/connection_people.png');
+  static const SvgGenImage google = SvgGenImage('assets/google.svg');
   static const SvgGenImage splashScreen =
       SvgGenImage('assets/splash_screen.svg');
 
   /// List of all assets
   static List<dynamic> get values =>
-      [background, connectionPeople, splashScreen];
+      [background, connectionPeople, google, splashScreen];
 }
 
 class AssetGenImage {

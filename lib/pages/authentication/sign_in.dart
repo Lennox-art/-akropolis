@@ -1,4 +1,5 @@
 import 'package:akropolis/constants/constants.dart';
+import 'package:akropolis/gen/assets.gen.dart';
 import 'package:akropolis/routes/routes.dart';
 import 'package:akropolis/theme/themes.dart';
 import 'package:flutter/gestures.dart';
@@ -15,9 +16,10 @@ class SignInScreen extends StatelessWidget {
       appBar: AppBar(
         title: null,
       ),
-      body: Column(
+      body: Flex(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         crossAxisAlignment: CrossAxisAlignment.center,
+        direction: Axis.vertical,
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
@@ -32,7 +34,7 @@ class SignInScreen extends StatelessWidget {
           ),
           Text(
             "Meaningful Video-Based Engagements",
-            style: theme.textTheme.displaySmall,
+            style: theme.textTheme.headlineMedium,
             textAlign: TextAlign.center,
           ),
           Text(
@@ -41,7 +43,7 @@ class SignInScreen extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           ElevatedButton.icon(
-            icon: const Icon(FontAwesomeIcons.google),
+            icon: Assets.google.svg(),
             onPressed: () {},
             label: const Text("Sign in with Google"),
             style: theme.elevatedButtonTheme.style?.copyWith(
@@ -59,7 +61,10 @@ class SignInScreen extends StatelessWidget {
             ),
           ),
           ElevatedButton.icon(
-            icon: const Icon(Icons.email_outlined),
+            icon: const Icon(
+              Icons.email_outlined,
+              color: iconColor,
+            ),
             onPressed: () {
               Navigator.of(context).pushNamed(AppRoutes.signInWithEmail.path);
             },
@@ -74,28 +79,33 @@ class SignInScreen extends StatelessWidget {
               ),
               shape: WidgetStatePropertyAll(
                 RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.0)),
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
               ),
             ),
           ),
-          Text.rich(
-            TextSpan(
-              text: "Don't have an account? ",
-              children: [
-                TextSpan(
-                  text: "Sign up",
-                  style: const TextStyle(
-                    color: primaryColor,
-                    decoration: TextDecoration.underline,
-                  ),
-                  recognizer: TapGestureRecognizer()
-                    ..onTap = () {
-                      Navigator.of(context).pushReplacementNamed(
-                        AppRoutes.signUp.path,
-                      );
-                    },
-                )
-              ],
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text.rich(
+              TextSpan(
+                text: "Don't have an account? ",
+                children: [
+                  TextSpan(
+                    text: "Sign up",
+                    style: const TextStyle(
+                      color: primaryColor,
+                      decorationColor: primaryColor,
+                      decoration: TextDecoration.underline,
+                    ),
+                    recognizer: TapGestureRecognizer()
+                      ..onTap = () {
+                        Navigator.of(context).pushReplacementNamed(
+                          AppRoutes.signUp.path,
+                        );
+                      },
+                  )
+                ],
+              ),
             ),
           ),
         ],
@@ -114,7 +124,8 @@ class SignInWithEmailScreen extends StatelessWidget {
       appBar: AppBar(
         title: null,
       ),
-      body: Column(
+      body: Flex(
+        direction: Axis.vertical,
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
@@ -129,27 +140,36 @@ class SignInWithEmailScreen extends StatelessWidget {
             "Sign in with email",
             style: theme.textTheme.headlineSmall,
           ),
-          ListTile(
-            title: const Text("Email"),
-            subtitle: TextFormField(
-              decoration:
-                  const InputDecoration(hintText: "johndoe@example.abc"),
-            ),
-          ),
-          ListTile(
-            title: const Text("Password"),
-            subtitle: TextFormField(
-              decoration:
-                  const InputDecoration(hintText: "Enter your password"),
-            ),
-          ),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: TextButton(
-              onPressed: () {
-                Navigator.of(context).pushNamed(AppRoutes.forgotPassword.path);
-              },
-              child: const Text("Forgot your password ?"),
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  ListTile(
+                    title: const Text("Email"),
+                    subtitle: TextFormField(
+                      decoration: const InputDecoration(hintText: "johndoe@example.abc"),
+                    ),
+                  ),
+                  ListTile(
+                    title: const Text("Password"),
+                    subtitle: TextFormField(
+                      decoration:
+                      const InputDecoration(hintText: "Enter your password"),
+                    ),
+                  ),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pushNamed(AppRoutes.forgotPassword.path);
+                      },
+                      child: const Text("Forgot your password ?"),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
           ElevatedButton(
@@ -158,26 +178,32 @@ class SignInWithEmailScreen extends StatelessWidget {
             },
             child: const Text("Sign in"),
           ),
-          Text.rich(
-            TextSpan(
-              text: "Don't have an account? ",
-              children: [
-                TextSpan(
-                  text: "Sign up",
-                  style: const TextStyle(
-                    color: primaryColor,
-                    decoration: TextDecoration.underline,
-                  ),
-                  recognizer: TapGestureRecognizer()
-                    ..onTap = () {
-                      Navigator.of(context).pushReplacementNamed(
-                        AppRoutes.signUp.path,
-                      );
-                    },
-                )
-              ],
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text.rich(
+              TextSpan(
+                text: "Don't have an account? ",
+                children: [
+                  TextSpan(
+                    text: "Sign up",
+                    style: const TextStyle(
+                      color: primaryColor,
+                      decorationColor: primaryColor,
+                      decoration: TextDecoration.underline,
+                    ),
+                    recognizer: TapGestureRecognizer()
+                      ..onTap = () {
+                        Navigator.of(context).pushReplacementNamed(
+                          AppRoutes.signUp.path,
+                        );
+                      },
+                  )
+                ],
+              ),
             ),
           ),
+          const SizedBox(height: 40,),
+
         ],
       ),
     );

@@ -9,19 +9,17 @@ class WelcomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(title: null,),
       body: Flex(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         direction: Axis.vertical,
         children: [
-          const SizedBox(height: 20,),
 
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(
               "Welcome to your new experience",
-              style: theme.textTheme.headlineSmall,
+              style: theme.textTheme.headlineMedium,
               textAlign: TextAlign.center,
             ),
           ),
@@ -30,7 +28,8 @@ class WelcomeScreen extends StatelessWidget {
             style: theme.textTheme.bodyLarge,
             textAlign: TextAlign.center,
           ),
-          Expanded(
+          Padding(
+            padding: const EdgeInsets.all(8.0),
             child: Image.asset("assets/connection_people.png"),
           ),
 
@@ -41,7 +40,6 @@ class WelcomeScreen extends StatelessWidget {
             child: const Text('Continue'),
           ),
 
-          const SizedBox(height: 20,),
         ],
       ),
     );

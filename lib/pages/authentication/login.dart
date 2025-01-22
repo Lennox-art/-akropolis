@@ -48,12 +48,16 @@ class LoginScreen extends StatelessWidget {
                   Text(
                     'Welcome to a new beginning',
                     style: theme.textTheme.bodyLarge,
+                    textAlign: TextAlign.center,
                   ),
                   Text(
                     'Akropolis connects people through video, fostering meaningful and vibrant social interactions.',
                     style: theme.textTheme.bodyMedium,
+                    textAlign: TextAlign.center,
                   ),
+                  const SizedBox(height: 20,),
                   ElevatedButton(
+
                     onPressed: () {
                       Navigator.of(context).pushNamed(AppRoutes.signIn.path);
                     },

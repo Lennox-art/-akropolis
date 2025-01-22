@@ -1,9 +1,9 @@
 import 'package:akropolis/constants/constants.dart';
+import 'package:akropolis/gen/assets.gen.dart';
 import 'package:akropolis/routes/routes.dart';
 import 'package:akropolis/theme/themes.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class SignUpPage extends StatelessWidget {
   const SignUpPage({super.key});
@@ -15,9 +15,10 @@ class SignUpPage extends StatelessWidget {
       appBar: AppBar(
         title: null,
       ),
-      body: Column(
+      body: Flex(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         crossAxisAlignment: CrossAxisAlignment.center,
+        direction: Axis.vertical,
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
@@ -32,7 +33,7 @@ class SignUpPage extends StatelessWidget {
           ),
           Text(
             "Meaningful Video-Based Engagements",
-            style: theme.textTheme.displaySmall,
+            style: theme.textTheme.headlineMedium,
             textAlign: TextAlign.center,
           ),
           Text(
@@ -41,7 +42,7 @@ class SignUpPage extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           ElevatedButton.icon(
-            icon: const Icon(FontAwesomeIcons.google),
+            icon: Assets.google.svg(),
             onPressed: () {},
             label: const Text("Sign up with Google"),
             style: theme.elevatedButtonTheme.style?.copyWith(
@@ -59,7 +60,10 @@ class SignUpPage extends StatelessWidget {
             ),
           ),
           ElevatedButton.icon(
-            icon: const Icon(Icons.email_outlined),
+            icon: const Icon(
+              Icons.email_outlined,
+              color: iconColor,
+            ),
             onPressed: () {
               Navigator.of(context).pushNamed(AppRoutes.signUpWithEmail.path);
             },
@@ -79,24 +83,28 @@ class SignUpPage extends StatelessWidget {
               ),
             ),
           ),
-          Text.rich(
-            TextSpan(
-              text: "Already have an account? ",
-              children: [
-                TextSpan(
-                  text: "Sign in",
-                  style: const TextStyle(
-                    color: primaryColor,
-                    decoration: TextDecoration.underline,
-                  ),
-                  recognizer: TapGestureRecognizer()
-                    ..onTap = () {
-                      Navigator.of(context).pushReplacementNamed(
-                        AppRoutes.signIn.path,
-                      );
-                    },
-                )
-              ],
+          Padding(
+            padding: const EdgeInsets.only(bottom: 20.0, top: 10.0),
+            child: Text.rich(
+              TextSpan(
+                text: "Already have an account? ",
+                children: [
+                  TextSpan(
+                    text: "Sign in",
+                    style: const TextStyle(
+                      color: primaryColor,
+                      decorationColor: primaryColor,
+                      decoration: TextDecoration.underline,
+                    ),
+                    recognizer: TapGestureRecognizer()
+                      ..onTap = () {
+                        Navigator.of(context).pushReplacementNamed(
+                          AppRoutes.signIn.path,
+                        );
+                      },
+                  )
+                ],
+              ),
             ),
           ),
         ],
@@ -115,67 +123,83 @@ class SignUpWithEmailScreen extends StatelessWidget {
       appBar: AppBar(
         title: null,
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(
-                appName.toUpperCase(),
-                style: theme.textTheme.titleLarge,
+      body: Flex(
+        direction: Axis.vertical,
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              appName.toUpperCase(),
+              style: theme.textTheme.titleLarge,
+            ),
+          ),
+          Text(
+            "Sign up with email",
+            style: theme.textTheme.headlineSmall,
+          ),
+          Expanded(
+            child: Center(
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ListTile(
+                      title: const Text("Display Name"),
+                      subtitle: TextFormField(
+                        decoration: const InputDecoration(hintText: "John Doe"),
+                      ),
+                    ),
+                    ListTile(
+                      title: const Text("Username"),
+                      subtitle: TextFormField(
+                        decoration:
+                            const InputDecoration(hintText: "@johndoe8734"),
+                      ),
+                    ),
+                    ListTile(
+                      title: const Text("Email"),
+                      subtitle: TextFormField(
+                        decoration: const InputDecoration(
+                            hintText: "johndoe@example.abc"),
+                      ),
+                    ),
+                    ListTile(
+                      title: const Text("Password"),
+                      subtitle: TextFormField(
+                        decoration: const InputDecoration(
+                            hintText: "Enter your password"),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-            Text(
-              "Sign up with email",
-              style: theme.textTheme.headlineSmall,
-            ),
-            ListTile(
-              title: const Text("Display Name"),
-              subtitle: TextFormField(
-                decoration: const InputDecoration(hintText: "John Doe"),
-              ),
-            ),
-            ListTile(
-              title: const Text("Username"),
-              subtitle: TextFormField(
-                decoration: const InputDecoration(hintText: "@johndoe8734"),
-              ),
-            ),
-            ListTile(
-              title: const Text("Email"),
-              subtitle: TextFormField(
-                decoration:
-                    const InputDecoration(hintText: "johndoe@example.abc"),
-              ),
-            ),
-            ListTile(
-              title: const Text("Password"),
-              subtitle: TextFormField(
-                decoration:
-                    const InputDecoration(hintText: "Enter your password"),
-              ),
-            ),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              await showEmailOTPDialog(context);
+              if (!context.mounted) return;
 
-            ElevatedButton(
-              onPressed: () async {
-                await showEmailOTPDialog(context);
-                if(!context.mounted) return;
-
-                Navigator.of(context).pushNamed(AppRoutes.newPassword.path);
-              },
-              child: const Text("Create Account"),
-            ),
-            Text.rich(
+              Navigator.of(context).pushNamed(AppRoutes.newPassword.path);
+            },
+            child: const Text("Create Account"),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text.rich(
+              style: theme.textTheme.bodySmall,
               TextSpan(
                 text:
-                    "By clicking “Create Account”, you acknowledge that you have read and understood, and agree to Akropolis’",
+                    "By clicking “Create Account”, you acknowledge that you have read and understood, and agree to Akropolis’ ",
                 children: [
                   TextSpan(
                     text: "Terms & Conditions",
                     style: const TextStyle(
                       color: primaryColor,
+                      decorationColor: primaryColor,
                       decoration: TextDecoration.underline,
                     ),
                     recognizer: TapGestureRecognizer()..onTap = () {},
@@ -187,6 +211,7 @@ class SignUpWithEmailScreen extends StatelessWidget {
                     text: "Privacy Policy",
                     style: const TextStyle(
                       color: primaryColor,
+                      decorationColor: primaryColor,
                       decoration: TextDecoration.underline,
                     ),
                     recognizer: TapGestureRecognizer()..onTap = () {},
@@ -194,8 +219,11 @@ class SignUpWithEmailScreen extends StatelessWidget {
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+          const SizedBox(
+            height: 40,
+          ),
+        ],
       ),
     );
   }
@@ -208,43 +236,81 @@ class EmailOTPBottomSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
     return BottomSheet(
+      constraints: const BoxConstraints(
+        minHeight: 300,
+        maxHeight: 500,
+      ),
       onClosing: () {},
       builder: (_) {
-        return SingleChildScrollView(
-          child: Column(
+        return Padding(
+          padding: const EdgeInsets.all(15.0),
+          child: Flex(
+            mainAxisSize: MainAxisSize.min,
+            direction: Axis.vertical,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text(
-                "Check your inbox",
-                style: theme.textTheme.headlineSmall,
-              ),
-              Text(
-                "Enter the code that was sent to x to sign up",
-                style: theme.textTheme.bodyMedium,
+              Align(
+                alignment: Alignment.centerRight,
+                child: IconButton(
+                  onPressed: Navigator.of(context).pop,
+                  icon: const Icon(
+                    Icons.cancel_outlined,
+                  ),
+                ),
               ),
               Padding(
-                padding: const EdgeInsets.all(10.0),
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  "Check your inbox",
+                  style: theme.textTheme.headlineSmall,
+                ),
+              ),
+              Text(
+                "Enter the code that we sent to x to sign up",
+                style: theme.textTheme.bodyMedium,
+              ),
+              Expanded(
                 child: Flex(
                   direction: Axis.horizontal,
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Expanded(
-                      child: TextFormField(),
+                      child: Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: TextFormField(),
+                      ),
                     ),
                     Expanded(
-                      child: TextFormField(),
+                      child: Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: TextFormField(),
+                      ),
                     ),
                     Expanded(
-                      child: TextFormField(),
+                      child: Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: TextFormField(),
+                      ),
                     ),
                     Expanded(
-                      child: TextFormField(),
+                      child: Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: TextFormField(),
+                      ),
                     ),
                     Expanded(
-                      child: TextFormField(),
+                      child: Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: TextFormField(),
+                      ),
                     ),
                     Expanded(
-                      child: TextFormField(),
+                      child: Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: TextFormField(),
+                      ),
                     ),
                   ],
                 ),
