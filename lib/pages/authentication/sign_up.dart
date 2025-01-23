@@ -213,7 +213,7 @@ class SignUpWithEmailScreen extends StatelessWidget {
                       );
 
                       User? newUser =
-                      await authCubit.signUpWithEmailAndPassword(
+                          await authCubit.signUpWithEmailAndPassword(
                         email: email,
                         password: password,
                       );
@@ -226,6 +226,7 @@ class SignUpWithEmailScreen extends StatelessWidget {
                         displayName: displayName,
                         username: username,
                         email: email,
+                        topics: {},
                       );
 
                       UserCubit userCubit = BlocProvider.of<UserCubit>(

@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'models.g.dart';
@@ -14,12 +16,15 @@ class AppUser {
 
   String? profilePicture;
 
+  Set<String> topics;
+
   AppUser({
     required this.id,
     required this.displayName,
     required this.username,
     required this.email,
     this.profilePicture,
+    required this.topics,
   });
 
   static const String collection = "user";

@@ -1,4 +1,5 @@
 import 'package:akropolis/constants/constants.dart';
+import 'package:akropolis/gen/assets.gen.dart';
 import 'package:akropolis/routes/routes.dart';
 import 'package:flutter/material.dart';
 
@@ -44,19 +45,22 @@ class LoginScreen extends StatelessWidget {
                     textAlign: TextAlign.center,
                   ),
 
-                   Expanded(
-                    child: Image.asset("assets/connection_people.png"),
+                   const Expanded(
+                    child: SizedBox.expand(),
                   ),
 
                   Text(
                     'Welcome to a new beginning',
-                    style: theme.textTheme.bodyLarge,
+                    style: theme.textTheme.headlineMedium,
                     textAlign: TextAlign.center,
                   ),
-                  Text(
-                    'Akropolis connects people through video, fostering meaningful and vibrant social interactions.',
-                    style: theme.textTheme.bodyMedium,
-                    textAlign: TextAlign.center,
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      'Akropolis connects people through video, fostering meaningful and vibrant social interactions.',
+                      style: theme.textTheme.bodyMedium,
+                      textAlign: TextAlign.center,
+                    ),
                   ),
                   const SizedBox(height: 20,),
                   ElevatedButton(

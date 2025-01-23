@@ -1,5 +1,6 @@
 import 'package:akropolis/models/models.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
@@ -26,6 +27,12 @@ class UserCubit extends Cubit<UserState> {
     await userCollectionRef.doc(user.id).set(user);
     userCache.putIfAbsent(user.id, () => user);
     emit(const LoadedUserState());
+  }
+
+  Future<AppUser?> getCurrentUser() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if(user == null) return null;
+    return findUserById(user.uid);
   }
 
   Future<AppUser?> findUserById(String id) async {

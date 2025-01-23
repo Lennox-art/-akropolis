@@ -1,6 +1,11 @@
+import 'dart:collection';
+
+import 'package:akropolis/models/models.dart';
 import 'package:akropolis/routes/routes.dart';
+import 'package:akropolis/state/user_cubit/user_cubit.dart';
 import 'package:akropolis/theme/themes.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SelectTopicScreen extends StatelessWidget {
   const SelectTopicScreen({super.key});
@@ -8,12 +13,19 @@ class SelectTopicScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    return Scaffold(
-      appBar: AppBar(
-        title: null,
-      ),
-      body: SingleChildScrollView(
-        child: Column(
+    final Set<String> selectedTopics = HashSet();
+
+    return SafeArea(
+      top: false,
+      bottom: true,
+      child: Scaffold(
+        appBar: AppBar(
+          title: null,
+        ),
+        body: Flex(
+          direction: Axis.vertical,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -28,56 +40,78 @@ class SelectTopicScreen extends StatelessWidget {
               style: theme.textTheme.bodyMedium,
               textAlign: TextAlign.center,
             ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: InterestChips(
-                minSelection: 6,
-                topics: const [
-                  'Akropolis',
-                  'Programming',
-                  'Life',
-                  'Technology',
-                  'Relationship',
-                  'News',
-                  'Cryptocurrency',
-                  'Business',
-                  'Politics',
-                  'Startup',
-                  'Design',
-                  'Software Development',
-                  'Building',
-                  'Artificial Intelligence',
-                  'Art',
-                  'Blockchain',
-                  'Culture',
-                  'Farming',
-                  'Music',
-                  'Car',
-                  'Kenya',
-                  'DJ',
-                  'Mobile Phone',
-                  'Football',
-                  'Graph',
-                  'Productivity',
-                  'Health',
-                  'Psychology',
-                  'Writing',
-                  'Love',
-                  'Science',
-                ],
-                onSelectionChanged: (selectedTopics) {
-                  print('Selected topics: $selectedTopics');
-                },
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: InterestChips(
+                  selectedTopics: selectedTopics,
+                  minSelection: 6,
+                  topics: const [
+                    'Akropolis',
+                    'Programming',
+                    'Life',
+                    'Technology',
+                    'Relationship',
+                    'News',
+                    'Cryptocurrency',
+                    'Business',
+                    'Politics',
+                    'Startup',
+                    'Design',
+                    'Software Development',
+                    'Building',
+                    'Artificial Intelligence',
+                    'Art',
+                    'Blockchain',
+                    'Culture',
+                    'Farming',
+                    'Music',
+                    'Car',
+                    'Kenya',
+                    'DJ',
+                    'Mobile Phone',
+                    'Football',
+                    'Graph',
+                    'Productivity',
+                    'Health',
+                    'Psychology',
+                    'Writing',
+                    'Love',
+                    'Science',
+                  ],
+                  onSelectionChanged: (selectedTopics) {
+                    print('Selected topics: $selectedTopics');
+                  },
+                ),
               ),
             ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pushNamedAndRemoveUntil(
-                  AppRoutes.welcomePreferences.path,
-                  (_) => false,
+            BlocBuilder<UserCubit, UserState>(
+              builder: (context, state) {
+                return state.map(
+                  loaded: (l) {
+                    return ElevatedButton(
+                      onPressed: () async {
+
+                        AppUser? currentUser = await BlocProvider.of<UserCubit>(context).getCurrentUser();
+                        if(currentUser == null) return;
+                        if(!context.mounted) return;
+
+                        currentUser.topics = selectedTopics;
+
+                        await BlocProvider.of<UserCubit>(context).saveAppUser(currentUser);
+                        if(!context.mounted) return;
+
+                        Navigator.of(context).pushNamedAndRemoveUntil(
+                          AppRoutes.welcomePreferences.path,
+                          (_) => false,
+                        );
+                      },
+                      child: const Text("Next"),
+                    );
+                  },
+                  loading: (_) => const CircularProgressIndicator.adaptive(),
                 );
               },
-              child: const Text("Next"),
             ),
           ],
         ),
@@ -91,11 +125,13 @@ class InterestChips extends StatefulWidget {
     super.key,
     this.minSelection = 6,
     this.topics = const [],
+    required this.selectedTopics,
     this.onSelectionChanged,
   });
 
   final int minSelection;
   final List<String> topics;
+  final Set<String> selectedTopics;
   final void Function(List<String>)? onSelectionChanged;
 
   @override
@@ -103,27 +139,25 @@ class InterestChips extends StatefulWidget {
 }
 
 class _InterestChipsState extends State<InterestChips> {
-  final Set<String> _selectedTopics = {};
-
   @override
   Widget build(BuildContext context) {
     return Wrap(
       spacing: 8,
       runSpacing: 8,
       children: widget.topics.map((topic) {
-        final isSelected = _selectedTopics.contains(topic);
+        final isSelected = widget.selectedTopics.contains(topic);
         return FilterChip(
           selected: isSelected,
           label: Text(topic),
           onSelected: (selected) {
             setState(() {
               if (selected) {
-                _selectedTopics.add(topic);
+                widget.selectedTopics.add(topic);
               } else {
-                _selectedTopics.remove(topic);
+                widget.selectedTopics.remove(topic);
               }
             });
-            widget.onSelectionChanged?.call(_selectedTopics.toList());
+            widget.onSelectionChanged?.call(widget.selectedTopics.toList());
           },
           backgroundColor: Colors.transparent,
           selectedColor: primaryColor,

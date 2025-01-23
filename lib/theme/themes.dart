@@ -56,7 +56,7 @@ TextTheme get textTheme {
     ),
     headlineMedium: TextStyle(
       fontFamily: 'Inter',
-      fontSize: 48,
+      fontSize: 30,
       // Example size for TitleLarge
       fontWeight: FontWeight.w500,
       color: Colors.white,
@@ -69,7 +69,7 @@ TextTheme get textTheme {
     ),
     headlineSmall: TextStyle(
       fontFamily: 'Inter',
-      fontSize: 32,
+      fontSize: 24.5,
       // Example size for headlineSmall
       fontWeight: FontWeight.w500,
       height: 1.25,

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:akropolis/routes/routes.dart';
 import 'package:flutter/material.dart';
 
 class SelectDefaultPreferencesScreen extends StatelessWidget {
@@ -41,13 +42,18 @@ class SelectDefaultPreferencesScreen extends StatelessWidget {
 
             ElevatedButton(
               onPressed: () {
-                exit(0);
+                Navigator.of(context).pushNamedAndRemoveUntil(
+                  AppRoutes.home.path, (_) => false,
+                );
               },
               child: const Text("Enable Notifications"),
             ),
+
             TextButton(
               onPressed: () {
-                exit(0);
+                Navigator.of(context).pushNamedAndRemoveUntil(
+                  AppRoutes.home.path, (_) => false,
+                );
               },
               child: const Text("Skip this step"),
             ),
@@ -55,6 +61,7 @@ class SelectDefaultPreferencesScreen extends StatelessWidget {
             const SizedBox(
               height: 28.0,
             ),
+
           ],
         ),
       ),
