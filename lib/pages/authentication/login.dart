@@ -35,12 +35,15 @@ class LoginScreen extends StatelessWidget {
                     child: Text(
                       appName.toUpperCase(),
                       style: theme.textTheme.titleLarge,
+                      textAlign: TextAlign.center,
                     ),
                   ),
                   Text(
                     appSlogan,
                     style: theme.textTheme.headlineSmall,
+                    textAlign: TextAlign.center,
                   ),
+
                    Expanded(
                     child: Image.asset("assets/connection_people.png"),
                   ),

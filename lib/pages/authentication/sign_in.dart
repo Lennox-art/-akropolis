@@ -1,9 +1,14 @@
 import 'package:akropolis/constants/constants.dart';
 import 'package:akropolis/gen/assets.gen.dart';
+import 'package:akropolis/models/models.dart';
 import 'package:akropolis/routes/routes.dart';
+import 'package:akropolis/state/authentication/authentication_cubit.dart';
+import 'package:akropolis/state/user_cubit/user_cubit.dart';
 import 'package:akropolis/theme/themes.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class SignInScreen extends StatelessWidget {
@@ -120,6 +125,10 @@ class SignInWithEmailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
+
+    TextEditingController emailController = TextEditingController();
+    TextEditingController passwordController = TextEditingController();
+
     return Scaffold(
       appBar: AppBar(
         title: null,
@@ -149,21 +158,27 @@ class SignInWithEmailScreen extends StatelessWidget {
                   ListTile(
                     title: const Text("Email"),
                     subtitle: TextFormField(
-                      decoration: const InputDecoration(hintText: "johndoe@example.abc"),
+                      controller: emailController,
+                      decoration: const InputDecoration(
+                        hintText: "johndoe@example.abc",
+                      ),
                     ),
                   ),
                   ListTile(
                     title: const Text("Password"),
                     subtitle: TextFormField(
-                      decoration:
-                      const InputDecoration(hintText: "Enter your password"),
+                      controller: passwordController,
+                      decoration: const InputDecoration(
+                        hintText: "Enter your password",
+                      ),
                     ),
                   ),
                   Align(
                     alignment: Alignment.centerLeft,
                     child: TextButton(
                       onPressed: () {
-                        Navigator.of(context).pushNamed(AppRoutes.forgotPassword.path);
+                        Navigator.of(context)
+                            .pushNamed(AppRoutes.forgotPassword.path);
                       },
                       child: const Text("Forgot your password ?"),
                     ),
@@ -172,11 +187,43 @@ class SignInWithEmailScreen extends StatelessWidget {
               ),
             ),
           ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).pushNamed(AppRoutes.welcome.path);
+          BlocBuilder<AuthenticationCubit, AuthenticationState>(
+            builder: (context, state) {
+              return state.map(
+                loading: (_) => const CircularProgressIndicator.adaptive(),
+                loaded: (l) {
+                  return ElevatedButton(
+                    onPressed: () async {
+                      String email = emailController.text;
+                      String password = passwordController.text;
+
+                      AuthenticationCubit authCubit =
+                          BlocProvider.of<AuthenticationCubit>(context);
+
+                      User? signedInUser =
+                          await authCubit.signInWithEmailAndPassword(
+                        email: email,
+                        password: password,
+                      );
+
+                      if (signedInUser == null) return;
+                      if (!context.mounted) return;
+
+                      UserCubit userCubit = BlocProvider.of<UserCubit>(context);
+                      AppUser? appUser = await userCubit.findUserById(
+                        signedInUser.uid,
+                      );
+
+                      if (appUser == null) return;
+                      if (!context.mounted) return;
+
+                      Navigator.of(context).pushNamed(AppRoutes.home.path);
+                    },
+                    child: const Text("Sign in"),
+                  );
+                },
+              );
             },
-            child: const Text("Sign in"),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
@@ -202,8 +249,9 @@ class SignInWithEmailScreen extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 40,),
-
+          const SizedBox(
+            height: 40,
+          ),
         ],
       ),
     );

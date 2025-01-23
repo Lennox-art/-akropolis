@@ -1,6 +1,9 @@
 import 'package:akropolis/gen/assets.gen.dart';
 import 'package:akropolis/routes/routes.dart';
+import 'package:akropolis/state/authentication/authentication_cubit.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -16,10 +19,9 @@ class _SplashScreenState extends State<SplashScreen> {
       const Duration(seconds: 2),
       () {
         if (!mounted) return;
-        Navigator.of(context).pushNamedAndRemoveUntil(
-          AppRoutes.login.path,
-          (_) => false,
-        );
+        User? user = BlocProvider.of<AuthenticationCubit>(context).getCurrentUser();
+        AppRoutes nextRoute = user == null ? AppRoutes.login : AppRoutes.home;
+        Navigator.of(context).pushNamedAndRemoveUntil(nextRoute.path, (_) => false);
       },
     );
     super.initState();

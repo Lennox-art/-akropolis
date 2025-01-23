@@ -1,9 +1,14 @@
 import 'package:akropolis/constants/constants.dart';
 import 'package:akropolis/gen/assets.gen.dart';
+import 'package:akropolis/models/models.dart';
 import 'package:akropolis/routes/routes.dart';
+import 'package:akropolis/state/authentication/authentication_cubit.dart';
+import 'package:akropolis/state/user_cubit/user_cubit.dart';
 import 'package:akropolis/theme/themes.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SignUpPage extends StatelessWidget {
   const SignUpPage({super.key});
@@ -119,6 +124,11 @@ class SignUpWithEmailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
+    TextEditingController displayNameController = TextEditingController();
+    TextEditingController usernameController = TextEditingController();
+    TextEditingController emailController = TextEditingController();
+    TextEditingController passwordController = TextEditingController();
+
     return Scaffold(
       appBar: AppBar(
         title: null,
@@ -149,28 +159,35 @@ class SignUpWithEmailScreen extends StatelessWidget {
                     ListTile(
                       title: const Text("Display Name"),
                       subtitle: TextFormField(
+                        controller: displayNameController,
                         decoration: const InputDecoration(hintText: "John Doe"),
                       ),
                     ),
                     ListTile(
                       title: const Text("Username"),
                       subtitle: TextFormField(
-                        decoration:
-                            const InputDecoration(hintText: "@johndoe8734"),
+                        controller: usernameController,
+                        decoration: const InputDecoration(
+                          hintText: "@johndoe8734",
+                        ),
                       ),
                     ),
                     ListTile(
                       title: const Text("Email"),
                       subtitle: TextFormField(
+                        controller: emailController,
                         decoration: const InputDecoration(
-                            hintText: "johndoe@example.abc"),
+                          hintText: "johndoe@example.abc",
+                        ),
                       ),
                     ),
                     ListTile(
                       title: const Text("Password"),
                       subtitle: TextFormField(
+                        controller: passwordController,
                         decoration: const InputDecoration(
-                            hintText: "Enter your password"),
+                          hintText: "Enter your password",
+                        ),
                       ),
                     ),
                   ],
@@ -178,14 +195,70 @@ class SignUpWithEmailScreen extends StatelessWidget {
               ),
             ),
           ),
-          ElevatedButton(
-            onPressed: () async {
-              await showEmailOTPDialog(context);
-              if (!context.mounted) return;
+          BlocBuilder<AuthenticationCubit, AuthenticationState>(
+            builder: (context, state) {
+              return state.map(
+                loading: (_) => const CircularProgressIndicator.adaptive(),
+                loaded: (l) {
+                  return ElevatedButton(
+                    onPressed: () async {
+                      String username = usernameController.text;
+                      String password = passwordController.text;
+                      String displayName = displayNameController.text;
+                      String email = emailController.text;
 
-              Navigator.of(context).pushNamed(AppRoutes.newPassword.path);
+                      AuthenticationCubit authCubit =
+                          BlocProvider.of<AuthenticationCubit>(
+                        context,
+                      );
+
+                      User? newUser =
+                      await authCubit.signUpWithEmailAndPassword(
+                        email: email,
+                        password: password,
+                      );
+
+                      if (newUser == null) return;
+                      if (!context.mounted) return;
+
+                      AppUser newAppUser = AppUser(
+                        id: newUser.uid,
+                        displayName: displayName,
+                        username: username,
+                        email: email,
+                      );
+
+                      UserCubit userCubit = BlocProvider.of<UserCubit>(
+                        context,
+                      );
+
+                      await userCubit.saveAppUser(newAppUser);
+                      //await showEmailOTPDialog(context);
+
+                      if (!context.mounted) return;
+
+                      newUser = await authCubit.signInWithEmailAndPassword(
+                        email: email,
+                        password: password,
+                      );
+
+                      if (!context.mounted) return;
+                      if (newUser == null) {
+                        Navigator.of(context).pushNamed(
+                          AppRoutes.signInWithEmail.path,
+                        );
+                        return;
+                      }
+
+                      Navigator.of(context).pushNamed(
+                        AppRoutes.welcome.path,
+                      );
+                    },
+                    child: const Text("Create Account"),
+                  );
+                },
+              );
             },
-            child: const Text("Create Account"),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),

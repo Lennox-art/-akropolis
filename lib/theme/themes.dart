@@ -257,6 +257,7 @@ ListTileThemeData get listTileThemeData {
 
 ThemeData get lightTheme {
   return ThemeData(
+    useMaterial3: true,
     colorScheme: const ColorScheme(
       brightness: Brightness.dark,
       // Dark theme for white text
