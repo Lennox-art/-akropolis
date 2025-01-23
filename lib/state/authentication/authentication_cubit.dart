@@ -26,6 +26,9 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
     );
 
     User? user = credential.user;
+    if(user != null) {
+      await user.sendEmailVerification();
+    }
 
     emit(LoadedAuthentication(user: user));
 
