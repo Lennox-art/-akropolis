@@ -54,24 +54,82 @@ class SignInScreen extends StatelessWidget {
               style: theme.textTheme.bodyMedium,
               textAlign: TextAlign.center,
             ),
-            ElevatedButton.icon(
-              icon: Assets.google.svg(),
-              onPressed: () {},
-              label: const Text("Sign in with Google"),
-              style: theme.elevatedButtonTheme.style?.copyWith(
-                backgroundColor: const WidgetStatePropertyAll(Colors.transparent),
-                side: const WidgetStatePropertyAll(
-                  BorderSide(
-                    width: 1.0,
-                    color: secondaryColor,
+            BlocConsumer<AuthenticationCubit, AuthenticationState>(
+                listener: (_, state) {
+              state.mapOrNull(
+                loaded: (l) {
+                  l.toast?.show();
+                },
+              );
+            }, builder: (_, state) {
+              return state.map(
+                loading: (_) => const CircularProgressIndicator.adaptive(),
+                loaded: (_) => ElevatedButton.icon(
+                  icon: Assets.google.svg(),
+                  onPressed: () async {
+                    User? signedInUser =
+                        await BlocProvider.of<AuthenticationCubit>(context)
+                            .signInWithGoogle();
+                    if (signedInUser == null) return;
+                    if (!context.mounted) return;
+
+                    UserCubit userCubit = BlocProvider.of<UserCubit>(context);
+                    AppUser? appUser = await userCubit.findUserById(
+                      signedInUser.uid,
+                    );
+
+                    if (appUser == null) {
+                      await userCubit.saveAppUser(
+                        AppUser(
+                          id: signedInUser.uid,
+                          displayName: signedInUser.displayName ?? '',
+                          username: signedInUser.displayName ?? '',
+                          email: signedInUser.email!,
+                          profilePicture: signedInUser.photoURL,
+                          topics: {},
+                        ),
+                      );
+
+                      if (!context.mounted) return;
+                      Navigator.of(context).pushNamedAndRemoveUntil(
+                        AppRoutes.welcome.path,
+                        (_) => false,
+                      );
+                      return;
+                    }
+
+                    if (!context.mounted) return;
+                    if(appUser.topics == null || (appUser.topics?.isEmpty ?? true)) {
+                      Navigator.of(context).pushNamedAndRemoveUntil(
+                        AppRoutes.welcomeTopics.path,
+                            (_) => false,
+                      );
+                      return;
+                    }
+
+                    Navigator.of(context).pushNamedAndRemoveUntil(
+                      AppRoutes.home.path,
+                      (_) => false,
+                    );
+                  },
+                  label: const Text("Sign in with Google"),
+                  style: theme.elevatedButtonTheme.style?.copyWith(
+                    backgroundColor:
+                        const WidgetStatePropertyAll(Colors.transparent),
+                    side: const WidgetStatePropertyAll(
+                      BorderSide(
+                        width: 1.0,
+                        color: secondaryColor,
+                      ),
+                    ),
+                    shape: WidgetStatePropertyAll(
+                      RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.0)),
+                    ),
                   ),
                 ),
-                shape: WidgetStatePropertyAll(
-                  RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.0)),
-                ),
-              ),
-            ),
+              );
+            }),
             ElevatedButton.icon(
               icon: const Icon(
                 Icons.email_outlined,
@@ -82,7 +140,8 @@ class SignInScreen extends StatelessWidget {
               },
               label: const Text("Sign in with Email"),
               style: theme.elevatedButtonTheme.style?.copyWith(
-                backgroundColor: const WidgetStatePropertyAll(Colors.transparent),
+                backgroundColor:
+                    const WidgetStatePropertyAll(Colors.transparent),
                 side: const WidgetStatePropertyAll(
                   BorderSide(
                     width: 1.0,
@@ -139,7 +198,6 @@ class SignInWithEmailScreen extends StatelessWidget {
     ValueNotifier<bool> hidePasswordNotifier = ValueNotifier(true);
     final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
-
     return Scaffold(
       appBar: AppBar(
         title: null,
@@ -187,7 +245,8 @@ class SignInWithEmailScreen extends StatelessWidget {
                           return TextFormField(
                             controller: passwordController,
                             validator: validatePassword,
-                            autovalidateMode: AutovalidateMode.onUserInteraction,
+                            autovalidateMode:
+                                AutovalidateMode.onUserInteraction,
                             obscureText: obscure,
                             maxLength: 16,
                             minLines: 1,
@@ -197,7 +256,8 @@ class SignInWithEmailScreen extends StatelessWidget {
                                 visible: obscure,
                                 replacement: IconButton(
                                   onPressed: () {
-                                    hidePasswordNotifier.value = !hidePasswordNotifier.value;
+                                    hidePasswordNotifier.value =
+                                        !hidePasswordNotifier.value;
                                   },
                                   icon: const Icon(
                                     Icons.password_outlined,
@@ -205,7 +265,8 @@ class SignInWithEmailScreen extends StatelessWidget {
                                 ),
                                 child: IconButton(
                                   onPressed: () {
-                                    hidePasswordNotifier.value = !hidePasswordNotifier.value;
+                                    hidePasswordNotifier.value =
+                                        !hidePasswordNotifier.value;
                                   },
                                   icon: const Icon(
                                     Icons.remove_red_eye_outlined,
@@ -246,7 +307,7 @@ class SignInWithEmailScreen extends StatelessWidget {
                 loaded: (l) {
                   return ElevatedButton(
                     onPressed: () async {
-                      if(!formKey.currentState!.validate()) return;
+                      if (!formKey.currentState!.validate()) return;
 
                       String email = emailController.text;
                       String password = passwordController.text;
@@ -271,7 +332,10 @@ class SignInWithEmailScreen extends StatelessWidget {
                       if (appUser == null) return;
                       if (!context.mounted) return;
 
-                      Navigator.of(context).pushNamed(AppRoutes.home.path);
+                      Navigator.of(context).pushNamedAndRemoveUntil(
+                        AppRoutes.home.path,
+                        (_) => false,
+                      );
                     },
                     child: const Text("Sign in"),
                   );

@@ -79,6 +79,9 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
 
   Future<User?> signInWithGoogle() async {
     try {
+
+      emit(const LoadingAuthentication());
+
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
       final GoogleSignInAuthentication? googleAuth =

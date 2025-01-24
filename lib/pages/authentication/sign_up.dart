@@ -28,8 +28,6 @@ class SignUpPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           direction: Axis.vertical,
           children: [
-
-
             Column(
               children: [
                 Padding(
@@ -47,7 +45,6 @@ class SignUpPage extends StatelessWidget {
                 ),
               ],
             ),
-
             Text(
               "Well crafted Video-Based Engagements",
               style: theme.textTheme.headlineLarge,
@@ -59,58 +56,82 @@ class SignUpPage extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             BlocConsumer<AuthenticationCubit, AuthenticationState>(
-                listener: (_, state) {
-              state.mapOrNull(
-                loaded: (l) {
-                  l.toast?.show();
-                },
-              );
-            }, builder: (_, state) {
-              return ElevatedButton.icon(
-                icon: Assets.google.svg(),
-                onPressed: () async {
-                  User? signedInUser =
-                      await BlocProvider.of<AuthenticationCubit>(context)
-                          .signInWithGoogle();
-                  if (signedInUser == null) return;
-                  if (!context.mounted) return;
+              listener: (_, state) {
+                state.mapOrNull(
+                  loaded: (l) {
+                    l.toast?.show();
+                  },
+                );
+              },
+              builder: (_, state) {
+                return state.map(
+                  loading: (_) => const CircularProgressIndicator.adaptive(),
+                  loaded: (_) => ElevatedButton.icon(
+                    icon: Assets.google.svg(),
+                    onPressed: () async {
+                      User? signedInUser =
+                          await BlocProvider.of<AuthenticationCubit>(context)
+                              .signInWithGoogle();
+                      if (signedInUser == null) return;
+                      if (!context.mounted) return;
 
-                  UserCubit userCubit = BlocProvider.of<UserCubit>(context);
-                  AppUser? appUser = await userCubit.findUserById(
-                    signedInUser.uid,
-                  );
+                      UserCubit userCubit = BlocProvider.of<UserCubit>(context);
+                      AppUser? appUser = await userCubit.getCurrentUser();
 
-                  if (appUser == null) {
-                    //TODO: fill in other details maybe
-                    //username
-                    //display name
-                    //email address
-                    //topics
-                    print("Fill in other details");
+                      if (appUser == null) {
+                        await userCubit.saveAppUser(
+                          AppUser(
+                            id: signedInUser.uid,
+                            displayName: signedInUser.displayName ?? '',
+                            username: signedInUser.displayName ?? '',
+                            email: signedInUser.email!,
+                            profilePicture: signedInUser.photoURL,
+                            topics: {},
+                          ),
+                        );
 
-                    return;
-                  }
-                  if (!context.mounted) return;
+                        if (!context.mounted) return;
+                        Navigator.of(context).pushNamedAndRemoveUntil(
+                          AppRoutes.welcome.path,
+                              (_) => false,
+                        );
+                        return;
+                      }
 
-                  Navigator.of(context).pushNamed(AppRoutes.home.path);
-                },
-                label: const Text("Sign up with Google"),
-                style: theme.elevatedButtonTheme.style?.copyWith(
-                  backgroundColor:
-                      const WidgetStatePropertyAll(Colors.transparent),
-                  side: const WidgetStatePropertyAll(
-                    BorderSide(
-                      width: 1.0,
-                      color: secondaryColor,
+                      if (!context.mounted) return;
+                      if (appUser.topics == null || (appUser.topics?.isEmpty ?? true)) {
+                        Navigator.of(context).pushNamedAndRemoveUntil(
+                          AppRoutes.welcomeTopics.path,
+                              (_) => false,
+                        );
+                        return;
+                      }
+                      Navigator.of(context).pushNamedAndRemoveUntil(
+                        AppRoutes.home.path,
+                            (_) => false,
+                      );
+                    },
+                    label: const Text("Sign up with Google"),
+                    style: theme.elevatedButtonTheme.style?.copyWith(
+                      backgroundColor: const WidgetStatePropertyAll(
+                        Colors.transparent,
+                      ),
+                      side: const WidgetStatePropertyAll(
+                        BorderSide(
+                          width: 1.0,
+                          color: secondaryColor,
+                        ),
+                      ),
+                      shape: WidgetStatePropertyAll(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                      ),
                     ),
                   ),
-                  shape: WidgetStatePropertyAll(
-                    RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.0)),
-                  ),
-                ),
-              );
-            }),
+                );
+              },
+            ),
             ElevatedButton.icon(
               icon: const Icon(
                 Icons.email_outlined,
@@ -121,7 +142,8 @@ class SignUpPage extends StatelessWidget {
               },
               label: const Text("Sign up with Email"),
               style: theme.elevatedButtonTheme.style?.copyWith(
-                backgroundColor: const WidgetStatePropertyAll(Colors.transparent),
+                backgroundColor:
+                    const WidgetStatePropertyAll(Colors.transparent),
                 side: const WidgetStatePropertyAll(
                   BorderSide(
                     width: 1.0,
@@ -179,7 +201,6 @@ class SignUpWithEmailScreen extends StatelessWidget {
     ValueNotifier<bool> hidePasswordNotifier = ValueNotifier(true);
     final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
-
     return Scaffold(
       appBar: AppBar(
         title: null,
@@ -215,7 +236,8 @@ class SignUpWithEmailScreen extends StatelessWidget {
                           validator: validateDisplayName,
                           autovalidateMode: AutovalidateMode.onUserInteraction,
                           controller: displayNameController,
-                          decoration: const InputDecoration(hintText: "John Doe"),
+                          decoration:
+                              const InputDecoration(hintText: "John Doe"),
                         ),
                       ),
                       ListTile(
@@ -248,7 +270,8 @@ class SignUpWithEmailScreen extends StatelessWidget {
                             return TextFormField(
                               controller: passwordController,
                               validator: validatePassword,
-                              autovalidateMode: AutovalidateMode.onUserInteraction,
+                              autovalidateMode:
+                                  AutovalidateMode.onUserInteraction,
                               obscureText: obscure,
                               maxLength: 16,
                               minLines: 1,
@@ -258,7 +281,8 @@ class SignUpWithEmailScreen extends StatelessWidget {
                                   visible: obscure,
                                   replacement: IconButton(
                                     onPressed: () {
-                                      hidePasswordNotifier.value = !hidePasswordNotifier.value;
+                                      hidePasswordNotifier.value =
+                                          !hidePasswordNotifier.value;
                                     },
                                     icon: const Icon(
                                       Icons.password_outlined,
@@ -266,7 +290,8 @@ class SignUpWithEmailScreen extends StatelessWidget {
                                   ),
                                   child: IconButton(
                                     onPressed: () {
-                                      hidePasswordNotifier.value = !hidePasswordNotifier.value;
+                                      hidePasswordNotifier.value =
+                                          !hidePasswordNotifier.value;
                                     },
                                     icon: const Icon(
                                       Icons.remove_red_eye_outlined,
@@ -298,8 +323,7 @@ class SignUpWithEmailScreen extends StatelessWidget {
                 loaded: (l) {
                   return ElevatedButton(
                     onPressed: () async {
-
-                      if(!formKey.currentState!.validate()) return;
+                      if (!formKey.currentState!.validate()) return;
 
                       String username = usernameController.text;
                       String password = passwordController.text;
@@ -320,16 +344,37 @@ class SignUpWithEmailScreen extends StatelessWidget {
                       if (newUser == null) return;
                       if (!context.mounted) return;
 
+                      UserCubit userCubit = BlocProvider.of<UserCubit>(
+                        context,
+                      );
+
+                      AppUser? appUser = await userCubit.findUserById(
+                        newUser.uid,
+                      );
+
+                      if (!context.mounted) return;
+                      if(appUser != null) {
+
+                        if(appUser.topics == null || (appUser.topics?.isEmpty ?? true)) {
+                          Navigator.of(context).pushNamed(
+                            AppRoutes.welcomeTopics.path,
+                          );
+                          return;
+                        }
+
+
+                        Navigator.of(context).pushNamed(
+                          AppRoutes.home.path,
+                        );
+                        return;
+                      }
+
                       AppUser newAppUser = AppUser(
                         id: newUser.uid,
                         displayName: displayName,
                         username: username,
                         email: email,
                         topics: {},
-                      );
-
-                      UserCubit userCubit = BlocProvider.of<UserCubit>(
-                        context,
                       );
 
                       await userCubit.saveAppUser(newAppUser);
