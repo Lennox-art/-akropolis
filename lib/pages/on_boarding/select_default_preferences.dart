@@ -29,7 +29,7 @@ class SelectDefaultPreferencesScreen extends StatelessWidget {
                 children: [
                   Text(
                     "Stay up to date",
-                    style: theme.textTheme.bodyLarge,
+                    style: theme.textTheme.headlineSmall,
                   ),
                   Text(
                     "Turn on notifications, and we’ll let you know when author post new videos",

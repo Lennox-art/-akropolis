@@ -19,7 +19,7 @@ class WelcomeScreen extends StatelessWidget {
             padding: const EdgeInsets.all(8.0),
             child: Text(
               "Welcome to your new experience",
-              style: theme.textTheme.headlineMedium,
+              style: theme.textTheme.displaySmall,
               textAlign: TextAlign.center,
             ),
           ),

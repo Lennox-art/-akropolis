@@ -1,7 +1,9 @@
-import 'package:bloc/bloc.dart';
+import 'package:akropolis/models/models.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 part 'authentication_state.dart';
 
@@ -18,37 +20,126 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
     required String email,
     required String password,
   }) async {
-    emit(const LoadingAuthentication());
+    try {
+      emit(const LoadingAuthentication());
 
-    UserCredential credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-      email: email,
-      password: password,
-    );
+      UserCredential credential =
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
 
-    User? user = credential.user;
-    if(user != null) {
+      User? user = credential.user;
+      if (user == null) throw Exception("Sign up failed");
+
       await user.sendEmailVerification();
+
+      emit(
+        LoadedAuthentication(
+          toast: ToastSuccess(message: "Account created for $email"),
+          user: user,
+        ),
+      );
+
+      return user;
+    } catch (e, trace) {
+      addError("Error creating account", trace);
+      return null;
     }
-
-    emit(LoadedAuthentication(user: user));
-
-    return user;
   }
 
   Future<User?> signInWithEmailAndPassword({
     required String email,
     required String password,
   }) async {
-    emit(const LoadingAuthentication());
+    try {
+      emit(const LoadingAuthentication());
 
-    UserCredential credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
-      email: email,
-      password: password,
+      UserCredential credential =
+          await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
+      User? user = credential.user;
+      if (user == null) throw Exception("Sign in failed");
+
+      emit(
+        LoadedAuthentication(
+          toast: ToastSuccess(message: "Signed in from ${user.email}"),
+          user: user,
+        ),
+      );
+      return user;
+    } catch (e, trace) {
+      addError("Error signing in", trace);
+      return null;
+    }
+  }
+
+  Future<User?> signInWithGoogle() async {
+    try {
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+
+      final GoogleSignInAuthentication? googleAuth =
+          await googleUser?.authentication;
+
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth?.accessToken,
+        idToken: googleAuth?.idToken,
+      );
+
+      UserCredential? userCredential =
+          await FirebaseAuth.instance.signInWithCredential(
+        credential,
+      );
+
+      User? user = userCredential.user;
+      if (user == null) throw Exception("Sign in with google failed");
+
+      emit(
+        LoadedAuthentication(
+          toast: ToastSuccess(message: "Signed in from ${user.email}"),
+          user: user,
+        ),
+      );
+      return user;
+    } catch (e, trace) {
+      addError("Error signing in with google", trace);
+      return null;
+    }
+  }
+
+  Future<void> resetPassword({
+    required String email,
+  }) async {
+    try {
+      emit(const LoadingAuthentication());
+
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+
+      emit(
+        LoadedAuthentication(
+          toast: ToastSuccess(message: "Check $email for email"),
+        ),
+      );
+    } catch (e, trace) {
+      addError("Error signing in", trace);
+    }
+  }
+
+  @override
+  void onError(Object error, StackTrace stackTrace) {
+    debugPrint(error.toString());
+    debugPrintStack(stackTrace: stackTrace);
+
+    emit(
+      LoadedAuthentication(
+        toast: ToastError(
+          message: error.toString(),
+        ),
+      ),
     );
-
-    User? user = credential.user;
-
-    emit(LoadedAuthentication(user: user));
-    return user;
+    super.onError(error, stackTrace);
   }
 }

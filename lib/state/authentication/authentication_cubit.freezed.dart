@@ -19,19 +19,19 @@ mixin _$AuthenticationState {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() loading,
-    required TResult Function(User? user) loaded,
+    required TResult Function(ToastMessage? toast, User? user) loaded,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? loading,
-    TResult? Function(User? user)? loaded,
+    TResult? Function(ToastMessage? toast, User? user)? loaded,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? loading,
-    TResult Function(User? user)? loaded,
+    TResult Function(ToastMessage? toast, User? user)? loaded,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -121,7 +121,7 @@ class _$LoadingAuthenticationImpl implements LoadingAuthentication {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() loading,
-    required TResult Function(User? user) loaded,
+    required TResult Function(ToastMessage? toast, User? user) loaded,
   }) {
     return loading();
   }
@@ -130,7 +130,7 @@ class _$LoadingAuthenticationImpl implements LoadingAuthentication {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? loading,
-    TResult? Function(User? user)? loaded,
+    TResult? Function(ToastMessage? toast, User? user)? loaded,
   }) {
     return loading?.call();
   }
@@ -139,7 +139,7 @@ class _$LoadingAuthenticationImpl implements LoadingAuthentication {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? loading,
-    TResult Function(User? user)? loaded,
+    TResult Function(ToastMessage? toast, User? user)? loaded,
     required TResult orElse(),
   }) {
     if (loading != null) {
@@ -190,7 +190,9 @@ abstract class _$$LoadedAuthenticationImplCopyWith<$Res> {
           $Res Function(_$LoadedAuthenticationImpl) then) =
       __$$LoadedAuthenticationImplCopyWithImpl<$Res>;
   @useResult
-  $Res call({User? user});
+  $Res call({ToastMessage? toast, User? user});
+
+  $ToastMessageCopyWith<$Res>? get toast;
 }
 
 /// @nodoc
@@ -206,28 +208,49 @@ class __$$LoadedAuthenticationImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? toast = freezed,
     Object? user = freezed,
   }) {
     return _then(_$LoadedAuthenticationImpl(
+      toast: freezed == toast
+          ? _value.toast
+          : toast // ignore: cast_nullable_to_non_nullable
+              as ToastMessage?,
       user: freezed == user
           ? _value.user
           : user // ignore: cast_nullable_to_non_nullable
               as User?,
     ));
   }
+
+  /// Create a copy of AuthenticationState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $ToastMessageCopyWith<$Res>? get toast {
+    if (_value.toast == null) {
+      return null;
+    }
+
+    return $ToastMessageCopyWith<$Res>(_value.toast!, (value) {
+      return _then(_value.copyWith(toast: value));
+    });
+  }
 }
 
 /// @nodoc
 
 class _$LoadedAuthenticationImpl implements LoadedAuthentication {
-  const _$LoadedAuthenticationImpl({this.user});
+  const _$LoadedAuthenticationImpl({this.toast, this.user});
 
+  @override
+  final ToastMessage? toast;
   @override
   final User? user;
 
   @override
   String toString() {
-    return 'AuthenticationState.loaded(user: $user)';
+    return 'AuthenticationState.loaded(toast: $toast, user: $user)';
   }
 
   @override
@@ -235,11 +258,12 @@ class _$LoadedAuthenticationImpl implements LoadedAuthentication {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$LoadedAuthenticationImpl &&
+            (identical(other.toast, toast) || other.toast == toast) &&
             (identical(other.user, user) || other.user == user));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, user);
+  int get hashCode => Object.hash(runtimeType, toast, user);
 
   /// Create a copy of AuthenticationState
   /// with the given fields replaced by the non-null parameter values.
@@ -255,29 +279,29 @@ class _$LoadedAuthenticationImpl implements LoadedAuthentication {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() loading,
-    required TResult Function(User? user) loaded,
+    required TResult Function(ToastMessage? toast, User? user) loaded,
   }) {
-    return loaded(user);
+    return loaded(toast, user);
   }
 
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? loading,
-    TResult? Function(User? user)? loaded,
+    TResult? Function(ToastMessage? toast, User? user)? loaded,
   }) {
-    return loaded?.call(user);
+    return loaded?.call(toast, user);
   }
 
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? loading,
-    TResult Function(User? user)? loaded,
+    TResult Function(ToastMessage? toast, User? user)? loaded,
     required TResult orElse(),
   }) {
     if (loaded != null) {
-      return loaded(user);
+      return loaded(toast, user);
     }
     return orElse();
   }
@@ -315,9 +339,11 @@ class _$LoadedAuthenticationImpl implements LoadedAuthentication {
 }
 
 abstract class LoadedAuthentication implements AuthenticationState {
-  const factory LoadedAuthentication({final User? user}) =
-      _$LoadedAuthenticationImpl;
+  const factory LoadedAuthentication(
+      {final ToastMessage? toast,
+      final User? user}) = _$LoadedAuthenticationImpl;
 
+  ToastMessage? get toast;
   User? get user;
 
   /// Create a copy of AuthenticationState

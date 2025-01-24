@@ -1,6 +1,7 @@
 import 'package:akropolis/gen/assets.gen.dart';
 import 'package:akropolis/routes/routes.dart';
 import 'package:akropolis/state/authentication/authentication_cubit.dart';
+import 'package:akropolis/theme/themes.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

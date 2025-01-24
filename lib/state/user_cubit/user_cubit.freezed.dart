@@ -18,19 +18,19 @@ final _privateConstructorUsedError = UnsupportedError(
 mixin _$UserState {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function() loaded,
+    required TResult Function(ToastMessage? toast) loaded,
     required TResult Function() loading,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? loaded,
+    TResult? Function(ToastMessage? toast)? loaded,
     TResult? Function()? loading,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? loaded,
+    TResult Function(ToastMessage? toast)? loaded,
     TResult Function()? loading,
     required TResult orElse(),
   }) =>
@@ -81,6 +81,10 @@ abstract class _$$LoadedUserStateImplCopyWith<$Res> {
   factory _$$LoadedUserStateImplCopyWith(_$LoadedUserStateImpl value,
           $Res Function(_$LoadedUserStateImpl) then) =
       __$$LoadedUserStateImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({ToastMessage? toast});
+
+  $ToastMessageCopyWith<$Res>? get toast;
 }
 
 /// @nodoc
@@ -93,54 +97,104 @@ class __$$LoadedUserStateImplCopyWithImpl<$Res>
 
   /// Create a copy of UserState
   /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? toast = freezed,
+  }) {
+    return _then(_$LoadedUserStateImpl(
+      toast: freezed == toast
+          ? _value.toast
+          : toast // ignore: cast_nullable_to_non_nullable
+              as ToastMessage?,
+    ));
+  }
+
+  /// Create a copy of UserState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $ToastMessageCopyWith<$Res>? get toast {
+    if (_value.toast == null) {
+      return null;
+    }
+
+    return $ToastMessageCopyWith<$Res>(_value.toast!, (value) {
+      return _then(_value.copyWith(toast: value));
+    });
+  }
 }
 
 /// @nodoc
 
-class _$LoadedUserStateImpl implements LoadedUserState {
-  const _$LoadedUserStateImpl();
+class _$LoadedUserStateImpl
+    with DiagnosticableTreeMixin
+    implements LoadedUserState {
+  const _$LoadedUserStateImpl({this.toast});
 
   @override
-  String toString() {
-    return 'UserState.loaded()';
+  final ToastMessage? toast;
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'UserState.loaded(toast: $toast)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'UserState.loaded'))
+      ..add(DiagnosticsProperty('toast', toast));
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is _$LoadedUserStateImpl);
+        (other.runtimeType == runtimeType &&
+            other is _$LoadedUserStateImpl &&
+            (identical(other.toast, toast) || other.toast == toast));
   }
 
   @override
-  int get hashCode => runtimeType.hashCode;
+  int get hashCode => Object.hash(runtimeType, toast);
+
+  /// Create a copy of UserState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$LoadedUserStateImplCopyWith<_$LoadedUserStateImpl> get copyWith =>
+      __$$LoadedUserStateImplCopyWithImpl<_$LoadedUserStateImpl>(
+          this, _$identity);
 
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function() loaded,
+    required TResult Function(ToastMessage? toast) loaded,
     required TResult Function() loading,
   }) {
-    return loaded();
+    return loaded(toast);
   }
 
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? loaded,
+    TResult? Function(ToastMessage? toast)? loaded,
     TResult? Function()? loading,
   }) {
-    return loaded?.call();
+    return loaded?.call(toast);
   }
 
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? loaded,
+    TResult Function(ToastMessage? toast)? loaded,
     TResult Function()? loading,
     required TResult orElse(),
   }) {
     if (loaded != null) {
-      return loaded();
+      return loaded(toast);
     }
     return orElse();
   }
@@ -178,7 +232,16 @@ class _$LoadedUserStateImpl implements LoadedUserState {
 }
 
 abstract class LoadedUserState implements UserState {
-  const factory LoadedUserState() = _$LoadedUserStateImpl;
+  const factory LoadedUserState({final ToastMessage? toast}) =
+      _$LoadedUserStateImpl;
+
+  ToastMessage? get toast;
+
+  /// Create a copy of UserState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$LoadedUserStateImplCopyWith<_$LoadedUserStateImpl> get copyWith =>
+      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
@@ -202,12 +265,20 @@ class __$$LoadingUserStateImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$LoadingUserStateImpl implements LoadingUserState {
+class _$LoadingUserStateImpl
+    with DiagnosticableTreeMixin
+    implements LoadingUserState {
   const _$LoadingUserStateImpl();
 
   @override
-  String toString() {
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
     return 'UserState.loading()';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(DiagnosticsProperty('type', 'UserState.loading'));
   }
 
   @override
@@ -222,7 +293,7 @@ class _$LoadingUserStateImpl implements LoadingUserState {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function() loaded,
+    required TResult Function(ToastMessage? toast) loaded,
     required TResult Function() loading,
   }) {
     return loading();
@@ -231,7 +302,7 @@ class _$LoadingUserStateImpl implements LoadingUserState {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? loaded,
+    TResult? Function(ToastMessage? toast)? loaded,
     TResult? Function()? loading,
   }) {
     return loading?.call();
@@ -240,7 +311,7 @@ class _$LoadingUserStateImpl implements LoadingUserState {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? loaded,
+    TResult Function(ToastMessage? toast)? loaded,
     TResult Function()? loading,
     required TResult orElse(),
   }) {

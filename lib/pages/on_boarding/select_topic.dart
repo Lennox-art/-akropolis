@@ -1,5 +1,6 @@
 import 'dart:collection';
 
+import 'package:akropolis/models/extensions.dart';
 import 'package:akropolis/models/models.dart';
 import 'package:akropolis/routes/routes.dart';
 import 'package:akropolis/state/user_cubit/user_cubit.dart';
@@ -31,7 +32,7 @@ class SelectTopicScreen extends StatelessWidget {
               padding: const EdgeInsets.all(8.0),
               child: Text(
                 "What are you interested in?",
-                style: theme.textTheme.bodyLarge,
+                style: theme.textTheme.headlineSmall,
                 textAlign: TextAlign.center,
               ),
             ),
@@ -85,7 +86,14 @@ class SelectTopicScreen extends StatelessWidget {
                 ),
               ),
             ),
-            BlocBuilder<UserCubit, UserState>(
+            BlocConsumer<UserCubit, UserState>(
+              listener:  (context, state) {
+                state.mapOrNull(
+                  loaded: (l) {
+                    l.toast?.show();
+                  },
+                );
+              },
               builder: (context, state) {
                 return state.map(
                   loaded: (l) {

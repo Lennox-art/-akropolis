@@ -1,4 +1,7 @@
+import 'package:akropolis/models/extensions.dart';
+import 'package:akropolis/state/authentication/authentication_cubit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ForgotPasswordScreen extends StatelessWidget {
   const ForgotPasswordScreen({super.key});
@@ -6,6 +9,7 @@ class ForgotPasswordScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
+    TextEditingController emailController = TextEditingController();
     return Scaffold(
       appBar: AppBar(
         title: null,
@@ -27,13 +31,33 @@ class ForgotPasswordScreen extends StatelessWidget {
           ListTile(
             title: const Text("Email"),
             subtitle: TextFormField(
-              decoration:
-              const InputDecoration(hintText: "johndoe@example.abc"),
+              controller: emailController,
+              decoration: const InputDecoration(
+                hintText: "johndoe@example.abc",
+              ),
             ),
           ),
-          ElevatedButton(
-            onPressed: () {},
-            child: const Text("Reset Password"),
+          BlocConsumer<AuthenticationCubit, AuthenticationState>(
+            listener: (context, state) {
+              state.mapOrNull(
+                loaded: (l) {
+                  l.toast?.show();
+                },
+              );
+            },
+            builder: (context, state) {
+              return state.map(
+                loading: (_) => const CircularProgressIndicator.adaptive(),
+                loaded: (_) => ElevatedButton(
+                  onPressed: () {
+                    BlocProvider.of<AuthenticationCubit>(context).resetPassword(
+                      email: emailController.text,
+                    );
+                  },
+                  child: const Text("Reset Password"),
+                ),
+              );
+            },
           ),
         ],
       ),

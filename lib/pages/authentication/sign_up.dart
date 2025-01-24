@@ -1,5 +1,7 @@
 import 'package:akropolis/constants/constants.dart';
+import 'package:akropolis/constants/validations.dart';
 import 'package:akropolis/gen/assets.gen.dart';
+import 'package:akropolis/models/extensions.dart';
 import 'package:akropolis/models/models.dart';
 import 'package:akropolis/routes/routes.dart';
 import 'package:akropolis/state/authentication/authentication_cubit.dart';
@@ -20,99 +22,145 @@ class SignUpPage extends StatelessWidget {
       appBar: AppBar(
         title: null,
       ),
-      body: Flex(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        direction: Axis.vertical,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              appName.toUpperCase(),
-              style: theme.textTheme.titleLarge,
-            ),
-          ),
-          Text(
-            appSlogan,
-            style: theme.textTheme.headlineSmall,
-          ),
-          Text(
-            "Meaningful Video-Based Engagements",
-            style: theme.textTheme.headlineMedium,
-            textAlign: TextAlign.center,
-          ),
-          Text(
-            "Fostering connections through meaningful discussions",
-            style: theme.textTheme.bodyMedium,
-            textAlign: TextAlign.center,
-          ),
-          ElevatedButton.icon(
-            icon: Assets.google.svg(),
-            onPressed: () {},
-            label: const Text("Sign up with Google"),
-            style: theme.elevatedButtonTheme.style?.copyWith(
-              backgroundColor: const WidgetStatePropertyAll(Colors.transparent),
-              side: const WidgetStatePropertyAll(
-                BorderSide(
-                  width: 1.0,
-                  color: secondaryColor,
+      body: SafeArea(
+        child: Flex(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          direction: Axis.vertical,
+          children: [
+
+
+            Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    appName.toUpperCase(),
+                    style: theme.textTheme.titleLarge,
+                    textAlign: TextAlign.center,
+                  ),
                 ),
-              ),
-              shape: WidgetStatePropertyAll(
-                RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.0)),
-              ),
-            ),
-          ),
-          ElevatedButton.icon(
-            icon: const Icon(
-              Icons.email_outlined,
-              color: iconColor,
-            ),
-            onPressed: () {
-              Navigator.of(context).pushNamed(AppRoutes.signUpWithEmail.path);
-            },
-            label: const Text("Sign up with Email"),
-            style: theme.elevatedButtonTheme.style?.copyWith(
-              backgroundColor: const WidgetStatePropertyAll(Colors.transparent),
-              side: const WidgetStatePropertyAll(
-                BorderSide(
-                  width: 1.0,
-                  color: secondaryColor,
+                Text(
+                  appSlogan,
+                  style: theme.textTheme.headlineSmall,
+                  textAlign: TextAlign.center,
                 ),
-              ),
-              shape: WidgetStatePropertyAll(
-                RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                ),
-              ),
+              ],
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 20.0, top: 10.0),
-            child: Text.rich(
-              TextSpan(
-                text: "Already have an account? ",
-                children: [
-                  TextSpan(
-                    text: "Sign in",
-                    style: const TextStyle(
-                      color: primaryColor,
-                      decorationColor: primaryColor,
-                      decoration: TextDecoration.underline,
+
+            Text(
+              "Well crafted Video-Based Engagements",
+              style: theme.textTheme.headlineLarge,
+              textAlign: TextAlign.center,
+            ),
+            Text(
+              "Fostering connections through meaningful discussions",
+              style: theme.textTheme.bodyMedium,
+              textAlign: TextAlign.center,
+            ),
+            BlocConsumer<AuthenticationCubit, AuthenticationState>(
+                listener: (_, state) {
+              state.mapOrNull(
+                loaded: (l) {
+                  l.toast?.show();
+                },
+              );
+            }, builder: (_, state) {
+              return ElevatedButton.icon(
+                icon: Assets.google.svg(),
+                onPressed: () async {
+                  User? signedInUser =
+                      await BlocProvider.of<AuthenticationCubit>(context)
+                          .signInWithGoogle();
+                  if (signedInUser == null) return;
+                  if (!context.mounted) return;
+
+                  UserCubit userCubit = BlocProvider.of<UserCubit>(context);
+                  AppUser? appUser = await userCubit.findUserById(
+                    signedInUser.uid,
+                  );
+
+                  if (appUser == null) {
+                    //TODO: fill in other details maybe
+                    //username
+                    //display name
+                    //email address
+                    //topics
+                    print("Fill in other details");
+
+                    return;
+                  }
+                  if (!context.mounted) return;
+
+                  Navigator.of(context).pushNamed(AppRoutes.home.path);
+                },
+                label: const Text("Sign up with Google"),
+                style: theme.elevatedButtonTheme.style?.copyWith(
+                  backgroundColor:
+                      const WidgetStatePropertyAll(Colors.transparent),
+                  side: const WidgetStatePropertyAll(
+                    BorderSide(
+                      width: 1.0,
+                      color: secondaryColor,
                     ),
-                    recognizer: TapGestureRecognizer()
-                      ..onTap = () {
-                        Navigator.of(context).pushReplacementNamed(
-                          AppRoutes.signIn.path,
-                        );
-                      },
-                  )
-                ],
+                  ),
+                  shape: WidgetStatePropertyAll(
+                    RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.0)),
+                  ),
+                ),
+              );
+            }),
+            ElevatedButton.icon(
+              icon: const Icon(
+                Icons.email_outlined,
+                color: iconColor,
+              ),
+              onPressed: () {
+                Navigator.of(context).pushNamed(AppRoutes.signUpWithEmail.path);
+              },
+              label: const Text("Sign up with Email"),
+              style: theme.elevatedButtonTheme.style?.copyWith(
+                backgroundColor: const WidgetStatePropertyAll(Colors.transparent),
+                side: const WidgetStatePropertyAll(
+                  BorderSide(
+                    width: 1.0,
+                    color: secondaryColor,
+                  ),
+                ),
+                shape: WidgetStatePropertyAll(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                ),
               ),
             ),
-          ),
-        ],
+            Padding(
+              padding: const EdgeInsets.only(bottom: 20.0, top: 10.0),
+              child: Text.rich(
+                TextSpan(
+                  text: "Already have an account? ",
+                  children: [
+                    TextSpan(
+                      text: "Sign in",
+                      style: const TextStyle(
+                        color: primaryColor,
+                        decorationColor: primaryColor,
+                        decoration: TextDecoration.underline,
+                      ),
+                      recognizer: TapGestureRecognizer()
+                        ..onTap = () {
+                          Navigator.of(context).pushReplacementNamed(
+                            AppRoutes.signIn.path,
+                          );
+                        },
+                    )
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -128,6 +176,9 @@ class SignUpWithEmailScreen extends StatelessWidget {
     TextEditingController usernameController = TextEditingController();
     TextEditingController emailController = TextEditingController();
     TextEditingController passwordController = TextEditingController();
+    ValueNotifier<bool> hidePasswordNotifier = ValueNotifier(true);
+    final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+
 
     return Scaffold(
       appBar: AppBar(
@@ -150,58 +201,106 @@ class SignUpWithEmailScreen extends StatelessWidget {
             style: theme.textTheme.headlineSmall,
           ),
           Expanded(
-            child: Center(
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ListTile(
-                      title: const Text("Display Name"),
-                      subtitle: TextFormField(
-                        controller: displayNameController,
-                        decoration: const InputDecoration(hintText: "John Doe"),
-                      ),
-                    ),
-                    ListTile(
-                      title: const Text("Username"),
-                      subtitle: TextFormField(
-                        controller: usernameController,
-                        decoration: const InputDecoration(
-                          hintText: "@johndoe8734",
+            child: Form(
+              key: formKey,
+              child: Center(
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ListTile(
+                        title: const Text("Display Name"),
+                        subtitle: TextFormField(
+                          validator: validateDisplayName,
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          controller: displayNameController,
+                          decoration: const InputDecoration(hintText: "John Doe"),
                         ),
                       ),
-                    ),
-                    ListTile(
-                      title: const Text("Email"),
-                      subtitle: TextFormField(
-                        controller: emailController,
-                        decoration: const InputDecoration(
-                          hintText: "johndoe@example.abc",
+                      ListTile(
+                        title: const Text("Username"),
+                        subtitle: TextFormField(
+                          controller: usernameController,
+                          validator: validateUsername,
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          decoration: const InputDecoration(
+                            hintText: "@johndoe8734",
+                          ),
                         ),
                       ),
-                    ),
-                    ListTile(
-                      title: const Text("Password"),
-                      subtitle: TextFormField(
-                        controller: passwordController,
-                        decoration: const InputDecoration(
-                          hintText: "Enter your password",
+                      ListTile(
+                        title: const Text("Email"),
+                        subtitle: TextFormField(
+                          controller: emailController,
+                          validator: validateEmail,
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          decoration: const InputDecoration(
+                            hintText: "johndoe@example.abc",
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                      ListTile(
+                        title: const Text("Password"),
+                        subtitle: ValueListenableBuilder(
+                          valueListenable: hidePasswordNotifier,
+                          builder: (_, obscure, __) {
+                            return TextFormField(
+                              controller: passwordController,
+                              validator: validatePassword,
+                              autovalidateMode: AutovalidateMode.onUserInteraction,
+                              obscureText: obscure,
+                              maxLength: 16,
+                              minLines: 1,
+                              decoration: InputDecoration(
+                                hintText: "Enter your password",
+                                suffixIcon: Visibility(
+                                  visible: obscure,
+                                  replacement: IconButton(
+                                    onPressed: () {
+                                      hidePasswordNotifier.value = !hidePasswordNotifier.value;
+                                    },
+                                    icon: const Icon(
+                                      Icons.password_outlined,
+                                    ),
+                                  ),
+                                  child: IconButton(
+                                    onPressed: () {
+                                      hidePasswordNotifier.value = !hidePasswordNotifier.value;
+                                    },
+                                    icon: const Icon(
+                                      Icons.remove_red_eye_outlined,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
-          BlocBuilder<AuthenticationCubit, AuthenticationState>(
+          BlocConsumer<AuthenticationCubit, AuthenticationState>(
+            listener: (context, state) {
+              state.mapOrNull(
+                loaded: (l) {
+                  l.toast?.show();
+                },
+              );
+            },
             builder: (context, state) {
               return state.map(
                 loading: (_) => const CircularProgressIndicator.adaptive(),
                 loaded: (l) {
                   return ElevatedButton(
                     onPressed: () async {
+
+                      if(!formKey.currentState!.validate()) return;
+
                       String username = usernameController.text;
                       String password = passwordController.text;
                       String displayName = displayNameController.text;

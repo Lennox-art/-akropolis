@@ -44,7 +44,7 @@ TextTheme get textTheme {
     ),
     headlineLarge: TextStyle(
       fontFamily: 'Inter',
-      fontSize: 64,
+      fontSize: 55,
       // Example size for headlineLarge
       fontWeight: FontWeight.w500,
       height: 1.25,
@@ -56,7 +56,7 @@ TextTheme get textTheme {
     ),
     headlineMedium: TextStyle(
       fontFamily: 'Inter',
-      fontSize: 30,
+      fontSize: 29,
       // Example size for TitleLarge
       fontWeight: FontWeight.w500,
       color: Colors.white,
@@ -90,7 +90,7 @@ TextTheme get textTheme {
     ),
     displayMedium: TextStyle(
       fontFamily: 'Inter',
-      fontSize: 60,
+      fontSize: 54,
       // Example size for Headline Medium
       fontWeight: FontWeight.w500,
       color: Colors.white70,
@@ -103,7 +103,7 @@ TextTheme get textTheme {
     ),
     displaySmall: TextStyle(
       fontFamily: 'Inter',
-      fontSize: 48,
+      fontSize: 46,
       // Example size for displaySmall
       fontWeight: FontWeight.w500,
       height: 1.3,
@@ -115,10 +115,11 @@ TextTheme get textTheme {
     ),
     bodyLarge: TextStyle(
       fontFamily: 'Inter',
-      fontSize: 20,
+      fontSize: 18,
       // Example size for bodyLarge
       fontWeight: FontWeight.w500,
       height: 1.5,
+      color: Colors.white70,
       // Example line-height ratio
       letterSpacing: 0.15,
       // Example tracking
