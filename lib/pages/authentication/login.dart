@@ -13,9 +13,9 @@ class LoginScreen extends StatelessWidget {
       body: Stack(
         children: [
           Container(
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               image: DecorationImage(
-                image: AssetImage('assets/background.png'),
+                image: Assets.background.provider(),
                 // Add your image to the assets folder
                 fit: BoxFit.cover,
               ),
@@ -39,6 +39,7 @@ class LoginScreen extends StatelessWidget {
                       textAlign: TextAlign.center,
                     ),
                   ),
+
                   Text(
                     appSlogan,
                     style: theme.textTheme.headlineSmall,

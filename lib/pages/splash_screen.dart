@@ -1,3 +1,4 @@
+import 'package:akropolis/constants/constants.dart';
 import 'package:akropolis/gen/assets.gen.dart';
 import 'package:akropolis/models/models.dart';
 import 'package:akropolis/routes/routes.dart';
@@ -18,7 +19,7 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
-    Future.delayed(
+    /* Future.delayed(
       const Duration(seconds: 2),
       () async {
         if (!mounted) return;
@@ -53,16 +54,41 @@ class _SplashScreenState extends State<SplashScreen> {
           (_) => false,
         );
       },
-    );
+    );*/
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    ThemeData theme = Theme.of(context);
     return Scaffold(
-      body: Assets.splashScreen.svg(
-        height: double.infinity,
-        width: double.infinity,
+      body: Stack(
+        children: [
+          Assets.splashScreenBg.image(
+            height: double.infinity,
+            width: double.infinity,
+          ),
+          Align(
+            alignment: Alignment.center,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                Text(
+                  appName.toUpperCase(),
+                  style: theme.textTheme.titleLarge,
+                  textAlign: TextAlign.center,
+                ),
+                Text(
+                  appSlogan,
+                  style: theme.textTheme.headlineSmall,
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
