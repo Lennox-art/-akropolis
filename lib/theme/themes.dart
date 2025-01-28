@@ -256,6 +256,30 @@ ListTileThemeData get listTileThemeData {
   );
 }
 
+TabBarThemeData get tabTheme {
+  return TabBarThemeData(
+    indicatorColor: Colors.white70,
+    indicatorSize: TabBarIndicatorSize.label,
+    dividerColor: Colors.white12,
+    labelColor: secondaryColor,
+    unselectedLabelColor: Colors.white70,
+    labelStyle: textTheme.bodyMedium,
+    unselectedLabelStyle: textTheme.bodySmall,
+    tabAlignment: TabAlignment.start,
+    textScaler: const TextScaler.linear(1),
+  );
+}
+
+BottomNavigationBarThemeData get bottomNavTheme {
+  return BottomNavigationBarThemeData(
+    showSelectedLabels: false,
+    showUnselectedLabels: false,
+    unselectedItemColor: secondaryColor,
+    selectedItemColor: primaryColor,
+    type: BottomNavigationBarType.fixed,
+  );
+}
+
 ThemeData get lightTheme {
   return ThemeData(
     useMaterial3: true,
@@ -281,6 +305,7 @@ ThemeData get lightTheme {
     textTheme: textTheme,
     scaffoldBackgroundColor: backgroundColor,
     appBarTheme: appBarTheme,
+    tabBarTheme: tabTheme,
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: elevatedButtonStyle,
     ),
@@ -296,5 +321,6 @@ ThemeData get lightTheme {
         borderRadius: BorderRadius.circular(10), // Rounded corners
       ),
     ),
+    bottomNavigationBarTheme: bottomNavTheme,
   );
 }

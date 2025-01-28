@@ -342,6 +342,14 @@ class SignInWithEmailScreen extends StatelessWidget {
                       if (appUser == null) return;
                       if (!context.mounted) return;
 
+                      if (appUser.topics == null || (appUser.topics?.isEmpty ?? true)) {
+                        Navigator.of(context).pushNamedAndRemoveUntil(
+                          AppRoutes.welcomeTopics.path,
+                              (_) => false,
+                        );
+                        return;
+                      }
+
                       Navigator.of(context).pushNamedAndRemoveUntil(
                         AppRoutes.home.path,
                         (_) => false,
