@@ -1,9 +1,9 @@
-import 'package:akropolis/constants/constants.dart';
+import 'package:akropolis/features/authentication/models/authentication_models.dart';
+import 'package:akropolis/features/authentication/view_model/authentication_cubit/authentication_cubit.dart';
+import 'package:akropolis/utils/constants.dart';
 import 'package:akropolis/gen/assets.gen.dart';
-import 'package:akropolis/models/models.dart';
+import 'package:akropolis/features/on_boarding/view_model/user_cubit/user_cubit.dart';
 import 'package:akropolis/routes/routes.dart';
-import 'package:akropolis/state/authentication/authentication_cubit.dart';
-import 'package:akropolis/state/user_cubit/user_cubit.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

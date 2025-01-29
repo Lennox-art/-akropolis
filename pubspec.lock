@@ -198,6 +198,15 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.0"
+  common_fn:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: main
+      resolved-ref: "7f1c7dd90925a728a5c6b0aa0a7a576931aa2988"
+      url: "https://bruc3balo:glpat-45CSRAxm48QD31nbADxz@gitlab.com/flutter_starter/common_fn.git"
+    source: git
+    version: "1.0.0"
   convert:
     dependency: transitive
     description:
@@ -238,6 +247,31 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.0"
+  dio:
+    dependency: transitive
+    description:
+      name: dio
+      sha256: "5598aa796bbf4699afd5c67c0f5f6e2ed542afc956884b9cd58c306966efc260"
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.7.0"
+  dio_web_adapter:
+    dependency: transitive
+    description:
+      name: dio_web_adapter
+      sha256: "33259a9276d6cea88774a0000cfae0d861003497755969c92faa223108620dc8"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.0"
+  exception_base:
+    dependency: transitive
+    description:
+      path: "."
+      ref: main
+      resolved-ref: "9ee723354a9d824bc8263a66411ba27ccf6c3f17"
+      url: "https://bruc3balo:glpat-45CSRAxm48QD31nbADxz@gitlab.com/flutter_starter/exception_base.git"
+    source: git
+    version: "1.0.0"
   fake_async:
     dependency: transitive
     description:
@@ -347,6 +381,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.0.0"
+  flutter_staggered_grid_view:
+    dependency: transitive
+    description:
+      name: flutter_staggered_grid_view
+      sha256: "19e7abb550c96fbfeb546b23f3ff356ee7c59a019a651f8f102a4ba9b7349395"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.7.0"
   flutter_svg:
     dependency: "direct main"
     description:
@@ -405,6 +447,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.0.0"
+  get_it:
+    dependency: "direct main"
+    description:
+      name: get_it
+      sha256: f126a3e286b7f5b578bf436d5592968706c4c1de28a228b870ce375d9f743103
+      url: "https://pub.dev"
+    source: hosted
+    version: "8.0.3"
   glob:
     dependency: transitive
     description:
@@ -509,6 +559,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.4.0"
+  infinite_scroll_pagination:
+    dependency: transitive
+    description:
+      name: infinite_scroll_pagination
+      sha256: "4047eb8191e8b33573690922a9e995af64c3949dc87efc844f936b039ea279df"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.1.0"
   io:
     dependency: transitive
     description:
@@ -541,6 +599,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.9.0"
+  jwt_decoder:
+    dependency: transitive
+    description:
+      name: jwt_decoder
+      sha256: "54774aebf83f2923b99e6416b4ea915d47af3bde56884eb622de85feabbc559f"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.1"
   leak_tracker:
     dependency: transitive
     description:
@@ -573,6 +639,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.0.0"
+  logger:
+    dependency: transitive
+    description:
+      name: logger
+      sha256: be4b23575aac7ebf01f225a241eb7f6b5641eeaf43c6a8613510fc2f8cf187d1
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.5.0"
   logging:
     dependency: transitive
     description:
@@ -581,6 +655,15 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.3.0"
+  logging_service:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: main
+      resolved-ref: "39539acf2b8bab9a76414b2040f40b5017546c0f"
+      url: "https://bruc3balo:glpat-45CSRAxm48QD31nbADxz@gitlab.com/flutter_starter/logging_service.git"
+    source: git
+    version: "1.0.0"
   macros:
     dependency: transitive
     description:
@@ -629,6 +712,15 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.0"
+  network_service:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: main
+      resolved-ref: "65b1c515b11f9a3a2107486d3730b47dfe569b43"
+      url: "https://bruc3balo:glpat-45CSRAxm48QD31nbADxz@gitlab.com/flutter_starter/network_service.git"
+    source: git
+    version: "1.0.0"
   package_config:
     dependency: transitive
     description:
@@ -637,6 +729,15 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.1"
+  paged_list_view:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: main
+      resolved-ref: d06b3c7bc42432db76e17177bd200bb5d4da25ae
+      url: "https://bruc3balo:glpat-45CSRAxm48QD31nbADxz@gitlab.com/flutter_starter/paged_list_view.git"
+    source: git
+    version: "0.0.1"
   path:
     dependency: transitive
     description:
@@ -722,6 +823,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  sliver_tools:
+    dependency: transitive
+    description:
+      name: sliver_tools
+      sha256: eae28220badfb9d0559207badcbbc9ad5331aac829a88cb0964d330d2a4636a6
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.2.12"
   source_gen:
     dependency: transitive
     description:
@@ -818,6 +927,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.4.0"
+  universal_io:
+    dependency: transitive
+    description:
+      name: universal_io
+      sha256: "1722b2dcc462b4b2f3ee7d188dad008b6eb4c40bbd03a3de451d82c78bba9aad"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.2.2"
+  uuid:
+    dependency: transitive
+    description:
+      name: uuid
+      sha256: "648e103079f7c64a36dc7d39369cabb358d377078a051d6ae2ad3aa539519313"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.0.7"
   vector_graphics:
     dependency: transitive
     description:

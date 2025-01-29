@@ -1,12 +1,20 @@
+import 'package:akropolis/features/authentication/view_model/authentication_cubit/authentication_cubit.dart';
+import 'package:akropolis/features/on_boarding/view_model/user_cubit/user_cubit.dart';
+import 'package:akropolis/features/world_news_feed/view_models/world_news_cubit/world_news_cubit.dart';
 import 'package:akropolis/routes/routes.dart';
-import 'package:akropolis/state/authentication/authentication_cubit.dart';
-import 'package:akropolis/state/user_cubit/user_cubit.dart';
 import 'package:akropolis/theme/themes.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
+import 'package:logging_service/logging_service.dart';
+import 'package:network_service/network_service.dart';
 
 import 'firebase_options.dart';
+
+final GetIt getIt = GetIt.I;
+final NetworkService ns = getIt<NetworkService>();
+final LoggingService log = getIt<LoggingService>();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,6 +22,12 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  LoggingService log = LoggingServiceImpl(level: Level.debug);
+  getIt.registerSingleton(log);
+
+  NetworkService ns = NetworkServiceImpl(log);
+  getIt.registerSingleton(ns);
 
   runApp(const AkropolisApplication());
 }
@@ -30,6 +44,9 @@ class AkropolisApplication extends StatelessWidget {
         ),
         BlocProvider(
           create: (context) => UserCubit(),
+        ),
+        BlocProvider(
+          create: (context) => WorldNewsCubit(),
         )
       ],
       child: MaterialApp(

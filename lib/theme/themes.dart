@@ -280,6 +280,17 @@ BottomNavigationBarThemeData get bottomNavTheme {
   );
 }
 
+CardTheme get cardTheme {
+  return CardTheme(
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(16.0),
+    ),
+    elevation: 4,
+    margin: const EdgeInsets.all(8.0),
+
+  );
+}
+
 ThemeData get lightTheme {
   return ThemeData(
     useMaterial3: true,
@@ -315,6 +326,7 @@ ThemeData get lightTheme {
     listTileTheme: listTileThemeData,
     inputDecorationTheme: inputDecorationTheme,
     iconTheme: iconThemeData,
+    cardTheme: cardTheme,
     iconButtonTheme: iconButtonThemeData,
     bottomSheetTheme: BottomSheetThemeData(
       shape: RoundedRectangleBorder(

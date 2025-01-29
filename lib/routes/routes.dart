@@ -1,12 +1,13 @@
-import 'package:akropolis/pages/authentication/forgot_password.dart';
-import 'package:akropolis/pages/authentication/login.dart';
-import 'package:akropolis/pages/authentication/new_password.dart';
-import 'package:akropolis/pages/authentication/sign_in.dart';
-import 'package:akropolis/pages/authentication/sign_up.dart';
-import 'package:akropolis/pages/home_page/home_page.dart';
-import 'package:akropolis/pages/on_boarding/select_default_preferences.dart';
-import 'package:akropolis/pages/on_boarding/select_topic.dart';
-import 'package:akropolis/pages/on_boarding/welcome_screen.dart';
+
+import 'package:akropolis/features/authentication/view/forgot_password.dart';
+import 'package:akropolis/features/authentication/view/login.dart';
+import 'package:akropolis/features/authentication/view/new_password.dart';
+import 'package:akropolis/features/authentication/view/sign_in.dart';
+import 'package:akropolis/features/authentication/view/sign_up.dart';
+import 'package:akropolis/pages/home_page.dart';
+import 'package:akropolis/features/on_boarding/presentation/select_default_preferences.dart';
+import 'package:akropolis/features/on_boarding/presentation/select_topic.dart';
+import 'package:akropolis/features/on_boarding/presentation/welcome_screen.dart';
 import 'package:akropolis/pages/splash_screen.dart';
 import 'package:flutter/material.dart';
 
