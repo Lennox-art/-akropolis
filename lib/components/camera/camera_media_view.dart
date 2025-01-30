@@ -1,7 +1,12 @@
+import 'dart:async';
+import 'dart:math';
+
+import 'package:akropolis/components/toast/toast.dart';
 import 'package:akropolis/main.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter/services.dart';
 import 'package:video_player/video_player.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
@@ -22,8 +27,9 @@ class CameraSettings with _$CameraSettings {
     Offset? exposurePoint,
     Offset? focusPoint,
     @Default(true) bool enableAudio,
-    CameraLensDirection? lensDirection,
     @Default(FlashMode.auto) FlashMode flashMode,
+    Duration? recordDuration,
+    @Default(false) bool isRecording,
     XFile? cameraFile,
   }) = DefaultCameraSettings;
 }
@@ -36,35 +42,77 @@ class CameraMediaView extends StatefulWidget {
   State<CameraMediaView> createState() => _CameraMediaViewState();
 }
 
-/// Returns a suitable camera icon for [direction].
-IconData getCameraLensIcon(CameraLensDirection direction) {
-  switch (direction) {
-    case CameraLensDirection.back:
-      return Icons.camera_rear;
-    case CameraLensDirection.front:
-      return Icons.camera_front;
-    case CameraLensDirection.external:
-      return Icons.camera;
-  }
-  // This enum is from a different package, so a new value could be added at
-  // any time. The example should keep working if that happens.
-  // ignore: dead_code
-  return Icons.camera;
-}
-
 class _CameraMediaViewState extends State<CameraMediaView> with WidgetsBindingObserver, TickerProviderStateMixin {
   VideoPlayerController? videoController;
-
-  late final AnimationController _flashModeControlRowAnimationController;
-  late final CurvedAnimation _flashModeControlRowAnimation;
-  late final AnimationController _exposureModeControlRowAnimationController;
-  late final CurvedAnimation _exposureModeControlRowAnimation;
-  late final AnimationController _focusModeControlRowAnimationController;
-  late final CurvedAnimation _focusModeControlRowAnimation;
+  CameraController? cameraController;
+  Timer? recordTimer;
 
   final ValueNotifier<CameraSettings> settingsNotifier = ValueNotifier(
     const DefaultCameraSettings(),
   );
+
+  Future<void> startRecording(CameraController cameraController) async {
+    if (settingsNotifier.value.isRecording) return;
+
+    //Prepare recording
+    await cameraController.prepareForVideoRecording();
+
+    //Prepare stopwatch
+    final Stopwatch stopwatch = Stopwatch();
+
+    //Start video recording
+    await cameraController.startVideoRecording();
+
+    //Start stopwatch
+    stopwatch.start();
+
+    //Every second ...
+    recordTimer = Timer.periodic(
+      const Duration(seconds: 2),
+      (t) async {
+        //If recording, update settings
+        CameraSettings camSettings = settingsNotifier.value;
+        if (camSettings.isRecording) {
+          log.info("Recoding in progress ${stopwatch.elapsed.inMinutes} : ${stopwatch.elapsed.inSeconds}");
+          settingsNotifier.value = camSettings.copyWith(
+            recordDuration: stopwatch.elapsed,
+            isRecording: true,
+          );
+          return;
+        }
+
+      },
+    );
+
+    settingsNotifier.addListener(
+      () async {
+        CameraSettings camSettings = settingsNotifier.value;
+        if(camSettings.isRecording) return;
+
+        log.info("Recoding stopped at ${stopwatch.elapsed.inMinutes} : ${stopwatch.elapsed.inSeconds}");
+
+        //If recording stopped
+        XFile data = await cameraController.stopVideoRecording();
+        settingsNotifier.value = camSettings.copyWith(
+          cameraFile: data,
+          isRecording: false,
+        );
+
+        stopwatch.stop();
+        recordTimer?.cancel();
+        cancelTimer();
+      },
+    );
+
+    log.info("Camera is recording");
+  }
+
+  void cancelTimer() {
+    if (recordTimer?.isActive ?? false) {
+      recordTimer?.cancel();
+      recordTimer = null;
+    }
+  }
 
   Future<void> initializeCameraController({
     required CameraController cameraController,
@@ -72,10 +120,13 @@ class _CameraMediaViewState extends State<CameraMediaView> with WidgetsBindingOb
     try {
       await cameraController.initialize();
 
+      this.cameraController = cameraController;
+
       double minAvailableZoom = await cameraController.getMinZoomLevel();
       double maxAvailableZoom = await cameraController.getMaxZoomLevel();
       double maxExposureOffset = await cameraController.getMaxExposureOffset();
       double minExposureOffset = await cameraController.getMinExposureOffset();
+      cameraController.lockCaptureOrientation(DeviceOrientation.landscapeRight);
 
       settingsNotifier.value = settingsNotifier.value.copyWith(
         minZoom: minAvailableZoom,
@@ -91,66 +142,43 @@ class _CameraMediaViewState extends State<CameraMediaView> with WidgetsBindingOb
   @override
   void initState() {
     super.initState();
-
     WidgetsBinding.instance.addObserver(this);
-
-    _flashModeControlRowAnimationController = AnimationController(
-      duration: const Duration(milliseconds: 300),
-      vsync: this,
-    );
-    _flashModeControlRowAnimation = CurvedAnimation(
-      parent: _flashModeControlRowAnimationController,
-      curve: Curves.easeInCubic,
-    );
-    _exposureModeControlRowAnimationController = AnimationController(
-      duration: const Duration(milliseconds: 300),
-      vsync: this,
-    );
-    _exposureModeControlRowAnimation = CurvedAnimation(
-      parent: _exposureModeControlRowAnimationController,
-      curve: Curves.easeInCubic,
-    );
-    _focusModeControlRowAnimationController = AnimationController(
-      duration: const Duration(milliseconds: 300),
-      vsync: this,
-    );
-    _focusModeControlRowAnimation = CurvedAnimation(
-      parent: _focusModeControlRowAnimationController,
-      curve: Curves.easeInCubic,
-    );
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    _flashModeControlRowAnimationController.dispose();
-    _flashModeControlRowAnimation.dispose();
-    _exposureModeControlRowAnimationController.dispose();
-    _exposureModeControlRowAnimation.dispose();
-    _focusModeControlRowAnimationController.dispose();
-    _focusModeControlRowAnimation.dispose();
+    cameraController?.dispose();
     super.dispose();
   }
 
-  /*
-  TODO:// Handle
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     log.info("Camera lifecycle changed to $state");
 
-    final CameraController? cameraController = cController;
+    final CameraController? cameraController = this.cameraController;
 
     // App state changed before we got the chance to initialize.
     if (cameraController == null || !cameraController.value.isInitialized) {
       return;
     }
 
-    if (state == AppLifecycleState.inactive) {
-      cameraController.dispose();
-    } else if (state == AppLifecycleState.resumed) {
-      _initializeCameraController(cameraController.description);
+    switch (state) {
+      case AppLifecycleState.detached:
+        cameraController.dispose();
+        break;
+      case AppLifecycleState.resumed:
+        cameraController.resumeVideoRecording();
+        break;
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.hidden:
+        cameraController.stopVideoRecording();
+        break;
+      case AppLifecycleState.paused:
+        cameraController.pauseVideoRecording();
+        break;
     }
-  }*/
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -175,7 +203,10 @@ class _CameraMediaViewState extends State<CameraMediaView> with WidgetsBindingOb
 
           if (camerasSnap.hasError) {
             SchedulerBinding.instance.addPostFrameCallback((_) async {
-              showInSnackBar(camerasSnap.error.toString());
+              ToastError(
+                title: "Cameras",
+                message: camerasSnap.error.toString(),
+              ).show();
             });
           }
 
@@ -183,7 +214,10 @@ class _CameraMediaViewState extends State<CameraMediaView> with WidgetsBindingOb
 
           if (cameras.isEmpty) {
             SchedulerBinding.instance.addPostFrameCallback((_) async {
-              showInSnackBar('No camera found.');
+              ToastInfo(
+                title: "No camera found",
+                message: camerasSnap.error.toString(),
+              ).show();
             });
             return const Text('None');
           }
@@ -197,8 +231,8 @@ class _CameraMediaViewState extends State<CameraMediaView> with WidgetsBindingOb
             builder: (_, camera, __) {
               final CameraController cameraController = CameraController(
                 camera,
-                ResolutionPreset.medium,
-                enableAudio: true,
+                ResolutionPreset.max,
+                enableAudio: settingsNotifier.value.enableAudio,
                 imageFormatGroup: ImageFormatGroup.jpeg,
               );
 
@@ -213,7 +247,10 @@ class _CameraMediaViewState extends State<CameraMediaView> with WidgetsBindingOb
 
                   if (ccSnap.hasError) {
                     SchedulerBinding.instance.addPostFrameCallback((_) async {
-                      showInSnackBar(ccSnap.error.toString());
+                      ToastError(
+                        title: "Initialization",
+                        message: ccSnap.error.toString(),
+                      ).show();
                     });
                   }
 
@@ -306,14 +343,18 @@ class _CameraMediaViewState extends State<CameraMediaView> with WidgetsBindingOb
                             child: Align(
                               alignment: Alignment.bottomCenter,
                               child: GestureDetector(
-                                onTap: () => onTakePictureButtonPressed(cameraController),
-                                child: const CircleAvatar(
-                                  radius: 45,
-                                  backgroundColor: Colors.white12,
-                                  child: CircleAvatar(
-                                    radius: 40,
-                                    backgroundColor: Colors.red,
-                                  ),
+                                onTap: () async {
+                                  if (!settingsNotifier.value.isRecording) {
+                                    startRecording(cameraController);
+                                    return;
+                                  }
+
+                                  settingsNotifier.value = camSettings.copyWith(
+                                    isRecording: false,
+                                  );
+                                },
+                                child: ShutterButton(
+                                  duration: camSettings.isRecording ? camSettings.recordDuration : null,
                                 ),
                               ),
                             ),
@@ -330,21 +371,79 @@ class _CameraMediaViewState extends State<CameraMediaView> with WidgetsBindingOb
                                 ),
                                 child: ListView(
                                   shrinkWrap: true,
-                                  physics: ClampingScrollPhysics(),
+                                  physics: const ClampingScrollPhysics(),
                                   children: [
-                                    IconButton(
-                                      onPressed: () {},
-                                      icon: const Icon(Icons.flip_camera_ios_outlined),
-                                    ), IconButton(
-                                      onPressed: () {},
-                                      icon: const Icon(Icons.flash_auto),
-                                    ), IconButton(
-                                      onPressed: () {},
-                                      icon: Icon(Icons.camera),
-                                    ), IconButton(
-                                      onPressed: () {},
-                                      icon: Icon(Icons.camera),
-                                    ),
+                                    switch (camera.lensDirection) {
+                                      CameraLensDirection.front => IconButton(
+                                          onPressed: () {
+                                            CameraDescription? backCamera =
+                                                cameras.where((c) => c.lensDirection == CameraLensDirection.back).firstOrNull;
+
+                                            if (backCamera == null) {
+                                              const ToastInfo(
+                                                title: "Camera flip",
+                                                message: "No rear camera",
+                                              ).show();
+                                              return;
+                                            }
+
+                                            cameraNotifier.value = backCamera;
+                                          },
+                                          icon: const Icon(Icons.camera_rear_outlined),
+                                        ),
+                                      CameraLensDirection.back => IconButton(
+                                          onPressed: () {
+                                            CameraDescription? frontCamera =
+                                                cameras.where((c) => c.lensDirection == CameraLensDirection.front).firstOrNull;
+
+                                            if (frontCamera == null) {
+                                              const ToastInfo(
+                                                title: "Camera flip",
+                                                message: "No front camera",
+                                              ).show();
+                                              return;
+                                            }
+
+                                            cameraNotifier.value = frontCamera;
+                                          },
+                                          icon: const Icon(Icons.camera_front_outlined),
+                                        ),
+                                      _ => const SizedBox.shrink(),
+                                    },
+                                    switch (camSettings.flashMode) {
+                                      FlashMode.off => IconButton(
+                                          onPressed: () {
+                                            settingsNotifier.value = camSettings.copyWith(
+                                              flashMode: FlashMode.auto,
+                                            );
+                                          },
+                                          icon: const Icon(Icons.flash_auto_outlined),
+                                        ),
+                                      FlashMode.auto => IconButton(
+                                          onPressed: () {
+                                            settingsNotifier.value = camSettings.copyWith(
+                                              flashMode: FlashMode.always,
+                                            );
+                                          },
+                                          icon: const Icon(Icons.flash_on_outlined),
+                                        ),
+                                      FlashMode.always => IconButton(
+                                          onPressed: () {
+                                            settingsNotifier.value = camSettings.copyWith(
+                                              flashMode: FlashMode.torch,
+                                            );
+                                          },
+                                          icon: const Icon(Icons.flashlight_on_outlined),
+                                        ),
+                                      FlashMode.torch => IconButton(
+                                          onPressed: () {
+                                            settingsNotifier.value = camSettings.copyWith(
+                                              flashMode: FlashMode.auto,
+                                            );
+                                          },
+                                          icon: const Icon(Icons.flash_off_outlined),
+                                        ),
+                                    },
                                   ],
                                 ),
                               ),
@@ -363,11 +462,7 @@ class _CameraMediaViewState extends State<CameraMediaView> with WidgetsBindingOb
     );
   }
 
-  String timestamp() => DateTime.now().millisecondsSinceEpoch.toString();
-
-  void showInSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
-  }
+  String get timestamp => DateTime.now().millisecondsSinceEpoch.toString();
 
   Future<void> onTakePictureButtonPressed(CameraController cameraController) async {
     XFile? pic = await takePicture(cameraController);
@@ -378,48 +473,20 @@ class _CameraMediaViewState extends State<CameraMediaView> with WidgetsBindingOb
     videoController = null;
   }
 
-  void onFlashModeButtonPressed() {
-    if (_flashModeControlRowAnimationController.value == 1) {
-      _flashModeControlRowAnimationController.reverse();
-    } else {
-      _flashModeControlRowAnimationController.forward();
-      _exposureModeControlRowAnimationController.reverse();
-      _focusModeControlRowAnimationController.reverse();
-    }
-  }
-
-  void onExposureModeButtonPressed() {
-    if (_exposureModeControlRowAnimationController.value == 1) {
-      _exposureModeControlRowAnimationController.reverse();
-    } else {
-      _exposureModeControlRowAnimationController.forward();
-      _flashModeControlRowAnimationController.reverse();
-      _focusModeControlRowAnimationController.reverse();
-    }
-  }
-
-  void onFocusModeButtonPressed() {
-    if (_focusModeControlRowAnimationController.value == 1) {
-      _focusModeControlRowAnimationController.reverse();
-    } else {
-      _focusModeControlRowAnimationController.forward();
-      _flashModeControlRowAnimationController.reverse();
-      _exposureModeControlRowAnimationController.reverse();
-    }
-  }
-
-  void toggleAudio() => settingsNotifier.value = settingsNotifier.value.copyWith(
-        enableAudio: !settingsNotifier.value.enableAudio,
-      );
-
   Future<void> onCaptureOrientationLockButtonPressed(CameraController cameraController) async {
     try {
       if (cameraController.value.isCaptureOrientationLocked) {
         await cameraController.unlockCaptureOrientation();
-        showInSnackBar('Capture orientation unlocked');
+        const ToastInfo(
+          title: "Capture orientation",
+          message: 'Capture orientation unlocked',
+        ).show();
       } else {
         await cameraController.lockCaptureOrientation();
-        showInSnackBar('Capture orientation locked to ${cameraController.value.lockedCaptureOrientation.toString().split('.').last}');
+        ToastInfo(
+          title: "Capture orientation",
+          message: 'Capture orientation locked to ${cameraController.value.lockedCaptureOrientation.toString().split('.').last}',
+        ).show();
       }
     } on CameraException catch (e) {
       _showCameraException(e);
@@ -452,6 +519,77 @@ class _CameraMediaViewState extends State<CameraMediaView> with WidgetsBindingOb
       'AudioAccessRestricted' => 'Audio access is restricted.',
       _ => 'Error: ${e.code}\n${e.description}'
     };
-    showInSnackBar(message);
+    ToastError(
+      title: e.code,
+      message: message,
+    ).show();
+  }
+}
+
+class MakeCircle extends CustomPainter {
+  final double strokeWidth;
+  final StrokeCap strokeCap;
+
+  MakeCircle({this.strokeCap = StrokeCap.square, this.strokeWidth = 10.0});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.blue
+      ..strokeCap = StrokeCap.round
+      ..strokeWidth = strokeWidth
+      ..style = PaintingStyle.stroke; //important set stroke style
+
+    final path = Path()
+      ..moveTo(strokeWidth, strokeWidth)
+      ..arcToPoint(Offset(size.width - strokeWidth, size.height - strokeWidth), radius: Radius.circular(max(size.width, size.height)));
+
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => false;
+}
+
+class ShutterButton extends StatelessWidget {
+  const ShutterButton({this.duration, super.key});
+
+  final Duration? duration;
+
+  @override
+  Widget build(BuildContext context) {
+    return Visibility(
+      visible: duration != null,
+      replacement: const Stack(
+        alignment: Alignment.center,
+        children: [
+          Icon(
+            Icons.circle_outlined,
+            color: Colors.white70,
+            size: 100,
+          ),
+          Icon(
+            Icons.circle_outlined,
+            color: Colors.red,
+            size: 70,
+          ),
+        ],
+      ),
+      child: const Stack(
+        alignment: Alignment.center,
+        children: [
+          Icon(
+            Icons.circle_outlined,
+            color: Colors.white70,
+            size: 100,
+          ),
+          Icon(
+            Icons.cancel,
+            color: Colors.black,
+            size: 70,
+          ),
+        ],
+      ),
+    );
   }
 }

@@ -24,7 +24,7 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  LoggingService log = LoggingServiceImpl(level: Level.debug);
+  LoggingService log = LoggingServiceImpl(level: Level.info);
   getIt.registerSingleton(log);
 
   NetworkService ns = NetworkServiceImpl(log);

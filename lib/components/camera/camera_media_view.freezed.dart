@@ -28,8 +28,9 @@ mixin _$CameraSettings {
   Offset? get exposurePoint => throw _privateConstructorUsedError;
   Offset? get focusPoint => throw _privateConstructorUsedError;
   bool get enableAudio => throw _privateConstructorUsedError;
-  CameraLensDirection? get lensDirection => throw _privateConstructorUsedError;
   FlashMode get flashMode => throw _privateConstructorUsedError;
+  Duration? get recordDuration => throw _privateConstructorUsedError;
+  bool get isRecording => throw _privateConstructorUsedError;
   XFile? get cameraFile => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
@@ -46,8 +47,9 @@ mixin _$CameraSettings {
             Offset? exposurePoint,
             Offset? focusPoint,
             bool enableAudio,
-            CameraLensDirection? lensDirection,
             FlashMode flashMode,
+            Duration? recordDuration,
+            bool isRecording,
             XFile? cameraFile)
         create,
   }) =>
@@ -67,8 +69,9 @@ mixin _$CameraSettings {
             Offset? exposurePoint,
             Offset? focusPoint,
             bool enableAudio,
-            CameraLensDirection? lensDirection,
             FlashMode flashMode,
+            Duration? recordDuration,
+            bool isRecording,
             XFile? cameraFile)?
         create,
   }) =>
@@ -88,8 +91,9 @@ mixin _$CameraSettings {
             Offset? exposurePoint,
             Offset? focusPoint,
             bool enableAudio,
-            CameraLensDirection? lensDirection,
             FlashMode flashMode,
+            Duration? recordDuration,
+            bool isRecording,
             XFile? cameraFile)?
         create,
     required TResult orElse(),
@@ -138,8 +142,9 @@ abstract class $CameraSettingsCopyWith<$Res> {
       Offset? exposurePoint,
       Offset? focusPoint,
       bool enableAudio,
-      CameraLensDirection? lensDirection,
       FlashMode flashMode,
+      Duration? recordDuration,
+      bool isRecording,
       XFile? cameraFile});
 }
 
@@ -170,8 +175,9 @@ class _$CameraSettingsCopyWithImpl<$Res, $Val extends CameraSettings>
     Object? exposurePoint = freezed,
     Object? focusPoint = freezed,
     Object? enableAudio = null,
-    Object? lensDirection = freezed,
     Object? flashMode = null,
+    Object? recordDuration = freezed,
+    Object? isRecording = null,
     Object? cameraFile = freezed,
   }) {
     return _then(_value.copyWith(
@@ -223,14 +229,18 @@ class _$CameraSettingsCopyWithImpl<$Res, $Val extends CameraSettings>
           ? _value.enableAudio
           : enableAudio // ignore: cast_nullable_to_non_nullable
               as bool,
-      lensDirection: freezed == lensDirection
-          ? _value.lensDirection
-          : lensDirection // ignore: cast_nullable_to_non_nullable
-              as CameraLensDirection?,
       flashMode: null == flashMode
           ? _value.flashMode
           : flashMode // ignore: cast_nullable_to_non_nullable
               as FlashMode,
+      recordDuration: freezed == recordDuration
+          ? _value.recordDuration
+          : recordDuration // ignore: cast_nullable_to_non_nullable
+              as Duration?,
+      isRecording: null == isRecording
+          ? _value.isRecording
+          : isRecording // ignore: cast_nullable_to_non_nullable
+              as bool,
       cameraFile: freezed == cameraFile
           ? _value.cameraFile
           : cameraFile // ignore: cast_nullable_to_non_nullable
@@ -261,8 +271,9 @@ abstract class _$$DefaultCameraSettingsImplCopyWith<$Res>
       Offset? exposurePoint,
       Offset? focusPoint,
       bool enableAudio,
-      CameraLensDirection? lensDirection,
       FlashMode flashMode,
+      Duration? recordDuration,
+      bool isRecording,
       XFile? cameraFile});
 }
 
@@ -291,8 +302,9 @@ class __$$DefaultCameraSettingsImplCopyWithImpl<$Res>
     Object? exposurePoint = freezed,
     Object? focusPoint = freezed,
     Object? enableAudio = null,
-    Object? lensDirection = freezed,
     Object? flashMode = null,
+    Object? recordDuration = freezed,
+    Object? isRecording = null,
     Object? cameraFile = freezed,
   }) {
     return _then(_$DefaultCameraSettingsImpl(
@@ -344,14 +356,18 @@ class __$$DefaultCameraSettingsImplCopyWithImpl<$Res>
           ? _value.enableAudio
           : enableAudio // ignore: cast_nullable_to_non_nullable
               as bool,
-      lensDirection: freezed == lensDirection
-          ? _value.lensDirection
-          : lensDirection // ignore: cast_nullable_to_non_nullable
-              as CameraLensDirection?,
       flashMode: null == flashMode
           ? _value.flashMode
           : flashMode // ignore: cast_nullable_to_non_nullable
               as FlashMode,
+      recordDuration: freezed == recordDuration
+          ? _value.recordDuration
+          : recordDuration // ignore: cast_nullable_to_non_nullable
+              as Duration?,
+      isRecording: null == isRecording
+          ? _value.isRecording
+          : isRecording // ignore: cast_nullable_to_non_nullable
+              as bool,
       cameraFile: freezed == cameraFile
           ? _value.cameraFile
           : cameraFile // ignore: cast_nullable_to_non_nullable
@@ -376,8 +392,9 @@ class _$DefaultCameraSettingsImpl implements DefaultCameraSettings {
       this.exposurePoint,
       this.focusPoint,
       this.enableAudio = true,
-      this.lensDirection,
       this.flashMode = FlashMode.auto,
+      this.recordDuration,
+      this.isRecording = false,
       this.cameraFile});
 
   @override
@@ -415,16 +432,19 @@ class _$DefaultCameraSettingsImpl implements DefaultCameraSettings {
   @JsonKey()
   final bool enableAudio;
   @override
-  final CameraLensDirection? lensDirection;
-  @override
   @JsonKey()
   final FlashMode flashMode;
+  @override
+  final Duration? recordDuration;
+  @override
+  @JsonKey()
+  final bool isRecording;
   @override
   final XFile? cameraFile;
 
   @override
   String toString() {
-    return 'CameraSettings.create(minExposureOffset: $minExposureOffset, maxExposureOffset: $maxExposureOffset, currentExposureOffset: $currentExposureOffset, minZoom: $minZoom, maxZoom: $maxZoom, currentZoom: $currentZoom, baseScale: $baseScale, currentScale: $currentScale, pointersOnScreen: $pointersOnScreen, exposurePoint: $exposurePoint, focusPoint: $focusPoint, enableAudio: $enableAudio, lensDirection: $lensDirection, flashMode: $flashMode, cameraFile: $cameraFile)';
+    return 'CameraSettings.create(minExposureOffset: $minExposureOffset, maxExposureOffset: $maxExposureOffset, currentExposureOffset: $currentExposureOffset, minZoom: $minZoom, maxZoom: $maxZoom, currentZoom: $currentZoom, baseScale: $baseScale, currentScale: $currentScale, pointersOnScreen: $pointersOnScreen, exposurePoint: $exposurePoint, focusPoint: $focusPoint, enableAudio: $enableAudio, flashMode: $flashMode, recordDuration: $recordDuration, isRecording: $isRecording, cameraFile: $cameraFile)';
   }
 
   @override
@@ -454,10 +474,12 @@ class _$DefaultCameraSettingsImpl implements DefaultCameraSettings {
                 other.focusPoint == focusPoint) &&
             (identical(other.enableAudio, enableAudio) ||
                 other.enableAudio == enableAudio) &&
-            (identical(other.lensDirection, lensDirection) ||
-                other.lensDirection == lensDirection) &&
             (identical(other.flashMode, flashMode) ||
                 other.flashMode == flashMode) &&
+            (identical(other.recordDuration, recordDuration) ||
+                other.recordDuration == recordDuration) &&
+            (identical(other.isRecording, isRecording) ||
+                other.isRecording == isRecording) &&
             (identical(other.cameraFile, cameraFile) ||
                 other.cameraFile == cameraFile));
   }
@@ -477,8 +499,9 @@ class _$DefaultCameraSettingsImpl implements DefaultCameraSettings {
       exposurePoint,
       focusPoint,
       enableAudio,
-      lensDirection,
       flashMode,
+      recordDuration,
+      isRecording,
       cameraFile);
 
   /// Create a copy of CameraSettings
@@ -506,8 +529,9 @@ class _$DefaultCameraSettingsImpl implements DefaultCameraSettings {
             Offset? exposurePoint,
             Offset? focusPoint,
             bool enableAudio,
-            CameraLensDirection? lensDirection,
             FlashMode flashMode,
+            Duration? recordDuration,
+            bool isRecording,
             XFile? cameraFile)
         create,
   }) {
@@ -524,8 +548,9 @@ class _$DefaultCameraSettingsImpl implements DefaultCameraSettings {
         exposurePoint,
         focusPoint,
         enableAudio,
-        lensDirection,
         flashMode,
+        recordDuration,
+        isRecording,
         cameraFile);
   }
 
@@ -545,8 +570,9 @@ class _$DefaultCameraSettingsImpl implements DefaultCameraSettings {
             Offset? exposurePoint,
             Offset? focusPoint,
             bool enableAudio,
-            CameraLensDirection? lensDirection,
             FlashMode flashMode,
+            Duration? recordDuration,
+            bool isRecording,
             XFile? cameraFile)?
         create,
   }) {
@@ -563,8 +589,9 @@ class _$DefaultCameraSettingsImpl implements DefaultCameraSettings {
         exposurePoint,
         focusPoint,
         enableAudio,
-        lensDirection,
         flashMode,
+        recordDuration,
+        isRecording,
         cameraFile);
   }
 
@@ -584,8 +611,9 @@ class _$DefaultCameraSettingsImpl implements DefaultCameraSettings {
             Offset? exposurePoint,
             Offset? focusPoint,
             bool enableAudio,
-            CameraLensDirection? lensDirection,
             FlashMode flashMode,
+            Duration? recordDuration,
+            bool isRecording,
             XFile? cameraFile)?
         create,
     required TResult orElse(),
@@ -604,8 +632,9 @@ class _$DefaultCameraSettingsImpl implements DefaultCameraSettings {
           exposurePoint,
           focusPoint,
           enableAudio,
-          lensDirection,
           flashMode,
+          recordDuration,
+          isRecording,
           cameraFile);
     }
     return orElse();
@@ -654,8 +683,9 @@ abstract class DefaultCameraSettings implements CameraSettings {
       final Offset? exposurePoint,
       final Offset? focusPoint,
       final bool enableAudio,
-      final CameraLensDirection? lensDirection,
       final FlashMode flashMode,
+      final Duration? recordDuration,
+      final bool isRecording,
       final XFile? cameraFile}) = _$DefaultCameraSettingsImpl;
 
   @override
@@ -683,9 +713,11 @@ abstract class DefaultCameraSettings implements CameraSettings {
   @override
   bool get enableAudio;
   @override
-  CameraLensDirection? get lensDirection;
-  @override
   FlashMode get flashMode;
+  @override
+  Duration? get recordDuration;
+  @override
+  bool get isRecording;
   @override
   XFile? get cameraFile;
 
