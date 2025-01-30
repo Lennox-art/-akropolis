@@ -1,4 +1,5 @@
 import 'package:akropolis/features/authentication/view_model/authentication_cubit/authentication_cubit.dart';
+import 'package:akropolis/features/for_you_feed/view_models/for_you_news_cubit/for_you_news_cubit.dart';
 import 'package:akropolis/features/on_boarding/view_model/user_cubit/user_cubit.dart';
 import 'package:akropolis/features/world_news_feed/view_models/world_news_cubit/world_news_cubit.dart';
 import 'package:akropolis/routes/routes.dart';
@@ -47,7 +48,10 @@ class AkropolisApplication extends StatelessWidget {
         ),
         BlocProvider(
           create: (context) => WorldNewsCubit(),
-        )
+        ),
+        BlocProvider(
+          create: (context) => ForYouNewsCubit(),
+        ),
       ],
       child: MaterialApp(
         theme: lightTheme,

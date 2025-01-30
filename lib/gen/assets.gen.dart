@@ -20,6 +20,7 @@ class Assets {
   static const AssetGenImage connectionPeople =
       AssetGenImage('assets/connection_people.png');
   static const SvgGenImage google = SvgGenImage('assets/google.svg');
+  static const SvgGenImage home = SvgGenImage('assets/home.svg');
   static const AssetGenImage signInBg = AssetGenImage('assets/sign_in_bg.png');
   static const SvgGenImage splashScreen =
       SvgGenImage('assets/splash_screen.svg');
@@ -31,6 +32,7 @@ class Assets {
         background,
         connectionPeople,
         google,
+        home,
         signInBg,
         splashScreen,
         splashScreenBg

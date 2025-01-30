@@ -7,7 +7,7 @@ part 'world_news_models.g.dart';
 class NewsApiResponse {
   final String status;
   final int totalResults;
-  final List<WorldNewsModel> articles;
+  final List<NewsApiArticleModel> articles;
 
   NewsApiResponse({
     required this.status,
@@ -22,9 +22,9 @@ class NewsApiResponse {
 }
 
 @JsonSerializable()
-class WorldNewsModel {
+class NewsApiArticleModel {
   final NewsSource source;
-  final String author;
+  final String? author;
   final String title;
   final String description;
   final String url;
@@ -32,7 +32,7 @@ class WorldNewsModel {
   final DateTime publishedAt;
   final String content;
 
-  WorldNewsModel({
+  NewsApiArticleModel({
     required this.source,
     required this.author,
     required this.title,
@@ -46,15 +46,15 @@ class WorldNewsModel {
 
   NewsSourceEnum? get sourceEnum => NewsSourceEnum.sourceMap[source.id];
 
-  factory WorldNewsModel.fromJson(Map<String, dynamic> json) =>
-      _$WorldNewsModelFromJson(json);
+  factory NewsApiArticleModel.fromJson(Map<String, dynamic> json) =>
+      _$NewsApiArticleModelFromJson(json);
 
-  Map<String, dynamic> toJson() => _$WorldNewsModelToJson(this);
+  Map<String, dynamic> toJson() => _$NewsApiArticleModelToJson(this);
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          other is WorldNewsModel &&
+          other is NewsApiArticleModel &&
               runtimeType == other.runtimeType &&
               source == other.source &&
               author == other.author &&
@@ -71,6 +71,19 @@ class WorldNewsModel {
       author.hashCode ^
       title.hashCode ^
       publishedAt.hashCode;
+
+  @override
+  String toString() => """
+  
+  source => $source,
+  sourceEnum => $sourceEnum
+  author => $author,
+  title => $title,
+  description => $description,
+  url => $url,
+  urlToImage => $urlToImage,
+  publishedAt => $publishedAt
+  """;
 }
 
 @JsonSerializable()

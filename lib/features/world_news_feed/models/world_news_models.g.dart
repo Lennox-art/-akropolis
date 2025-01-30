@@ -11,7 +11,7 @@ NewsApiResponse _$NewsApiResponseFromJson(Map<String, dynamic> json) =>
       status: json['status'] as String,
       totalResults: (json['totalResults'] as num).toInt(),
       articles: (json['articles'] as List<dynamic>)
-          .map((e) => WorldNewsModel.fromJson(e as Map<String, dynamic>))
+          .map((e) => NewsApiArticleModel.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
 
@@ -22,10 +22,10 @@ Map<String, dynamic> _$NewsApiResponseToJson(NewsApiResponse instance) =>
       'articles': instance.articles,
     };
 
-WorldNewsModel _$WorldNewsModelFromJson(Map<String, dynamic> json) =>
-    WorldNewsModel(
+NewsApiArticleModel _$NewsApiArticleModelFromJson(Map<String, dynamic> json) =>
+    NewsApiArticleModel(
       source: NewsSource.fromJson(json['source'] as Map<String, dynamic>),
-      author: json['author'] as String,
+      author: json['author'] as String?,
       title: json['title'] as String,
       description: json['description'] as String,
       url: json['url'] as String,
@@ -34,7 +34,8 @@ WorldNewsModel _$WorldNewsModelFromJson(Map<String, dynamic> json) =>
       content: json['content'] as String,
     );
 
-Map<String, dynamic> _$WorldNewsModelToJson(WorldNewsModel instance) =>
+Map<String, dynamic> _$NewsApiArticleModelToJson(
+        NewsApiArticleModel instance) =>
     <String, dynamic>{
       'source': instance.source,
       'author': instance.author,

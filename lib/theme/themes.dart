@@ -287,7 +287,6 @@ CardTheme get cardTheme {
     ),
     elevation: 4,
     margin: const EdgeInsets.all(8.0),
-
   );
 }
 

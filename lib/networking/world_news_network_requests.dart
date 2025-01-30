@@ -8,7 +8,7 @@ const NetworkConnection newsApiConnection = NetworkConnection(
   scheme: NetworkScheme.https,
 );
 
-Future<NetworkResponse<Map<String, dynamic>>> getEverythingNewsApi({
+Future<NetworkResponse<Map<String, dynamic>>> sendGetEverythingNewsApi({
   int page = 1,
   int pageSize = 100,
   String? language,

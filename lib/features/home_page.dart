@@ -126,16 +126,25 @@ class HomePage extends StatelessWidget {
         valueListenable: bottomValue,
         builder: (_, value, __) => BottomNavigationBar(
           currentIndex: value.index,
-          onTap: (i) => bottomValue.value = bottomTabs[i],
-          items: bottomTabs
-              .map(
+          onTap: (i) {
+            switch (bottomTabs[i]) {
+              case BottomNavigationTabs.post:
+                Navigator.of(context).pushNamed(
+                  AppRoutes.createPost.path,
+                );
+                break;
+              default:
+                bottomValue.value = bottomTabs[i];
+                break;
+            }
+          },
+          items: bottomTabs.map(
                 (e) => BottomNavigationBarItem(
                   label: e.title,
                   icon: Icon(e.icon),
                   tooltip: e.title,
                 ),
-              )
-              .toList(),
+              ).toList(),
         ),
       ),
     );

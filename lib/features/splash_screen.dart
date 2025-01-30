@@ -71,6 +71,7 @@ class _SplashScreenState extends State<SplashScreen> {
           Assets.splashScreenBg.image(
             height: double.infinity,
             width: double.infinity,
+            fit: BoxFit.fill,
           ),
           Align(
             alignment: Alignment.center,
