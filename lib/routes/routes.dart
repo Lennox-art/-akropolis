@@ -1,9 +1,9 @@
-import 'package:akropolis/components/camera/camera_media_view.dart';
 import 'package:akropolis/features/authentication/view/forgot_password.dart';
 import 'package:akropolis/features/authentication/view/login.dart';
 import 'package:akropolis/features/authentication/view/new_password.dart';
 import 'package:akropolis/features/authentication/view/sign_in.dart';
 import 'package:akropolis/features/authentication/view/sign_up.dart';
+import 'package:akropolis/features/camera_view/view/camera_view.dart';
 import 'package:akropolis/features/create_post/views/create_post_page.dart';
 import 'package:akropolis/features/create_post/views/edit_video_post_page.dart';
 import 'package:akropolis/features/home_page.dart';
@@ -28,7 +28,7 @@ enum AppRoutes {
   home("/home"),
   createPost("/CreatePostPage"),
   editVideoPostPage("/editVideoPostPage"),
-  cameraMediaViewPage("/editVideoPostPage");
+  cameraViewPage("/cameraViewPage");
 
   final String path;
 
@@ -49,6 +49,6 @@ enum AppRoutes {
     AppRoutes.home => const HomePage(),
     AppRoutes.createPost => const CreatePostPage(),
     AppRoutes.editVideoPostPage => const EditVideoPostPage(),
-    AppRoutes.cameraMediaViewPage => const CameraMediaView(),
+    AppRoutes.cameraViewPage => const CameraMediaView(),
   };
 }

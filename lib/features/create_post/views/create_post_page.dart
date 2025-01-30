@@ -49,7 +49,7 @@ class CreatePostPage extends StatelessWidget {
                     child: GestureDetector(
                       onTap: () {
                         Navigator.of(context).pushNamed(
-                          AppRoutes.cameraMediaViewPage.path,
+                          AppRoutes.cameraViewPage.path,
                         );
                       },
                       child: const Card(
