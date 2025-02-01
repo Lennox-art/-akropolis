@@ -1,6 +1,7 @@
-import 'dart:typed_data';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:video_player/video_player.dart';
 
 enum EditVideoPostSteps { videoEditing, postDescription }
 
@@ -9,8 +10,7 @@ class EditVideoPostPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Uint8List? videoData =
-        ModalRoute.of(context)?.settings.arguments as Uint8List?;
+    File? videoData = ModalRoute.of(context)?.settings.arguments as File?;
 
     if (videoData == null) {
       return Scaffold(
@@ -37,18 +37,17 @@ class EditVideoPostPage extends StatelessWidget {
               Expanded(
                 child: switch (step) {
                   EditVideoPostSteps.videoEditing => VideoEditingWidget(
-                      videoData: videoData,
+                      data: videoData,
                     ),
                   EditVideoPostSteps.postDescription => PostDescriptionWidget(
-                      videoData: videoData,
+                      data: videoData,
                     ),
                 },
               ),
               ListTile(
                 trailing: TextButton(
                   onPressed: () {
-                    switch(step) {
-
+                    switch (step) {
                       case EditVideoPostSteps.videoEditing:
                         stepNotifier.value = EditVideoPostSteps.postDescription;
                         break;
@@ -69,9 +68,9 @@ class EditVideoPostPage extends StatelessWidget {
 }
 
 class PostDescriptionWidget extends StatelessWidget {
-  const PostDescriptionWidget({required this.videoData, super.key});
+  const PostDescriptionWidget({required this.data, super.key});
 
-  final Uint8List videoData;
+  final File data;
 
   @override
   Widget build(BuildContext context) {
@@ -79,13 +78,82 @@ class PostDescriptionWidget extends StatelessWidget {
   }
 }
 
-class VideoEditingWidget extends StatelessWidget {
-  const VideoEditingWidget({required this.videoData, super.key});
+enum VideoEditingTools {
+  trimVideo("Trim", Icons.cut_outlined),
+  thumbnailPicker("Thumbnail", Icons.pages_outlined);
 
-  final Uint8List videoData;
+  const VideoEditingTools(this.title, this.iconData);
+
+  final String title;
+  final IconData iconData;
+}
+
+class VideoEditingWidget extends StatelessWidget {
+  const VideoEditingWidget({required this.data, super.key});
+
+  final File data;
 
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    final ValueNotifier<VideoEditingTools> currentToolNotifier = ValueNotifier(
+      VideoEditingTools.trimVideo,
+    );
+
+    return Scaffold(
+      appBar: AppBar(
+        title: null,
+      ),
+      body: Flex(
+        direction: Axis.vertical,
+        children: [
+          Expanded(
+            child: ValueListenableBuilder(
+              valueListenable: currentToolNotifier,
+              builder: (_, tool, __) {
+                return switch (tool) {
+                  VideoEditingTools.trimVideo => TrimVideoWidget(data: data),
+                  VideoEditingTools.thumbnailPicker => Container(),
+                };
+              },
+            ),
+          ),
+          SizedBox(
+            height: 80,
+            child: Row(
+              children: VideoEditingTools.values
+                  .map(
+                    (t) => IconButton(
+                      onPressed: () {
+                        currentToolNotifier.value = t;
+                      },
+                      icon: Icon(t.iconData),
+                    ),
+                  )
+                  .toList(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class TrimVideoWidget extends StatelessWidget {
+  const TrimVideoWidget({required this.data, super.key});
+
+  final File data;
+
+  @override
+  Widget build(BuildContext context) {
+    final VideoPlayerController controller = VideoPlayerController.file(data);
+    controller.initialize().then((_) => controller.play());
+
+
+    return AspectRatio(
+      aspectRatio: controller.value.aspectRatio,
+      child: VideoPlayer(
+        controller,
+      ),
+    );
   }
 }

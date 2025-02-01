@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:akropolis/gen/assets.gen.dart';
 import 'package:akropolis/routes/routes.dart';
 import 'package:flutter/material.dart';
@@ -47,10 +49,19 @@ class CreatePostPage extends StatelessWidget {
                     height: 150,
                     width: 150,
                     child: GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).pushNamed(
+                      onTap: () async {
+
+                        dynamic videoData = await Navigator.of(context).pushNamed(
                           AppRoutes.cameraViewPage.path,
                         );
+
+                        if (videoData == null || !context.mounted) return;
+
+                        Navigator.of(context).pushNamed(
+                          AppRoutes.videoEditingPage.path,
+                          arguments: videoData,
+                        );
+
                       },
                       child: const Card(
                         child: Padding(

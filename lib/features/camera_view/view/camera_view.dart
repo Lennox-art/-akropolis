@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:akropolis/components/toast/toast.dart';
@@ -9,6 +10,7 @@ import 'package:akropolis/utils/functions.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:path_provider/path_provider.dart';
 
 /// Camera example home widget.
 class CameraMediaView extends StatefulWidget {
@@ -135,7 +137,7 @@ class _CameraMediaViewState extends State<CameraMediaView> with WidgetsBindingOb
             initialized: (i) {
               Map<CameraLensDirection, CameraDescription> cameraMap = {};
 
-              for(var d in i.deviceCameras) {
+              for (var d in i.deviceCameras) {
                 cameraMap.putIfAbsent(d.lensDirection, () => d);
               }
               List<CameraDescription> deviceCameras = cameraMap.values.toList();
@@ -176,244 +178,276 @@ class _CameraMediaViewState extends State<CameraMediaView> with WidgetsBindingOb
               CameraDescription camera = p.camera;
               List<CameraDescription> deviceCameras = p.deviceCameras;
               CameraController cameraController = p.cameraController;
-              return Stack(
-                alignment: Alignment.center,
-                children: <Widget>[
-                  Listener(
-                    onPointerDown: (_) {
-                      cameraCubit.modifyCameraSettings(
-                        cameraSettings: cameraSettings.copyWith(
-                          pointersOnScreen: cameraSettings.pointersOnScreen + 1,
-                        ),
-                      );
-                    },
-                    onPointerUp: (_) {
-                      cameraCubit.modifyCameraSettings(
-                        cameraSettings: cameraSettings.copyWith(
-                          pointersOnScreen: cameraSettings.pointersOnScreen - 1,
-                        ),
-                      );
-                    },
-                    child: LayoutBuilder(
-                      builder: (_, constraints) {
-                        return SizedBox(
-                          width: constraints.maxWidth,
-                          height: constraints.maxHeight,
-                          child: CameraPreview(
-                            cameraController,
-                            child: GestureDetector(
-                              behavior: HitTestBehavior.opaque,
-                              onScaleStart: (d) {},
-                              onScaleUpdate: (d) async {
-                                if (d.pointerCount != 2) return;
+              return Flex(
+                direction: Axis.vertical,
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: <Widget>[
+                        Listener(
+                          onPointerDown: (_) {
+                            cameraCubit.modifyCameraSettings(
+                              cameraSettings: cameraSettings.copyWith(
+                                pointersOnScreen: cameraSettings.pointersOnScreen + 1,
+                              ),
+                            );
+                          },
+                          onPointerUp: (_) {
+                            cameraCubit.modifyCameraSettings(
+                              cameraSettings: cameraSettings.copyWith(
+                                pointersOnScreen: cameraSettings.pointersOnScreen - 1,
+                              ),
+                            );
+                          },
+                          child: LayoutBuilder(
+                            builder: (_, constraints) {
+                              return SizedBox(
+                                width: constraints.maxWidth,
+                                height: constraints.maxHeight,
+                                child: CameraPreview(
+                                  cameraController,
+                                  child: GestureDetector(
+                                    behavior: HitTestBehavior.opaque,
+                                    onScaleStart: (d) {},
+                                    onScaleUpdate: (d) async {
+                                      if (d.pointerCount != 2) return;
 
-                                double zoomLevel = (cameraSettings.baseScale * d.scale).clamp(
-                                  cameraSettings.minZoom,
-                                  cameraSettings.maxZoom,
-                                );
+                                      double zoomLevel = (cameraSettings.baseScale * d.scale).clamp(
+                                        cameraSettings.minZoom,
+                                        cameraSettings.maxZoom,
+                                      );
 
-                                cameraCubit.modifyCameraSettings(
-                                  cameraSettings: cameraSettings.copyWith(
-                                    currentZoom: zoomLevel,
-                                  ),
-                                );
-                              },
-                              onTapDown: (details) {
-                                final Offset offset = Offset(
-                                  details.localPosition.dx / constraints.maxWidth,
-                                  details.localPosition.dy / constraints.maxHeight,
-                                );
+                                      cameraCubit.modifyCameraSettings(
+                                        cameraSettings: cameraSettings.copyWith(
+                                          currentZoom: zoomLevel,
+                                        ),
+                                      );
+                                    },
+                                    onTapDown: (details) {
+                                      final Offset offset = Offset(
+                                        details.localPosition.dx / constraints.maxWidth,
+                                        details.localPosition.dy / constraints.maxHeight,
+                                      );
 
-                                cameraCubit.modifyCameraSettings(
-                                  cameraSettings: cameraSettings.copyWith(
-                                    exposurePoint: offset,
-                                    focusPoint: offset,
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Align(
-                      alignment: Alignment.bottomCenter,
-                      child: GestureDetector(
-                        onTap: () async {
-                          cameraCubit.startRecording(
-                            camera: camera,
-                            cameraController: cameraController,
-                          );
-                        },
-                        child: const Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            Icon(
-                              Icons.circle_outlined,
-                              color: Colors.white70,
-                              size: 100,
-                            ),
-                            Icon(
-                              Icons.circle_outlined,
-                              color: Colors.red,
-                              size: 70,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Container(
-                        width: 50,
-                        decoration: BoxDecoration(
-                          color: Colors.black45,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: ListView(
-                          shrinkWrap: true,
-                          physics: const ClampingScrollPhysics(),
-                          children: [
-                            switch (camera.lensDirection) {
-                              CameraLensDirection.front => IconButton(
-                                  onPressed: () {
-                                    CameraDescription? backCamera =
-                                        deviceCameras.where((c) => c.lensDirection == CameraLensDirection.back).firstOrNull;
-
-                                    if (backCamera == null) {
-                                      const ToastInfo(
-                                        title: "Camera flip",
-                                        message: "No rear camera",
-                                      ).show();
-                                      return;
-                                    }
-                                    cameraCubit.chooseCamera(
-                                      camera: backCamera,
-                                    );
-                                  },
-                                  icon: Icon(camera.lensDirection.iconData),
-                                ),
-                              CameraLensDirection.back => IconButton(
-                                  onPressed: () {
-                                    CameraDescription? frontCamera =
-                                        deviceCameras.where((c) => c.lensDirection == CameraLensDirection.front).firstOrNull;
-
-                                    if (frontCamera == null) {
-                                      const ToastInfo(
-                                        title: "Camera flip",
-                                        message: "No front camera",
-                                      ).show();
-                                      return;
-                                    }
-
-                                    cameraCubit.chooseCamera(camera: frontCamera);
-                                  },
-                                  icon: Icon(camera.lensDirection.iconData),
-                                ),
-                              _ => const SizedBox.shrink(),
-                            },
-                            switch (cameraSettings.flashMode) {
-                              FlashMode.off => IconButton(
-                                  onPressed: () {
-                                    cameraCubit.modifyCameraSettings(
-                                      cameraSettings: cameraSettings.copyWith(
-                                        flashMode: FlashMode.auto,
-                                      ),
-                                    );
-                                  },
-                                  icon: const Icon(Icons.flash_off_outlined),
-                                ),
-                              FlashMode.auto => IconButton(
-                                  onPressed: () {
-                                    cameraCubit.modifyCameraSettings(
-                                      cameraSettings: cameraSettings.copyWith(
-                                        flashMode: FlashMode.always,
-                                      ),
-                                    );
-                                  },
-                                  icon: const Icon(Icons.flash_auto_outlined),
-                                ),
-                              FlashMode.always => IconButton(
-                                  onPressed: () {
-                                    cameraCubit.modifyCameraSettings(
-                                      cameraSettings: cameraSettings.copyWith(
-                                        flashMode: FlashMode.torch,
-                                      ),
-                                    );
-                                  },
-                                  icon: const Icon(Icons.flash_on_outlined),
-                                ),
-                              FlashMode.torch => IconButton(
-                                  onPressed: () {
-                                    cameraCubit.modifyCameraSettings(
-                                      cameraSettings: cameraSettings.copyWith(
-                                        flashMode: FlashMode.auto,
-                                      ),
-                                    );
-                                  },
-                                  icon: const Icon(Icons.flashlight_on_outlined),
-                                ),
-                            },
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  Visibility(
-                    visible: cameraSettings.cameraFile != null,
-                    child: Align(
-                      alignment: Alignment.bottomRight,
-                      child: Builder(
-                        builder: (context) {
-                          XFile? file = cameraSettings.cameraFile;
-                          if (file == null) return const SizedBox.shrink();
-
-                          double size = 100;
-
-                          return FutureBuilder(
-                            future: generateThumbnailBytes(videoPath: file.path),
-                            builder: (_, snap) {
-                              if (snap.connectionState != ConnectionState.done) {
-                                return const CircularProgressIndicator.adaptive();
-                              }
-
-                              if (snap.hasError) {
-                                return const Icon(Icons.broken_image_outlined);
-                              }
-
-                              Uint8List? imageBytes = snap.data;
-
-                              if (imageBytes == null || imageBytes.isEmpty) {
-                                return const Icon(Icons.hide_image_outlined);
-                              }
-
-                              return Container(
-                                height: size,
-                                width: size,
-                                decoration: BoxDecoration(
-                                  border: Border.all(color: Colors.pink),
-                                ),
-                                child: Center(
-                                  child: Image.memory(
-                                    fit: BoxFit.fill,
-                                    height: size,
-                                    width: size,
-                                    imageBytes,
+                                      cameraCubit.modifyCameraSettings(
+                                        cameraSettings: cameraSettings.copyWith(
+                                          exposurePoint: offset,
+                                          focusPoint: offset,
+                                        ),
+                                      );
+                                    },
                                   ),
                                 ),
                               );
                             },
-                          );
-                        },
-                      ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Align(
+                            alignment: Alignment.bottomCenter,
+                            child: GestureDetector(
+                              onTap: () async {
+                                cameraCubit.startRecording(
+                                  camera: camera,
+                                  cameraController: cameraController,
+                                );
+                              },
+                              child: const Stack(
+                                alignment: Alignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.circle_outlined,
+                                    color: Colors.white70,
+                                    size: 100,
+                                  ),
+                                  Icon(
+                                    Icons.circle_outlined,
+                                    color: Colors.red,
+                                    size: 70,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Container(
+                              width: 50,
+                              decoration: BoxDecoration(
+                                color: Colors.black45,
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: ListView(
+                                shrinkWrap: true,
+                                physics: const ClampingScrollPhysics(),
+                                children: [
+                                  switch (camera.lensDirection) {
+                                    CameraLensDirection.front => IconButton(
+                                        onPressed: () {
+                                          CameraDescription? backCamera =
+                                              deviceCameras.where((c) => c.lensDirection == CameraLensDirection.back).firstOrNull;
+
+                                          if (backCamera == null) {
+                                            const ToastInfo(
+                                              title: "Camera flip",
+                                              message: "No rear camera",
+                                            ).show();
+                                            return;
+                                          }
+                                          cameraCubit.chooseCamera(
+                                            camera: backCamera,
+                                          );
+                                        },
+                                        icon: Icon(camera.lensDirection.iconData),
+                                      ),
+                                    CameraLensDirection.back => IconButton(
+                                        onPressed: () {
+                                          CameraDescription? frontCamera =
+                                              deviceCameras.where((c) => c.lensDirection == CameraLensDirection.front).firstOrNull;
+
+                                          if (frontCamera == null) {
+                                            const ToastInfo(
+                                              title: "Camera flip",
+                                              message: "No front camera",
+                                            ).show();
+                                            return;
+                                          }
+
+                                          cameraCubit.chooseCamera(camera: frontCamera);
+                                        },
+                                        icon: Icon(camera.lensDirection.iconData),
+                                      ),
+                                    _ => const SizedBox.shrink(),
+                                  },
+                                  switch (cameraSettings.flashMode) {
+                                    FlashMode.off => IconButton(
+                                        onPressed: () {
+                                          cameraCubit.modifyCameraSettings(
+                                            cameraSettings: cameraSettings.copyWith(
+                                              flashMode: FlashMode.auto,
+                                            ),
+                                          );
+                                        },
+                                        icon: const Icon(Icons.flash_off_outlined),
+                                      ),
+                                    FlashMode.auto => IconButton(
+                                        onPressed: () {
+                                          cameraCubit.modifyCameraSettings(
+                                            cameraSettings: cameraSettings.copyWith(
+                                              flashMode: FlashMode.always,
+                                            ),
+                                          );
+                                        },
+                                        icon: const Icon(Icons.flash_auto_outlined),
+                                      ),
+                                    FlashMode.always => IconButton(
+                                        onPressed: () {
+                                          cameraCubit.modifyCameraSettings(
+                                            cameraSettings: cameraSettings.copyWith(
+                                              flashMode: FlashMode.torch,
+                                            ),
+                                          );
+                                        },
+                                        icon: const Icon(Icons.flash_on_outlined),
+                                      ),
+                                    FlashMode.torch => IconButton(
+                                        onPressed: () {
+                                          cameraCubit.modifyCameraSettings(
+                                            cameraSettings: cameraSettings.copyWith(
+                                              flashMode: FlashMode.auto,
+                                            ),
+                                          );
+                                        },
+                                        icon: const Icon(Icons.flashlight_on_outlined),
+                                      ),
+                                  },
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  )
+                  ),
+                  Visibility(
+                    visible: cameraSettings.cameraFile != null,
+                    child: Builder(
+                      builder: (context) {
+                        XFile? file = cameraSettings.cameraFile;
+                        if (file == null) return const SizedBox.shrink();
+
+                        double size = 100;
+
+                        return FutureBuilder(
+                          future: generateThumbnailBytes(videoPath: file.path),
+                          builder: (_, snap) {
+                            if (snap.connectionState != ConnectionState.done) {
+                              return const CircularProgressIndicator.adaptive();
+                            }
+
+                            if (snap.hasError) {
+                              return const Icon(Icons.broken_image_outlined);
+                            }
+
+                            Uint8List? imageBytes = snap.data;
+
+                            if (imageBytes == null || imageBytes.isEmpty) {
+                              return const Icon(Icons.hide_image_outlined);
+                            }
+
+                            return Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Container(
+                                  height: size,
+                                  width: size,
+                                  decoration: BoxDecoration(
+                                    border: Border.all(color: Colors.pink),
+                                  ),
+                                  child: Center(
+                                    child: Image.memory(
+                                      fit: BoxFit.fill,
+                                      height: size,
+                                      width: size,
+                                      imageBytes,
+                                    ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: ElevatedButton(
+                                    onPressed: () async {
+                                      final Directory tempDir = await getTemporaryDirectory();
+                                      final String tempVideoPath = '${tempDir.path}/${file.name}';
+                                      File videoFile = File(tempVideoPath);
+                                      await videoFile.writeAsBytes(await file.readAsBytes());
+                                      if (!context.mounted) return;
+
+                                      Navigator.of(context).pop(videoFile);
+                                    },
+                                    style: theme.elevatedButtonTheme.style?.copyWith(
+                                      fixedSize: const WidgetStatePropertyAll(
+                                        Size(100, 50),
+                                      ),
+                                    ),
+                                    child: const Text("Next"),
+                                  ),
+                                )
+                              ],
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  ),
                 ],
               );
             },

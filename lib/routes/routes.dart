@@ -11,6 +11,7 @@ import 'package:akropolis/features/on_boarding/presentation/select_default_prefe
 import 'package:akropolis/features/on_boarding/presentation/select_topic.dart';
 import 'package:akropolis/features/on_boarding/presentation/welcome_screen.dart';
 import 'package:akropolis/features/splash_screen.dart';
+import 'package:akropolis/features/video_editing/view/video_editing.dart';
 import 'package:flutter/material.dart';
 
 enum AppRoutes {
@@ -27,9 +28,8 @@ enum AppRoutes {
   welcomePreferences("/welcomePreferences"),
   home("/home"),
   createPost("/CreatePostPage"),
-  editVideoPostPage("/editVideoPostPage"),
+  videoEditingPage("/videoEditingPage"),
   cameraViewPage("/cameraViewPage");
-
   final String path;
 
   const AppRoutes(this.path);
@@ -48,7 +48,7 @@ enum AppRoutes {
     AppRoutes.welcomePreferences => const SelectDefaultPreferencesScreen(),
     AppRoutes.home => const HomePage(),
     AppRoutes.createPost => const CreatePostPage(),
-    AppRoutes.editVideoPostPage => const EditVideoPostPage(),
+    AppRoutes.videoEditingPage => const EditVideoPostPage(),
     AppRoutes.cameraViewPage => const CameraMediaView(),
   };
 }
