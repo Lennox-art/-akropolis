@@ -22,7 +22,7 @@ class CameraMediaView extends StatefulWidget {
 
 class _CameraMediaViewState extends State<CameraMediaView> with WidgetsBindingObserver, TickerProviderStateMixin {
   late final CameraCubit cameraCubit = BlocProvider.of<CameraCubit>(context);
-
+  final int cameraPreviewRotation = Platform.isAndroid ? 1 : 0;
   @override
   void initState() {
     super.initState();
@@ -207,38 +207,41 @@ class _CameraMediaViewState extends State<CameraMediaView> with WidgetsBindingOb
                               return SizedBox(
                                 width: constraints.maxWidth,
                                 height: constraints.maxHeight,
-                                child: CameraPreview(
-                                  cameraController,
-                                  child: GestureDetector(
-                                    behavior: HitTestBehavior.opaque,
-                                    onScaleStart: (d) {},
-                                    onScaleUpdate: (d) async {
-                                      if (d.pointerCount != 2) return;
+                                child: RotatedBox(
+                                  quarterTurns: cameraPreviewRotation,
+                                  child: CameraPreview(
+                                    cameraController,
+                                    child: GestureDetector(
+                                      behavior: HitTestBehavior.opaque,
+                                      onScaleStart: (d) {},
+                                      onScaleUpdate: (d) async {
+                                        if (d.pointerCount != 2) return;
 
-                                      double zoomLevel = (cameraSettings.baseScale * d.scale).clamp(
-                                        cameraSettings.minZoom,
-                                        cameraSettings.maxZoom,
-                                      );
+                                        double zoomLevel = (cameraSettings.baseScale * d.scale).clamp(
+                                          cameraSettings.minZoom,
+                                          cameraSettings.maxZoom,
+                                        );
 
-                                      cameraCubit.modifyCameraSettings(
-                                        cameraSettings: cameraSettings.copyWith(
-                                          currentZoom: zoomLevel,
-                                        ),
-                                      );
-                                    },
-                                    onTapDown: (details) {
-                                      final Offset offset = Offset(
-                                        details.localPosition.dx / constraints.maxWidth,
-                                        details.localPosition.dy / constraints.maxHeight,
-                                      );
+                                        cameraCubit.modifyCameraSettings(
+                                          cameraSettings: cameraSettings.copyWith(
+                                            currentZoom: zoomLevel,
+                                          ),
+                                        );
+                                      },
+                                      onTapDown: (details) {
+                                        final Offset offset = Offset(
+                                          details.localPosition.dx / constraints.maxWidth,
+                                          details.localPosition.dy / constraints.maxHeight,
+                                        );
 
-                                      cameraCubit.modifyCameraSettings(
-                                        cameraSettings: cameraSettings.copyWith(
-                                          exposurePoint: offset,
-                                          focusPoint: offset,
-                                        ),
-                                      );
-                                    },
+                                        cameraCubit.modifyCameraSettings(
+                                          cameraSettings: cameraSettings.copyWith(
+                                            exposurePoint: offset,
+                                            focusPoint: offset,
+                                          ),
+                                        );
+                                      },
+                                    ),
                                   ),
                                 ),
                               );
@@ -284,9 +287,8 @@ class _CameraMediaViewState extends State<CameraMediaView> with WidgetsBindingOb
                                 color: Colors.black45,
                                 borderRadius: BorderRadius.circular(20),
                               ),
-                              child: ListView(
-                                shrinkWrap: true,
-                                physics: const ClampingScrollPhysics(),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
                                 children: [
                                   switch (camera.lensDirection) {
                                     CameraLensDirection.front => IconButton(
@@ -479,38 +481,41 @@ class _CameraMediaViewState extends State<CameraMediaView> with WidgetsBindingOb
                         return SizedBox(
                           width: constraints.maxWidth,
                           height: constraints.maxHeight,
-                          child: CameraPreview(
-                            cameraController,
-                            child: GestureDetector(
-                              behavior: HitTestBehavior.opaque,
-                              onScaleStart: (d) {},
-                              onScaleUpdate: (d) async {
-                                if (d.pointerCount != 2) return;
+                          child: RotatedBox(
+                            quarterTurns: cameraPreviewRotation,
+                            child: CameraPreview(
+                              cameraController,
+                              child: GestureDetector(
+                                behavior: HitTestBehavior.opaque,
+                                onScaleStart: (d) {},
+                                onScaleUpdate: (d) async {
+                                  if (d.pointerCount != 2) return;
 
-                                double zoomLevel = (cameraSettings.currentZoom * d.scale).clamp(
-                                  cameraSettings.minZoom,
-                                  cameraSettings.maxZoom,
-                                );
+                                  double zoomLevel = (cameraSettings.currentZoom * d.scale).clamp(
+                                    cameraSettings.minZoom,
+                                    cameraSettings.maxZoom,
+                                  );
 
-                                cameraCubit.modifyCameraSettings(
-                                  cameraSettings: cameraSettings.copyWith(
-                                    currentZoom: zoomLevel,
-                                  ),
-                                );
-                              },
-                              onTapDown: (details) {
-                                final Offset offset = Offset(
-                                  details.localPosition.dx / constraints.maxWidth,
-                                  details.localPosition.dy / constraints.maxHeight,
-                                );
+                                  cameraCubit.modifyCameraSettings(
+                                    cameraSettings: cameraSettings.copyWith(
+                                      currentZoom: zoomLevel,
+                                    ),
+                                  );
+                                },
+                                onTapDown: (details) {
+                                  final Offset offset = Offset(
+                                    details.localPosition.dx / constraints.maxWidth,
+                                    details.localPosition.dy / constraints.maxHeight,
+                                  );
 
-                                cameraCubit.modifyCameraSettings(
-                                  cameraSettings: cameraSettings.copyWith(
-                                    exposurePoint: offset,
-                                    focusPoint: offset,
-                                  ),
-                                );
-                              },
+                                  cameraCubit.modifyCameraSettings(
+                                    cameraSettings: cameraSettings.copyWith(
+                                      exposurePoint: offset,
+                                      focusPoint: offset,
+                                    ),
+                                  );
+                                },
+                              ),
                             ),
                           ),
                         );

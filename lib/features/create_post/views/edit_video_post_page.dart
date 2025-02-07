@@ -79,8 +79,14 @@ class PostDescriptionWidget extends StatelessWidget {
 }
 
 enum VideoEditingTools {
-  trimVideo("Trim", Icons.cut_outlined),
-  thumbnailPicker("Thumbnail", Icons.pages_outlined);
+  trimVideo(
+    "Trim",
+    Icons.cut_outlined,
+  ),
+  thumbnailPicker(
+    "Thumbnail",
+    Icons.pages_outlined,
+  );
 
   const VideoEditingTools(this.title, this.iconData);
 
@@ -145,15 +151,49 @@ class TrimVideoWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final VideoPlayerController controller = VideoPlayerController.file(data);
-    controller.initialize().then((_) => controller.play());
+    final ValueNotifier<File> tempDataNotifier = ValueNotifier(data);
+    final ValueNotifier<RangeValues> rangeNotifier = ValueNotifier(const RangeValues(0.0, 1.0));
 
+    return ValueListenableBuilder(
+      valueListenable: tempDataNotifier,
+      builder: (_, file, __) {
 
-    return AspectRatio(
-      aspectRatio: controller.value.aspectRatio,
-      child: VideoPlayer(
-        controller,
-      ),
+        final VideoPlayerController controller = VideoPlayerController.file(
+          file,
+        );
+
+        return FutureBuilder(
+          future: controller.initialize(),
+          builder: (_, snap) {
+
+            if(snap.connectionState != ConnectionState.done) {
+              return const CircularProgressIndicator.adaptive();
+            }
+
+            return Column(
+              children: [
+                AspectRatio(
+                  aspectRatio: controller.value.aspectRatio,
+                  child: VideoPlayer(
+                    controller,
+                  ),
+                ),
+                ValueListenableBuilder(
+                  valueListenable: rangeNotifier,
+                  builder: (_, values, __) {
+                    return RangeSlider(
+                      values: values,
+                      onChanged: (v) {
+                        rangeNotifier.value = v;
+                      },
+                    );
+                  }
+                ),
+              ],
+            );
+          }
+        );
+      }
     );
   }
 }
