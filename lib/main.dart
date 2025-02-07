@@ -1,5 +1,5 @@
 import 'package:akropolis/features/authentication/view_model/authentication_cubit/authentication_cubit.dart';
-import 'package:akropolis/features/camera_view/view_model/camera_cubit.dart';
+import 'package:akropolis/features/create_post/view_model/create_post_cubit.dart';
 import 'package:akropolis/features/for_you_feed/view_models/for_you_news_cubit/for_you_news_cubit.dart';
 import 'package:akropolis/features/on_boarding/view_model/user_cubit/user_cubit.dart';
 import 'package:akropolis/features/world_news_feed/view_models/world_news_cubit/world_news_cubit.dart';
@@ -9,6 +9,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:logging_service/logging_service.dart';
 import 'package:network_service/network_service.dart';
 
@@ -17,6 +18,7 @@ import 'firebase_options.dart';
 final GetIt getIt = GetIt.I;
 final NetworkService ns = getIt<NetworkService>();
 final LoggingService log = getIt<LoggingService>();
+final ImagePicker picker = getIt<ImagePicker>();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,6 +37,9 @@ Future<void> main() async {
 
   NetworkService ns = NetworkServiceImpl(log);
   getIt.registerSingleton(ns);
+
+  final ImagePicker picker = ImagePicker();
+  getIt.registerSingleton(picker);
 
   runApp(const AkropolisApplication());
 }
@@ -59,7 +64,7 @@ class AkropolisApplication extends StatelessWidget {
           create: (context) => ForYouNewsCubit(),
         ),
         BlocProvider(
-          create: (context) => CameraCubit(),
+          create: (context) => CreatePostCubit(),
         ),
       ],
       child: MaterialApp(

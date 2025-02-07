@@ -1,5 +1,4 @@
 import 'package:akropolis/main.dart';
-import 'package:video_compress/video_compress.dart';
 import 'dart:typed_data';
 
 /// Converts `DateTime` to a "time ago" string
@@ -35,11 +34,12 @@ Future<Uint8List?> generateThumbnailBytes({
   int quality = 50,
 }) async {
   try {
-    return VideoCompress.getByteThumbnail(
+    throw Exception("Not implemented");
+   /* return VideoCompress.getByteThumbnail(
       videoPath,
       quality: quality, // default(100)
       position: timeMs, // default(-1)
-    );
+    );*/
   } catch (e, trace) {
     log.error('Error generating thumbnail bytes: $e', trace: trace);
     return null;

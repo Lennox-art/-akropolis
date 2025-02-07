@@ -37,10 +37,11 @@ dependencies:
       url: https://bruc3balo:glpat-45CSRAxm48QD31nbADxz@gitlab.com/flutter_starter/paged_list_view.git
       ref: main
   camera: ^0.11.1
-  video_player: ^2.8.2
-  video_compress: ^3.1.3
+  video_player:
+  # video_compress:
   path_provider:
-
+  image_picker: ^1.1.2
+  video_compress: ^3.1.3
 
 dev_dependencies:
   flutter_test:

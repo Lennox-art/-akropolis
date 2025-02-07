@@ -3,15 +3,14 @@ import 'package:akropolis/features/authentication/view/login.dart';
 import 'package:akropolis/features/authentication/view/new_password.dart';
 import 'package:akropolis/features/authentication/view/sign_in.dart';
 import 'package:akropolis/features/authentication/view/sign_up.dart';
-import 'package:akropolis/features/camera_view/view/camera_view.dart';
 import 'package:akropolis/features/create_post/views/create_post_page.dart';
 import 'package:akropolis/features/create_post/views/edit_video_post_page.dart';
+import 'package:akropolis/features/create_post/views/post_meta_data_page.dart';
 import 'package:akropolis/features/home_page.dart';
 import 'package:akropolis/features/on_boarding/presentation/select_default_preferences.dart';
 import 'package:akropolis/features/on_boarding/presentation/select_topic.dart';
 import 'package:akropolis/features/on_boarding/presentation/welcome_screen.dart';
 import 'package:akropolis/features/splash_screen.dart';
-import 'package:akropolis/features/video_editing/view/video_editing.dart';
 import 'package:flutter/material.dart';
 
 enum AppRoutes {
@@ -29,7 +28,8 @@ enum AppRoutes {
   home("/home"),
   createPost("/CreatePostPage"),
   videoEditingPage("/videoEditingPage"),
-  cameraViewPage("/cameraViewPage");
+  finalizePost("/finalizePost");
+
   final String path;
 
   const AppRoutes(this.path);
@@ -49,6 +49,6 @@ enum AppRoutes {
     AppRoutes.home => const HomePage(),
     AppRoutes.createPost => const CreatePostPage(),
     AppRoutes.videoEditingPage => const EditVideoPostPage(),
-    AppRoutes.cameraViewPage => const CameraMediaView(),
+    AppRoutes.finalizePost => const PostMetaDataPage(),
   };
 }

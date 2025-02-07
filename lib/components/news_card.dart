@@ -1,3 +1,4 @@
+import 'package:akropolis/features/create_post/models/models.dart';
 import 'package:akropolis/features/for_you_feed/models/for_you_models.dart';
 import 'package:akropolis/features/world_news_feed/models/world_news_models.dart';
 import 'package:akropolis/main.dart';
@@ -5,40 +6,42 @@ import 'package:akropolis/utils/functions.dart';
 import 'package:flutter/material.dart';
 
 class NewsCard extends StatelessWidget {
-  final String? newsImageUrl;
-  final String title;
-  final String? author;
-  final String description;
-  final DateTime publishedAt;
-  final String? newsSourceImageUrl;
+  final NewsPost post;
 
   const NewsCard({
     super.key,
-    required this.newsImageUrl,
-    required this.title,
-    required this.author,
-    required this.description,
-    required this.publishedAt,
-    required this.newsSourceImageUrl,
+    required this.post,
   });
 
   NewsCard.newsApi(NewsApiArticleModel news, {super.key})
-      : newsImageUrl = news.urlToImage,
-        title = news.title,
-        author = news.author,
-        description = news.description,
-        publishedAt = news.publishedAt,
-        newsSourceImageUrl = news.sourceEnum?.imageUrl {
+      : post = NewsPost(
+          thumbnailUrl: news.urlToImage,
+          postUrl: news.url,
+          title: news.title,
+          description: news.description,
+          author: Author(
+            id: news.source.id,
+            name: news.source.name,
+            type: AuthorType.publisher,
+          ),
+          publishedAt: news.publishedAt,
+        ) {
     log.info(news);
   }
 
   NewsCard.mediaStack(MediaStackArticleModel news, {super.key})
-      : newsImageUrl = news.image,
-        title = news.title,
-        author = news.author,
-        description = news.description,
-        publishedAt = news.publishedAt,
-        newsSourceImageUrl = null {
+      : post = NewsPost(
+          thumbnailUrl: news.url,
+          postUrl: news.url,
+          title: news.title,
+          description: news.description,
+          author: Author(
+            id: news.source,
+            name: news.author ?? 'Unknown',
+            type: AuthorType.publisher,
+          ),
+          publishedAt: news.publishedAt,
+        ) {
     log.info(news);
   }
 
@@ -61,7 +64,7 @@ class NewsCard extends StatelessWidget {
                 size: 250,
               ),
               child: Image.network(
-                newsImageUrl ?? '',
+                post.postUrl,
                 height: 180,
                 width: double.infinity,
                 fit: BoxFit.cover,
@@ -78,7 +81,7 @@ class NewsCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  title,
+                  post.title,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.bodyMedium?.copyWith(
@@ -93,16 +96,14 @@ class NewsCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Icon(
-                      author == null
-                          ? Icons.question_mark_outlined
-                          : Icons.person,
+                      Icons.person,
                       size: 18,
                       color: Colors.grey,
                     ),
                     const SizedBox(width: 4),
                     Expanded(
                       child: Text(
-                        author ?? "Unknown Author",
+                        post.author.name,
                         overflow: TextOverflow.ellipsis,
                         style: theme.textTheme.labelLarge?.copyWith(
                           fontSize: 14,
@@ -112,7 +113,7 @@ class NewsCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      timeAgo(publishedAt),
+                      timeAgo(post.publishedAt),
                       style: theme.textTheme.labelMedium?.copyWith(
                         fontSize: 14,
                         color: Colors.grey,
@@ -122,7 +123,7 @@ class NewsCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  description,
+                  post.description,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(fontSize: 14),
@@ -131,7 +132,7 @@ class NewsCard extends StatelessWidget {
                 Row(
                   children: [
                     Visibility(
-                      visible: newsSourceImageUrl != null,
+                      visible: post.author.imageUrl != null,
                       replacement: const CircleAvatar(
                         radius: 12,
                         backgroundColor: Colors.yellow,
@@ -139,7 +140,7 @@ class NewsCard extends StatelessWidget {
                       child: CircleAvatar(
                         radius: 12,
                         backgroundImage: NetworkImage(
-                          newsSourceImageUrl ?? '',
+                          post.author.imageUrl ?? '',
                         ),
                       ),
                     ),

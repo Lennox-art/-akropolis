@@ -1,8 +1,13 @@
-import 'dart:typed_data';
+import 'dart:math';
 
+import 'package:akropolis/features/create_post/view_model/create_post_cubit.dart';
 import 'package:akropolis/gen/assets.gen.dart';
+import 'package:akropolis/main.dart';
 import 'package:akropolis/routes/routes.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
 
 class CreatePostPage extends StatelessWidget {
   const CreatePostPage({super.key});
@@ -50,18 +55,24 @@ class CreatePostPage extends StatelessWidget {
                     width: 150,
                     child: GestureDetector(
                       onTap: () async {
+                        XFile? videoData = await getIt<ImagePicker>().pickVideo(
+                          source: ImageSource.camera,
+                          preferredCameraDevice: CameraDevice.rear,
+                          maxDuration: const Duration(minutes: 1),
+                        );
+                        if (videoData == null || !context.mounted) return;
 
-                        dynamic videoData = await Navigator.of(context).pushNamed(
-                          AppRoutes.cameraViewPage.path,
+                        await BlocProvider.of<CreatePostCubit>(context)
+                            .createNewPost(
+                          file: videoData,
+                          user: FirebaseAuth.instance.currentUser!,
                         );
 
-                        if (videoData == null || !context.mounted) return;
+                        if (!context.mounted) return;
 
                         Navigator.of(context).pushNamed(
                           AppRoutes.videoEditingPage.path,
-                          arguments: videoData,
                         );
-
                       },
                       child: const Card(
                         child: Padding(
@@ -78,44 +89,84 @@ class CreatePostPage extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(
+                  SizedBox(
                     height: 150,
                     width: 150,
-                    child: Card(
-                      child: Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Icon(Icons.upload_file_outlined),
-                            Text("Upload a video"),
-                          ],
+                    child: GestureDetector(
+                      onTap: () async {
+                        XFile? videoData = await getIt<ImagePicker>().pickVideo(
+                          source: ImageSource.gallery,
+                          preferredCameraDevice: CameraDevice.rear,
+                          maxDuration: const Duration(minutes: 1),
+                        );
+                        if (videoData == null || !context.mounted) return;
+
+                        await BlocProvider.of<CreatePostCubit>(context)
+                            .createNewPost(
+                          file: videoData,
+                          user: FirebaseAuth.instance.currentUser!,
+                        );
+
+                        if (!context.mounted) return;
+
+                        Navigator.of(context).pushNamed(
+                          AppRoutes.videoEditingPage.path,
+                        );
+                      },
+                      child: const Card(
+                        child: Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Icon(Icons.upload_file_outlined),
+                              Text("Upload a video"),
+                            ],
+                          ),
                         ),
                       ),
                     ),
                   ),
                 ],
               ),
-              const Row(
+              Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   SizedBox(
                     height: 150,
                     width: 150,
-                    child: Card(
-                      child: Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Icon(Icons.circle_outlined),
-                            Text("Draft"),
-                          ],
-                        ),
-                      ),
+                    child: BlocBuilder<CreatePostCubit, CreatePostState>(
+                      builder: (_, state) {
+                        return state.map(
+                          loading: (_) =>
+                              const CircularProgressIndicator.adaptive(),
+                          loaded: (l) {
+                            bool hasDraft = l.form != null;
+
+                            return Card(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Icon(
+                                      Icons.circle_outlined,
+                                      color: hasDraft
+                                          ? Colors.green
+                                          : theme.iconTheme.color,
+                                    ),
+                                    Text("Draft"),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      },
                     ),
                   ),
                   SizedBox(
@@ -128,8 +179,8 @@ class CreatePostPage extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Icon(Icons.group_work_outlined),
-                            Text("Use template"),
+                            /*Icon(Icons.group_work_outlined),
+                            Text("Use template"),*/
                           ],
                         ),
                       ),
