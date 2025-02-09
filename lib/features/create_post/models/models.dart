@@ -1,10 +1,12 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:akropolis/features/authentication/models/authentication_models.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import 'package:flutter/material.dart';
 
 part 'models.freezed.dart';
+part 'models.g.dart';
 
 enum VideoEditingTools {
   trimVideo(
@@ -24,6 +26,7 @@ enum VideoEditingTools {
 
 enum AuthorType { user, publisher }
 
+@JsonSerializable()
 class Author {
   final String id;
   final String name;
@@ -36,9 +39,15 @@ class Author {
     this.imageUrl,
     required this.type,
   });
+
+  factory Author.fromJson(Map<String, dynamic> json) => _$AuthorFromJson(json);
+
+  Map<String, dynamic> toJson() => _$AuthorToJson(this);
 }
 
+@JsonSerializable()
 class NewsPost {
+  final String id;
   final String thumbnailUrl;
   final String postUrl;
   final String title;
@@ -47,6 +56,7 @@ class NewsPost {
   final DateTime publishedAt;
 
   NewsPost({
+    required this.id,
     required this.thumbnailUrl,
     required this.postUrl,
     required this.title,
@@ -54,16 +64,25 @@ class NewsPost {
     required this.author,
     required this.publishedAt,
   });
+
+  static const String collection = 'news_posts';
+
+  factory NewsPost.fromJson(Map<String, dynamic> json) => _$NewsPostFromJson(json);
+
+  Map<String, dynamic> toJson() => _$NewsPostToJson(this);
 }
 
 @freezed
 class CreatePostForm with _$CreatePostForm {
   const factory CreatePostForm.create({
-    required String userId,
+    required String postId,
+    required AppUser appUser,
     File? videoData,
+    @Default(false) bool videoDataUploaded,
+
+    Duration? videoDuration,
     Uint8List? thumbnailData,
-    String? title,
-    String? description,
+    @Default(false) bool thumbnailUploaded,
   }) = _CreatePostForm;
 }
 

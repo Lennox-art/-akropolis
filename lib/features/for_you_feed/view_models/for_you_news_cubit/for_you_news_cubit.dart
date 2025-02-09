@@ -1,10 +1,12 @@
 import 'dart:collection';
 
 import 'package:akropolis/components/toast/toast.dart';
+import 'package:akropolis/features/create_post/models/models.dart';
 import 'package:akropolis/features/for_you_feed/models/for_you_models.dart';
 import 'package:akropolis/main.dart';
 import 'package:akropolis/networking/media_stack_network_requests.dart';
 import 'package:akropolis/utils/enums.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:common_fn/common_fn.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -13,11 +15,19 @@ part 'for_you_news_state.dart';
 part 'for_you_news_cubit.freezed.dart';
 
 class ForYouNewsCubit extends Cubit<ForYouNewsState> {
-  final LinkedHashSet<MediaStackArticleModel> cachedNews = LinkedHashSet();
+  final LinkedHashSet<NewsPost> cachedNews = LinkedHashSet();
+  final CollectionReference postsCollectionRef = FirebaseFirestore.instance.collection(NewsPost.collection).withConverter<NewsPost>(
+    fromFirestore: (snapshot, _) => NewsPost.fromJson(snapshot.data()!),
+    toFirestore: (model, _) => model.toJson(),
+  );
+  DocumentSnapshot? lastFetchedUserPost;
+
 
   ForYouNewsCubit() : super(const ForYouNewsState.loading());
 
-  Future<List<MediaStackArticleModel>?> fetchNews({
+
+
+  Future<List<NewsPost>?> fetchNews({
     required int page,
     required int pageSize,
     required bool fromCache,
@@ -33,7 +43,7 @@ class ForYouNewsCubit extends Cubit<ForYouNewsState> {
 
       if (fromCache && cachedNews.isNotEmpty) {
 
-        return pageList<MediaStackArticleModel>(
+        return pageList<NewsPost>(
           cachedNews.take(pageSize).toList(),
           page: page == 1 ? 0 : page,
           pageSize: pageSize,
@@ -66,7 +76,8 @@ class ForYouNewsCubit extends Cubit<ForYouNewsState> {
         },
         success: (s) {
           MediaStackResponse apiResponse = MediaStackResponse.fromJson(s.data!);
-          cachedNews.addAll(apiResponse.data);
+          List<NewsPost> data = apiResponse.data.map((e) => e.toPostModel).toList();
+          cachedNews.addAll(data);
 
           emit(
             ForYouNewsLoadedState(
@@ -76,10 +87,43 @@ class ForYouNewsCubit extends Cubit<ForYouNewsState> {
               ),
             ),
           );
-          return apiResponse.data;
+          return data;
         },
       );
 
+    } catch(e, trace) {
+      addError(e, trace);
+      return null;
+    }
+  }
+
+  Future<List<NewsPost>?> fetchUserPostsNews({
+    required int pageSize,
+    required bool fromCache,
+    List<String> keywords = const [],
+  }) async {
+    try {
+
+      if (fromCache && cachedNews.isNotEmpty) {
+
+        return pageList<NewsPost>(
+          cachedNews.take(pageSize).toList(),
+          page: 0,
+          pageSize: pageSize,
+        );
+      }
+
+      var query = postsCollectionRef.orderBy("publishedAt", descending: true).limit(pageSize);
+      if(lastFetchedUserPost != null) query = query.startAfterDocument(lastFetchedUserPost!);
+
+      var qs = await query.get();
+
+      //cache last
+      lastFetchedUserPost = qs.docs.lastOrNull;
+      List<NewsPost> data = qs.docs.map((e) => e.data() as NewsPost).toList();
+      cachedNews.addAll(data);
+
+      return data;
     } catch(e, trace) {
       addError(e, trace);
       return null;

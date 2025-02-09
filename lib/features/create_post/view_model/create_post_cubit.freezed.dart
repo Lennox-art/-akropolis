@@ -18,20 +18,20 @@ final _privateConstructorUsedError = UnsupportedError(
 mixin _$CreatePostState {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function() loading,
-    required TResult Function(CreatePostForm? form) loaded,
+    required TResult Function(UploadProgress? progress) loading,
+    required TResult Function(ToastMessage? toast, CreatePostForm? form) loaded,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? loading,
-    TResult? Function(CreatePostForm? form)? loaded,
+    TResult? Function(UploadProgress? progress)? loading,
+    TResult? Function(ToastMessage? toast, CreatePostForm? form)? loaded,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? loading,
-    TResult Function(CreatePostForm? form)? loaded,
+    TResult Function(UploadProgress? progress)? loading,
+    TResult Function(ToastMessage? toast, CreatePostForm? form)? loaded,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -82,6 +82,8 @@ abstract class _$$LoadingPostStateImplCopyWith<$Res> {
   factory _$$LoadingPostStateImplCopyWith(_$LoadingPostStateImpl value,
           $Res Function(_$LoadingPostStateImpl) then) =
       __$$LoadingPostStateImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({UploadProgress? progress});
 }
 
 /// @nodoc
@@ -94,54 +96,81 @@ class __$$LoadingPostStateImplCopyWithImpl<$Res>
 
   /// Create a copy of CreatePostState
   /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? progress = freezed,
+  }) {
+    return _then(_$LoadingPostStateImpl(
+      progress: freezed == progress
+          ? _value.progress
+          : progress // ignore: cast_nullable_to_non_nullable
+              as UploadProgress?,
+    ));
+  }
 }
 
 /// @nodoc
 
 class _$LoadingPostStateImpl implements LoadingPostState {
-  const _$LoadingPostStateImpl();
+  const _$LoadingPostStateImpl({this.progress});
+
+  @override
+  final UploadProgress? progress;
 
   @override
   String toString() {
-    return 'CreatePostState.loading()';
+    return 'CreatePostState.loading(progress: $progress)';
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is _$LoadingPostStateImpl);
+        (other.runtimeType == runtimeType &&
+            other is _$LoadingPostStateImpl &&
+            (identical(other.progress, progress) ||
+                other.progress == progress));
   }
 
   @override
-  int get hashCode => runtimeType.hashCode;
+  int get hashCode => Object.hash(runtimeType, progress);
+
+  /// Create a copy of CreatePostState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$LoadingPostStateImplCopyWith<_$LoadingPostStateImpl> get copyWith =>
+      __$$LoadingPostStateImplCopyWithImpl<_$LoadingPostStateImpl>(
+          this, _$identity);
 
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function() loading,
-    required TResult Function(CreatePostForm? form) loaded,
+    required TResult Function(UploadProgress? progress) loading,
+    required TResult Function(ToastMessage? toast, CreatePostForm? form) loaded,
   }) {
-    return loading();
+    return loading(progress);
   }
 
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? loading,
-    TResult? Function(CreatePostForm? form)? loaded,
+    TResult? Function(UploadProgress? progress)? loading,
+    TResult? Function(ToastMessage? toast, CreatePostForm? form)? loaded,
   }) {
-    return loading?.call();
+    return loading?.call(progress);
   }
 
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? loading,
-    TResult Function(CreatePostForm? form)? loaded,
+    TResult Function(UploadProgress? progress)? loading,
+    TResult Function(ToastMessage? toast, CreatePostForm? form)? loaded,
     required TResult orElse(),
   }) {
     if (loading != null) {
-      return loading();
+      return loading(progress);
     }
     return orElse();
   }
@@ -179,7 +208,16 @@ class _$LoadingPostStateImpl implements LoadingPostState {
 }
 
 abstract class LoadingPostState implements CreatePostState {
-  const factory LoadingPostState() = _$LoadingPostStateImpl;
+  const factory LoadingPostState({final UploadProgress? progress}) =
+      _$LoadingPostStateImpl;
+
+  UploadProgress? get progress;
+
+  /// Create a copy of CreatePostState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$LoadingPostStateImplCopyWith<_$LoadingPostStateImpl> get copyWith =>
+      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
@@ -188,8 +226,9 @@ abstract class _$$LoadedPostStateImplCopyWith<$Res> {
           $Res Function(_$LoadedPostStateImpl) then) =
       __$$LoadedPostStateImplCopyWithImpl<$Res>;
   @useResult
-  $Res call({CreatePostForm? form});
+  $Res call({ToastMessage? toast, CreatePostForm? form});
 
+  $ToastMessageCopyWith<$Res>? get toast;
   $CreatePostFormCopyWith<$Res>? get form;
 }
 
@@ -206,14 +245,33 @@ class __$$LoadedPostStateImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? toast = freezed,
     Object? form = freezed,
   }) {
     return _then(_$LoadedPostStateImpl(
+      toast: freezed == toast
+          ? _value.toast
+          : toast // ignore: cast_nullable_to_non_nullable
+              as ToastMessage?,
       form: freezed == form
           ? _value.form
           : form // ignore: cast_nullable_to_non_nullable
               as CreatePostForm?,
     ));
+  }
+
+  /// Create a copy of CreatePostState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $ToastMessageCopyWith<$Res>? get toast {
+    if (_value.toast == null) {
+      return null;
+    }
+
+    return $ToastMessageCopyWith<$Res>(_value.toast!, (value) {
+      return _then(_value.copyWith(toast: value));
+    });
   }
 
   /// Create a copy of CreatePostState
@@ -234,14 +292,16 @@ class __$$LoadedPostStateImplCopyWithImpl<$Res>
 /// @nodoc
 
 class _$LoadedPostStateImpl implements LoadedPostState {
-  const _$LoadedPostStateImpl({this.form});
+  const _$LoadedPostStateImpl({this.toast, this.form});
 
+  @override
+  final ToastMessage? toast;
   @override
   final CreatePostForm? form;
 
   @override
   String toString() {
-    return 'CreatePostState.loaded(form: $form)';
+    return 'CreatePostState.loaded(toast: $toast, form: $form)';
   }
 
   @override
@@ -249,11 +309,12 @@ class _$LoadedPostStateImpl implements LoadedPostState {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$LoadedPostStateImpl &&
+            (identical(other.toast, toast) || other.toast == toast) &&
             (identical(other.form, form) || other.form == form));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, form);
+  int get hashCode => Object.hash(runtimeType, toast, form);
 
   /// Create a copy of CreatePostState
   /// with the given fields replaced by the non-null parameter values.
@@ -267,30 +328,30 @@ class _$LoadedPostStateImpl implements LoadedPostState {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function() loading,
-    required TResult Function(CreatePostForm? form) loaded,
+    required TResult Function(UploadProgress? progress) loading,
+    required TResult Function(ToastMessage? toast, CreatePostForm? form) loaded,
   }) {
-    return loaded(form);
+    return loaded(toast, form);
   }
 
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? loading,
-    TResult? Function(CreatePostForm? form)? loaded,
+    TResult? Function(UploadProgress? progress)? loading,
+    TResult? Function(ToastMessage? toast, CreatePostForm? form)? loaded,
   }) {
-    return loaded?.call(form);
+    return loaded?.call(toast, form);
   }
 
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? loading,
-    TResult Function(CreatePostForm? form)? loaded,
+    TResult Function(UploadProgress? progress)? loading,
+    TResult Function(ToastMessage? toast, CreatePostForm? form)? loaded,
     required TResult orElse(),
   }) {
     if (loaded != null) {
-      return loaded(form);
+      return loaded(toast, form);
     }
     return orElse();
   }
@@ -328,9 +389,11 @@ class _$LoadedPostStateImpl implements LoadedPostState {
 }
 
 abstract class LoadedPostState implements CreatePostState {
-  const factory LoadedPostState({final CreatePostForm? form}) =
-      _$LoadedPostStateImpl;
+  const factory LoadedPostState(
+      {final ToastMessage? toast,
+      final CreatePostForm? form}) = _$LoadedPostStateImpl;
 
+  ToastMessage? get toast;
   CreatePostForm? get form;
 
   /// Create a copy of CreatePostState

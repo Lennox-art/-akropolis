@@ -3,7 +3,9 @@ import 'dart:typed_data';
 
 import 'package:akropolis/features/create_post/models/models.dart';
 import 'package:akropolis/features/create_post/view_model/create_post_cubit.dart';
+import 'package:akropolis/main.dart';
 import 'package:akropolis/routes/routes.dart';
+import 'package:akropolis/utils/functions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:video_player/video_player.dart';
@@ -25,8 +27,12 @@ class EditVideoPostPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Expanded(
-                    child: VideoEditingWidget(
-                      data: l.form!.videoData!,
+                    child: Visibility(
+                      visible: l.form != null,
+                      child: VideoEditingWidget(
+                        data: l.form!.videoData!,
+                        videoDuration: Duration.zero,
+                      ),
                     ),
                   ),
                   ListTile(
@@ -52,10 +58,12 @@ class EditVideoPostPage extends StatelessWidget {
 class VideoEditingWidget extends StatelessWidget {
   const VideoEditingWidget({
     required this.data,
+    required this.videoDuration,
     super.key,
   });
 
   final File data;
+  final Duration videoDuration;
 
   @override
   Widget build(BuildContext context) {
@@ -73,11 +81,17 @@ class VideoEditingWidget extends StatelessWidget {
               return switch (tool) {
                 VideoEditingTools.trimVideo => TrimVideoWidget(
                     data: data,
-                    onTrim: (vid) {},
+                    onTrim: (vid) {
+
+                    },
                   ),
                 VideoEditingTools.thumbnailPicker => ThumbnailVideoWidget(
                     data: data,
-                    onSelect: (data) {},
+                    videoDuration: videoDuration,
+                    onSelect: (data) {
+                      log.debug("Modifying thumbnail");
+                      BlocProvider.of<CreatePostCubit>(context).modifyThumbnail(thumbnail: data);
+                    },
                   ),
               };
             },
@@ -162,77 +176,59 @@ class TrimVideoWidget extends StatelessWidget {
 class ThumbnailVideoWidget extends StatelessWidget {
   const ThumbnailVideoWidget({
     required this.data,
+    required this.videoDuration,
     required this.onSelect,
     super.key,
   });
 
   final File data;
+  final Duration? videoDuration;
   final Function(Uint8List) onSelect;
 
   @override
   Widget build(BuildContext context) {
     final ValueNotifier<Uint8List?> thumbnailNotifier = ValueNotifier(null);
     final ValueNotifier<double> durationNotifier = ValueNotifier(0.0);
-    final VideoPlayerController controller = VideoPlayerController.file(data);
 
-    return FutureBuilder(
-      future: controller.initialize(),
-      builder: (_, vidSnap) {
-        if (vidSnap.connectionState != ConnectionState.done) {
-          return const CircularProgressIndicator.adaptive();
-        }
-        controller.pause();
-        return Flex(
-          direction: Axis.vertical,
-          children: [
-            Expanded(
-              child: AspectRatio(
-                aspectRatio: controller.value.aspectRatio,
-                child: VideoPlayer(controller),
-              ),
-            ),
-            ValueListenableBuilder(
-                valueListenable: thumbnailNotifier,
-                builder: (_, thumbNail, __) {
-                  if (thumbNail == null) {
-                    return const Text("Select thumbnail");
-                  }
+    return Flex(
+      direction: Axis.vertical,
+      children: [
+        Expanded(
+          child: ValueListenableBuilder(
+              valueListenable: thumbnailNotifier,
+              builder: (_, thumbNail, __) {
+                if (thumbNail == null) {
+                  return const Text("Select thumbnail");
+                }
 
-                  return SizedBox(
-                    width: 100,
-                    height: 100,
-                    child: Image.memory(thumbNail),
-                  );
-                }),
-            ValueListenableBuilder(
-              valueListenable: durationNotifier,
-              builder: (_, values, __) {
-                return Slider(
-                  value: values,
-                  onChanged: (v) async {
-                    durationNotifier.value = v;
-                    int maxDurationInMS =
-                        controller.value.duration.inMilliseconds;
-                    double positionInMs = (v * maxDurationInMS) / 1;
-
-                    print("POSITION IN MS $positionInMs");
-                    print("POSITION INT MS ${positionInMs.round()}");
-
-                    controller.seekTo(Duration(seconds: positionInMs.round()));
-
-                    /*final uint8list = await VideoCompress.getByteThumbnail(
-                      data.path,
-                      quality: 50,
-                      position: positionInMs.round(),
-                    );
-                    thumbnailNotifier.value = uint8list;*/
-                  },
+                return SizedBox(
+                  width: 100,
+                  height: 100,
+                  child: Image.memory(thumbNail),
                 );
+              }),
+        ),
+        ValueListenableBuilder(
+          valueListenable: durationNotifier,
+          builder: (_, values, __) {
+            return Slider(
+              value: values,
+              onChanged: (v) async {
+                durationNotifier.value = v;
+                final uint8list = await generateThumbnailBytes(
+                  videoPath: data.path,
+                  quality: 50,
+                  timeMs: v.round(),
+                );
+                thumbnailNotifier.value = uint8list;
+                if (uint8list != null) {
+                  onSelect(uint8list);
+                }
               },
-            ),
-          ],
-        );
-      },
+            );
+          },
+        ),
+      ],
     );
   }
 }

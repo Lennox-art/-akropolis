@@ -1,4 +1,5 @@
 import 'package:akropolis/features/create_post/view_model/create_post_cubit.dart';
+import 'package:akropolis/routes/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -18,23 +19,64 @@ class PostMetaDataPage extends StatelessWidget {
         builder: (_, state) {
           return Flex(
             direction: Axis.vertical,
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Card(
+              Expanded(
+                child: Card(
+                  child: state.map(
+                    loading: (l) => const CircularProgressIndicator.adaptive(),
+                    loaded: (l) {
 
+                      return Visibility(
+                        visible: l.form != null,
+                        child: Image.memory(
+                          l.form!.thumbnailData!,
+                        ),
+                      );
+                    },
+                  ),
+                ),
               ),
-              TextFormField(
-                controller: titleController,
-                decoration: const InputDecoration(label: Text("Title")),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextFormField(
+                  controller: titleController,
+                  decoration: const InputDecoration(
+                    label: Text("Title"),
+                  ),
+                ),
               ),
-              TextFormField(
-                controller: descriptionController,
-                decoration: const InputDecoration(label: Text("Description")),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextFormField(
+                  controller: descriptionController,
+                  decoration: const InputDecoration(
+                    label: Text("Description"),
+                  ),
+                ),
               ),
-              ElevatedButton(
-                onPressed: () {},
-                child: const Text("Post"),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ElevatedButton(
+                  onPressed: () async {
+                    String title = titleController.text;
+                    String description = descriptionController.text;
+
+                    await BlocProvider.of<CreatePostCubit>(context).doPost(
+                      title: title,
+                      description: description,
+                    );
+
+                    if (!context.mounted) return;
+
+                    Navigator.of(context).pushNamedAndRemoveUntil(
+                      AppRoutes.home.path,
+                      (_) => false,
+                    );
+                  },
+                  child: const Text("Post"),
+                ),
               ),
             ],
           );

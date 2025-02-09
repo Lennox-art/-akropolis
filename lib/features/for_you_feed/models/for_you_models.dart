@@ -1,3 +1,5 @@
+import 'package:akropolis/features/create_post/models/models.dart';
+import 'package:common_fn/common_fn.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'for_you_models.g.dart';
@@ -84,4 +86,20 @@ class MediaStackArticleModel {
   country => $country,
   publishedAt => $publishedAt,
   """;
+}
+
+extension MediaStackArticleModelToNewsPost on MediaStackArticleModel {
+  NewsPost get toPostModel => NewsPost(
+    id: generateRandomUuid(),
+    thumbnailUrl: url,
+    postUrl: url,
+    title: title,
+    description: description,
+    author: Author(
+      id: source,
+      name: author ?? 'Unknown',
+      type: AuthorType.publisher,
+    ),
+    publishedAt: publishedAt,
+  );
 }

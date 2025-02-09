@@ -1,4 +1,5 @@
 import 'package:akropolis/components/news_card.dart';
+import 'package:akropolis/features/create_post/models/models.dart';
 import 'package:akropolis/features/for_you_feed/models/for_you_models.dart';
 import 'package:akropolis/features/for_you_feed/view_models/for_you_news_cubit/for_you_news_cubit.dart';
 import 'package:akropolis/features/world_news_feed/models/enums.dart';
@@ -16,18 +17,22 @@ class ForYouContent extends StatelessWidget {
 
     return RefreshIndicator(
       onRefresh: () => pagedListKey.currentState!.refresh(),
-      child: PagedList<MediaStackArticleModel>(
+      child: PagedList<NewsPost>(
         key: pagedListKey,
         firstPageProgressIndicatorBuilder: (_) => const CircularProgressIndicator.adaptive(),
         newPageProgressIndicatorBuilder: (_) => const CircularProgressIndicator.adaptive(),
-        itemBuilder: (_, news, i) => NewsCard.mediaStack(news),
+        itemBuilder: (_, news, i) => NewsCard(post: news,),
         fetchPage: (int page, int pageSize, bool initialFetch) async {
-          return BlocProvider.of<ForYouNewsCubit>(context).fetchNews(
+          /*return BlocProvider.of<ForYouNewsCubit>(context).fetchNews(
             page: page,
             pageSize: pageSize,
             fromCache: initialFetch,
             language: Language.en,
             sources: NewsSourceEnum.values.map((s) => s.name).toList(),
+          );*/
+          return BlocProvider.of<ForYouNewsCubit>(context).fetchUserPostsNews(
+            pageSize: pageSize,
+            fromCache: initialFetch,
           );
         },
       ),

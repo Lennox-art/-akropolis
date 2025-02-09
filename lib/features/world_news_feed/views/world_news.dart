@@ -21,7 +21,7 @@ class WorldNewsContent extends StatelessWidget {
         key: pagedListKey,
         firstPageProgressIndicatorBuilder: (_) => const CircularProgressIndicator.adaptive(),
         newPageProgressIndicatorBuilder: (_) => const CircularProgressIndicator.adaptive(),
-        itemBuilder: (_, news, i) => NewsCard.newsApi(news),
+        itemBuilder: (_, news, i) => NewsCard(post: news.toNewsPost),
         fetchPage: (int page, int pageSize, bool initialFetch) async {
           if(page == 0) page = 1;
           return BlocProvider.of<WorldNewsCubit>(context).fetchNews(

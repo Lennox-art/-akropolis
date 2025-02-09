@@ -5,6 +5,7 @@ import 'package:akropolis/features/on_boarding/view_model/user_cubit/user_cubit.
 import 'package:akropolis/features/world_news_feed/view_models/world_news_cubit/world_news_cubit.dart';
 import 'package:akropolis/routes/routes.dart';
 import 'package:akropolis/theme/themes.dart';
+//import 'package:ffmpeg_helper/helpers/ffmpeg_helper_class.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -22,6 +23,8 @@ final ImagePicker picker = getIt<ImagePicker>();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  //await FFMpegHelper.instance.initialize();
 
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,

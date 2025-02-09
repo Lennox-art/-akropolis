@@ -1,4 +1,6 @@
+import 'package:akropolis/features/create_post/models/models.dart';
 import 'package:akropolis/features/world_news_feed/models/enums.dart';
+import 'package:common_fn/common_fn.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'world_news_models.g.dart';
@@ -99,4 +101,20 @@ class NewsSource {
 
   @override
   String toString() => "id : $id, name : $name";
+}
+
+extension NewsApiArticleModelToNewsPost on NewsApiArticleModel {
+  NewsPost get toNewsPost =>  NewsPost(
+    id: generateRandomUuid(),
+    thumbnailUrl: urlToImage,
+    postUrl: url,
+    title: title,
+    description: description,
+    author: Author(
+      id: source.id,
+      name: source.name,
+      type: AuthorType.publisher,
+    ),
+    publishedAt: publishedAt,
+  );
 }

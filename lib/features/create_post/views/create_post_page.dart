@@ -1,6 +1,8 @@
 import 'dart:math';
 
+import 'package:akropolis/features/authentication/models/authentication_models.dart';
 import 'package:akropolis/features/create_post/view_model/create_post_cubit.dart';
+import 'package:akropolis/features/on_boarding/view_model/user_cubit/user_cubit.dart';
 import 'package:akropolis/gen/assets.gen.dart';
 import 'package:akropolis/main.dart';
 import 'package:akropolis/routes/routes.dart';
@@ -62,10 +64,12 @@ class CreatePostPage extends StatelessWidget {
                         );
                         if (videoData == null || !context.mounted) return;
 
-                        await BlocProvider.of<CreatePostCubit>(context)
-                            .createNewPost(
+                        AppUser? user = await BlocProvider.of<UserCubit>(context).getCurrentUser();
+                        if (user == null || !context.mounted) return;
+
+                        await BlocProvider.of<CreatePostCubit>(context).createNewPost(
                           file: videoData,
-                          user: FirebaseAuth.instance.currentUser!,
+                          user: user,
                         );
 
                         if (!context.mounted) return;
@@ -101,10 +105,12 @@ class CreatePostPage extends StatelessWidget {
                         );
                         if (videoData == null || !context.mounted) return;
 
-                        await BlocProvider.of<CreatePostCubit>(context)
-                            .createNewPost(
+                        AppUser? user = await BlocProvider.of<UserCubit>(context).getCurrentUser();
+                        if (user == null || !context.mounted) return;
+
+                        await BlocProvider.of<CreatePostCubit>(context).createNewPost(
                           file: videoData,
-                          user: FirebaseAuth.instance.currentUser!,
+                          user: user,
                         );
 
                         if (!context.mounted) return;
@@ -140,8 +146,7 @@ class CreatePostPage extends StatelessWidget {
                     child: BlocBuilder<CreatePostCubit, CreatePostState>(
                       builder: (_, state) {
                         return state.map(
-                          loading: (_) =>
-                              const CircularProgressIndicator.adaptive(),
+                          loading: (_) => const CircularProgressIndicator.adaptive(),
                           loaded: (l) {
                             bool hasDraft = l.form != null;
 
@@ -149,15 +154,12 @@ class CreatePostPage extends StatelessWidget {
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Column(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceAround,
+                                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Icon(
                                       Icons.circle_outlined,
-                                      color: hasDraft
-                                          ? Colors.green
-                                          : theme.iconTheme.color,
+                                      color: hasDraft ? Colors.green : theme.iconTheme.color,
                                     ),
                                     Text("Draft"),
                                   ],

@@ -16,29 +16,49 @@ final _privateConstructorUsedError = UnsupportedError(
 
 /// @nodoc
 mixin _$CreatePostForm {
-  String get userId => throw _privateConstructorUsedError;
+  String get postId => throw _privateConstructorUsedError;
+  AppUser get appUser => throw _privateConstructorUsedError;
   File? get videoData => throw _privateConstructorUsedError;
+  bool get videoDataUploaded => throw _privateConstructorUsedError;
+  Duration? get videoDuration => throw _privateConstructorUsedError;
   Uint8List? get thumbnailData => throw _privateConstructorUsedError;
-  String? get title => throw _privateConstructorUsedError;
-  String? get description => throw _privateConstructorUsedError;
+  bool get thumbnailUploaded => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(String userId, File? videoData,
-            Uint8List? thumbnailData, String? title, String? description)
+    required TResult Function(
+            String postId,
+            AppUser appUser,
+            File? videoData,
+            bool videoDataUploaded,
+            Duration? videoDuration,
+            Uint8List? thumbnailData,
+            bool thumbnailUploaded)
         create,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(String userId, File? videoData, Uint8List? thumbnailData,
-            String? title, String? description)?
+    TResult? Function(
+            String postId,
+            AppUser appUser,
+            File? videoData,
+            bool videoDataUploaded,
+            Duration? videoDuration,
+            Uint8List? thumbnailData,
+            bool thumbnailUploaded)?
         create,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(String userId, File? videoData, Uint8List? thumbnailData,
-            String? title, String? description)?
+    TResult Function(
+            String postId,
+            AppUser appUser,
+            File? videoData,
+            bool videoDataUploaded,
+            Duration? videoDuration,
+            Uint8List? thumbnailData,
+            bool thumbnailUploaded)?
         create,
     required TResult orElse(),
   }) =>
@@ -74,11 +94,13 @@ abstract class $CreatePostFormCopyWith<$Res> {
       _$CreatePostFormCopyWithImpl<$Res, CreatePostForm>;
   @useResult
   $Res call(
-      {String userId,
+      {String postId,
+      AppUser appUser,
       File? videoData,
+      bool videoDataUploaded,
+      Duration? videoDuration,
       Uint8List? thumbnailData,
-      String? title,
-      String? description});
+      bool thumbnailUploaded});
 }
 
 /// @nodoc
@@ -96,33 +118,43 @@ class _$CreatePostFormCopyWithImpl<$Res, $Val extends CreatePostForm>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? userId = null,
+    Object? postId = null,
+    Object? appUser = null,
     Object? videoData = freezed,
+    Object? videoDataUploaded = null,
+    Object? videoDuration = freezed,
     Object? thumbnailData = freezed,
-    Object? title = freezed,
-    Object? description = freezed,
+    Object? thumbnailUploaded = null,
   }) {
     return _then(_value.copyWith(
-      userId: null == userId
-          ? _value.userId
-          : userId // ignore: cast_nullable_to_non_nullable
+      postId: null == postId
+          ? _value.postId
+          : postId // ignore: cast_nullable_to_non_nullable
               as String,
+      appUser: null == appUser
+          ? _value.appUser
+          : appUser // ignore: cast_nullable_to_non_nullable
+              as AppUser,
       videoData: freezed == videoData
           ? _value.videoData
           : videoData // ignore: cast_nullable_to_non_nullable
               as File?,
+      videoDataUploaded: null == videoDataUploaded
+          ? _value.videoDataUploaded
+          : videoDataUploaded // ignore: cast_nullable_to_non_nullable
+              as bool,
+      videoDuration: freezed == videoDuration
+          ? _value.videoDuration
+          : videoDuration // ignore: cast_nullable_to_non_nullable
+              as Duration?,
       thumbnailData: freezed == thumbnailData
           ? _value.thumbnailData
           : thumbnailData // ignore: cast_nullable_to_non_nullable
               as Uint8List?,
-      title: freezed == title
-          ? _value.title
-          : title // ignore: cast_nullable_to_non_nullable
-              as String?,
-      description: freezed == description
-          ? _value.description
-          : description // ignore: cast_nullable_to_non_nullable
-              as String?,
+      thumbnailUploaded: null == thumbnailUploaded
+          ? _value.thumbnailUploaded
+          : thumbnailUploaded // ignore: cast_nullable_to_non_nullable
+              as bool,
     ) as $Val);
   }
 }
@@ -136,11 +168,13 @@ abstract class _$$CreatePostFormImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {String userId,
+      {String postId,
+      AppUser appUser,
       File? videoData,
+      bool videoDataUploaded,
+      Duration? videoDuration,
       Uint8List? thumbnailData,
-      String? title,
-      String? description});
+      bool thumbnailUploaded});
 }
 
 /// @nodoc
@@ -156,33 +190,43 @@ class __$$CreatePostFormImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? userId = null,
+    Object? postId = null,
+    Object? appUser = null,
     Object? videoData = freezed,
+    Object? videoDataUploaded = null,
+    Object? videoDuration = freezed,
     Object? thumbnailData = freezed,
-    Object? title = freezed,
-    Object? description = freezed,
+    Object? thumbnailUploaded = null,
   }) {
     return _then(_$CreatePostFormImpl(
-      userId: null == userId
-          ? _value.userId
-          : userId // ignore: cast_nullable_to_non_nullable
+      postId: null == postId
+          ? _value.postId
+          : postId // ignore: cast_nullable_to_non_nullable
               as String,
+      appUser: null == appUser
+          ? _value.appUser
+          : appUser // ignore: cast_nullable_to_non_nullable
+              as AppUser,
       videoData: freezed == videoData
           ? _value.videoData
           : videoData // ignore: cast_nullable_to_non_nullable
               as File?,
+      videoDataUploaded: null == videoDataUploaded
+          ? _value.videoDataUploaded
+          : videoDataUploaded // ignore: cast_nullable_to_non_nullable
+              as bool,
+      videoDuration: freezed == videoDuration
+          ? _value.videoDuration
+          : videoDuration // ignore: cast_nullable_to_non_nullable
+              as Duration?,
       thumbnailData: freezed == thumbnailData
           ? _value.thumbnailData
           : thumbnailData // ignore: cast_nullable_to_non_nullable
               as Uint8List?,
-      title: freezed == title
-          ? _value.title
-          : title // ignore: cast_nullable_to_non_nullable
-              as String?,
-      description: freezed == description
-          ? _value.description
-          : description // ignore: cast_nullable_to_non_nullable
-              as String?,
+      thumbnailUploaded: null == thumbnailUploaded
+          ? _value.thumbnailUploaded
+          : thumbnailUploaded // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 }
@@ -191,26 +235,34 @@ class __$$CreatePostFormImplCopyWithImpl<$Res>
 
 class _$CreatePostFormImpl implements _CreatePostForm {
   const _$CreatePostFormImpl(
-      {required this.userId,
+      {required this.postId,
+      required this.appUser,
       this.videoData,
+      this.videoDataUploaded = false,
+      this.videoDuration,
       this.thumbnailData,
-      this.title,
-      this.description});
+      this.thumbnailUploaded = false});
 
   @override
-  final String userId;
+  final String postId;
+  @override
+  final AppUser appUser;
   @override
   final File? videoData;
   @override
+  @JsonKey()
+  final bool videoDataUploaded;
+  @override
+  final Duration? videoDuration;
+  @override
   final Uint8List? thumbnailData;
   @override
-  final String? title;
-  @override
-  final String? description;
+  @JsonKey()
+  final bool thumbnailUploaded;
 
   @override
   String toString() {
-    return 'CreatePostForm.create(userId: $userId, videoData: $videoData, thumbnailData: $thumbnailData, title: $title, description: $description)';
+    return 'CreatePostForm.create(postId: $postId, appUser: $appUser, videoData: $videoData, videoDataUploaded: $videoDataUploaded, videoDuration: $videoDuration, thumbnailData: $thumbnailData, thumbnailUploaded: $thumbnailUploaded)';
   }
 
   @override
@@ -218,19 +270,30 @@ class _$CreatePostFormImpl implements _CreatePostForm {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$CreatePostFormImpl &&
-            (identical(other.userId, userId) || other.userId == userId) &&
+            (identical(other.postId, postId) || other.postId == postId) &&
+            (identical(other.appUser, appUser) || other.appUser == appUser) &&
             (identical(other.videoData, videoData) ||
                 other.videoData == videoData) &&
+            (identical(other.videoDataUploaded, videoDataUploaded) ||
+                other.videoDataUploaded == videoDataUploaded) &&
+            (identical(other.videoDuration, videoDuration) ||
+                other.videoDuration == videoDuration) &&
             const DeepCollectionEquality()
                 .equals(other.thumbnailData, thumbnailData) &&
-            (identical(other.title, title) || other.title == title) &&
-            (identical(other.description, description) ||
-                other.description == description));
+            (identical(other.thumbnailUploaded, thumbnailUploaded) ||
+                other.thumbnailUploaded == thumbnailUploaded));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, userId, videoData,
-      const DeepCollectionEquality().hash(thumbnailData), title, description);
+  int get hashCode => Object.hash(
+      runtimeType,
+      postId,
+      appUser,
+      videoData,
+      videoDataUploaded,
+      videoDuration,
+      const DeepCollectionEquality().hash(thumbnailData),
+      thumbnailUploaded);
 
   /// Create a copy of CreatePostForm
   /// with the given fields replaced by the non-null parameter values.
@@ -244,33 +307,54 @@ class _$CreatePostFormImpl implements _CreatePostForm {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(String userId, File? videoData,
-            Uint8List? thumbnailData, String? title, String? description)
+    required TResult Function(
+            String postId,
+            AppUser appUser,
+            File? videoData,
+            bool videoDataUploaded,
+            Duration? videoDuration,
+            Uint8List? thumbnailData,
+            bool thumbnailUploaded)
         create,
   }) {
-    return create(userId, videoData, thumbnailData, title, description);
+    return create(postId, appUser, videoData, videoDataUploaded, videoDuration,
+        thumbnailData, thumbnailUploaded);
   }
 
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(String userId, File? videoData, Uint8List? thumbnailData,
-            String? title, String? description)?
+    TResult? Function(
+            String postId,
+            AppUser appUser,
+            File? videoData,
+            bool videoDataUploaded,
+            Duration? videoDuration,
+            Uint8List? thumbnailData,
+            bool thumbnailUploaded)?
         create,
   }) {
-    return create?.call(userId, videoData, thumbnailData, title, description);
+    return create?.call(postId, appUser, videoData, videoDataUploaded,
+        videoDuration, thumbnailData, thumbnailUploaded);
   }
 
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(String userId, File? videoData, Uint8List? thumbnailData,
-            String? title, String? description)?
+    TResult Function(
+            String postId,
+            AppUser appUser,
+            File? videoData,
+            bool videoDataUploaded,
+            Duration? videoDuration,
+            Uint8List? thumbnailData,
+            bool thumbnailUploaded)?
         create,
     required TResult orElse(),
   }) {
     if (create != null) {
-      return create(userId, videoData, thumbnailData, title, description);
+      return create(postId, appUser, videoData, videoDataUploaded,
+          videoDuration, thumbnailData, thumbnailUploaded);
     }
     return orElse();
   }
@@ -306,22 +390,28 @@ class _$CreatePostFormImpl implements _CreatePostForm {
 
 abstract class _CreatePostForm implements CreatePostForm {
   const factory _CreatePostForm(
-      {required final String userId,
+      {required final String postId,
+      required final AppUser appUser,
       final File? videoData,
+      final bool videoDataUploaded,
+      final Duration? videoDuration,
       final Uint8List? thumbnailData,
-      final String? title,
-      final String? description}) = _$CreatePostFormImpl;
+      final bool thumbnailUploaded}) = _$CreatePostFormImpl;
 
   @override
-  String get userId;
+  String get postId;
+  @override
+  AppUser get appUser;
   @override
   File? get videoData;
   @override
+  bool get videoDataUploaded;
+  @override
+  Duration? get videoDuration;
+  @override
   Uint8List? get thumbnailData;
   @override
-  String? get title;
-  @override
-  String? get description;
+  bool get thumbnailUploaded;
 
   /// Create a copy of CreatePostForm
   /// with the given fields replaced by the non-null parameter values.

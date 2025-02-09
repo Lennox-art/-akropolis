@@ -3,7 +3,9 @@ import 'package:akropolis/features/for_you_feed/models/for_you_models.dart';
 import 'package:akropolis/features/world_news_feed/models/world_news_models.dart';
 import 'package:akropolis/main.dart';
 import 'package:akropolis/utils/functions.dart';
+import 'package:common_fn/common_fn.dart';
 import 'package:flutter/material.dart';
+
 
 class NewsCard extends StatelessWidget {
   final NewsPost post;
@@ -13,37 +15,6 @@ class NewsCard extends StatelessWidget {
     required this.post,
   });
 
-  NewsCard.newsApi(NewsApiArticleModel news, {super.key})
-      : post = NewsPost(
-          thumbnailUrl: news.urlToImage,
-          postUrl: news.url,
-          title: news.title,
-          description: news.description,
-          author: Author(
-            id: news.source.id,
-            name: news.source.name,
-            type: AuthorType.publisher,
-          ),
-          publishedAt: news.publishedAt,
-        ) {
-    log.info(news);
-  }
-
-  NewsCard.mediaStack(MediaStackArticleModel news, {super.key})
-      : post = NewsPost(
-          thumbnailUrl: news.url,
-          postUrl: news.url,
-          title: news.title,
-          description: news.description,
-          author: Author(
-            id: news.source,
-            name: news.author ?? 'Unknown',
-            type: AuthorType.publisher,
-          ),
-          publishedAt: news.publishedAt,
-        ) {
-    log.info(news);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +35,7 @@ class NewsCard extends StatelessWidget {
                 size: 250,
               ),
               child: Image.network(
-                post.postUrl,
+                post.thumbnailUrl,
                 height: 180,
                 width: double.infinity,
                 fit: BoxFit.cover,
@@ -95,7 +66,7 @@ class NewsCard extends StatelessWidget {
                   direction: Axis.horizontal,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.person,
                       size: 18,
                       color: Colors.grey,
