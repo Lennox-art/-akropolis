@@ -25,7 +25,7 @@ interface NewsPost {
   title: string;
   description: string;
   author: Author;
-  publishedAt: Date;
+  publishedAt: string;
 }
 
 // Define article structure
@@ -74,9 +74,20 @@ const articleToNewsPost = (article: Article): NewsPost => ({
     name: article.author || "Unknown",
     type: "publisher",
   },
-  publishedAt: new Date(article.published_at), // Convert to Date object
+  publishedAt: generateTimestamp(new Date(article.published_at)), // Convert to Date object
 });
 
+function generateTimestamp(now: Date): string {
+  const isoString = now.toISOString(); // "2025-02-09T20:37:23.344Z"
+
+  // Extract milliseconds and pad to six decimal places
+  const millis = now.getMilliseconds().toString().padStart(3, "0"); // "344"
+  const micros = millis + "359"; // Appending extra digits manually
+
+  return isoString.replace(/\.\d{3}Z$/, `.${micros}Z`);
+}
+
+console.log(generateTimestamp(new Date()));
 const generateTimestampId = (): string => {
   const now = process.hrtime.bigint(); // High-resolution time in nanoseconds
   return now.toString(); // Convert to string
