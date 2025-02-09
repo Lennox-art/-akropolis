@@ -1,13 +1,9 @@
 import * as logger from "firebase-functions/logger";
 import * as functions from 'firebase-functions/v2';
-import * as admin from "firebase-admin";
 import axios from "axios";
 import { firestore } from "firebase-admin";
 
-// Ensure Firebase is initialized only once
-if (admin.apps.length === 0) {
-  admin.initializeApp();
-}
+
 
 // Author Model
 interface Author {

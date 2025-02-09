@@ -1,10 +1,4 @@
 {
-  "dependencies": {
-    "@google-cloud/storage": "7.8.0",
-    "axios": "^1.7.9",
-    "firebase-admin": "^13.1.0",
-    "firebase-functions": "^6.3.1"
-  },
   "name": "akropolis",
   "version": "1.0.0",
   "description": "Build runner ```bash   flutter pub run build_runner build --delete-conflicting-outputs ```",
@@ -29,5 +23,8 @@
   "homepage": "https://github.com/Lennox-art/-akropolis#readme",
   "devDependencies": {
     "firebase-tools": "^13.30.0"
+  },
+  "dependencies": {
+    "axios": "^1.7.9"
   }
 }
