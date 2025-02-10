@@ -1,4 +1,5 @@
 import 'package:akropolis/components/news_card.dart';
+import 'package:akropolis/features/authentication/view_model/authentication_cubit/authentication_cubit.dart';
 import 'package:akropolis/features/create_post/models/models.dart';
 import 'package:akropolis/features/for_you_feed/models/for_you_models.dart';
 import 'package:akropolis/features/for_you_feed/view_models/for_you_news_cubit/for_you_news_cubit.dart';

@@ -1,38 +1,187 @@
-import 'package:akropolis/features/create_post/models/models.dart';
-import 'package:akropolis/features/for_you_feed/models/for_you_models.dart';
-import 'package:akropolis/features/world_news_feed/models/world_news_models.dart';
-import 'package:akropolis/main.dart';
-import 'package:akropolis/utils/functions.dart';
-import 'package:common_fn/common_fn.dart';
-import 'package:flutter/material.dart';
+import 'dart:io';
+import 'dart:typed_data';
 
+import 'package:akropolis/features/authentication/view_model/authentication_cubit/authentication_cubit.dart';
+import 'package:akropolis/features/create_post/models/models.dart';
+import 'package:akropolis/utils/functions.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:common_fn/common_fn.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class NewsCard extends StatelessWidget {
   final NewsPost post;
+
+  DocumentReference get postsCollectionRef => FirebaseFirestore.instance.collection(NewsPost.collection).doc(post.id).withConverter<NewsPost>(
+        fromFirestore: (snapshot, _) => NewsPost.fromJson(snapshot.data()!),
+        toFirestore: (model, _) => model.toJson(),
+      );
 
   const NewsCard({
     super.key,
     required this.post,
   });
 
+  void setViewedPost(String userId) {
+    bool isViewer = post.viewers?.contains(userId) ?? false;
+    if (isViewer) return;
+
+    post.viewers ??= {};
+    post.viewers!.add(userId);
+
+    postsCollectionRef.update({
+      'viewers': FieldValue.arrayUnion([userId])
+    });
+  }
+
+  void setLogicReaction(String userId) {
+    bool hasReacted = post.reaction?.log.contains(userId) ?? false;
+    if (hasReacted) return;
+
+    post.reaction ??= PostReaction(log: {}, emp: {});
+    post.reaction!.log.add(userId);
+
+    postsCollectionRef.update({
+      'reaction.log': FieldValue.arrayUnion([userId])
+    });
+    postsCollectionRef.update({
+      'reaction.emp': FieldValue.arrayRemove([userId])
+    });
+  }
+
+  void setEmpReaction(String userId) {
+    bool hasReacted = post.reaction?.emp.contains(userId) ?? false;
+    if (hasReacted) return;
+
+    post.reaction ??= PostReaction(log: {}, emp: {});
+    post.reaction!.emp.add(userId);
+
+    postsCollectionRef.update({
+      'reaction.log': FieldValue.arrayRemove([userId])
+    });
+    postsCollectionRef.update({
+      'reaction.emp': FieldValue.arrayUnion([userId])
+    });
+  }
+
+  Future<void> setCommentReaction({
+    required String userId,
+    required String updatePath,
+    required File videoData,
+    required Uint8List thumbnail,
+  }) async {
+    String commentId = "${post.id}-${generateTimeUuid()}";
+
+    final thumbnailsRef = FirebaseStorage.instance.ref().child("thumbnails");
+    final postsRef = FirebaseStorage.instance.ref().child("comments");
+
+    late String thumbnailUrl;
+    UploadTask thumbTask = thumbnailsRef.child(commentId).putFile(
+          videoData,
+          SettableMetadata(
+            customMetadata: {
+              "postId": post.id,
+              "commentId": commentId,
+            },
+          ),
+        );
+    await for (var snapshot in thumbTask.snapshotEvents) {
+      switch (snapshot.state) {
+        case TaskState.running:
+          final progress = 100.0 * (snapshot.bytesTransferred / snapshot.totalBytes);
+          print("Post Upload is $progress% complete.");
+          break;
+        case TaskState.paused:
+          print("Upload is paused.");
+          break;
+        case TaskState.canceled:
+          print("Upload was canceled");
+          break;
+        case TaskState.error:
+          // Handle unsuccessful uploads
+          break;
+        case TaskState.success:
+          thumbnailUrl = await snapshot.ref.getDownloadURL();
+          break;
+      }
+    }
+
+    late String postUrl;
+    UploadTask postTask = postsRef.child(commentId).putFile(
+          videoData,
+          SettableMetadata(
+            customMetadata: {
+              "postId": post.id,
+              "commentId": commentId,
+            },
+          ),
+        );
+    await for (var snapshot in postTask.snapshotEvents) {
+      switch (snapshot.state) {
+        case TaskState.running:
+          final progress = 100.0 * (snapshot.bytesTransferred / snapshot.totalBytes);
+          print("Post Upload is $progress% complete.");
+          break;
+        case TaskState.paused:
+          print("Upload is paused.");
+          break;
+        case TaskState.canceled:
+          print("Upload was canceled");
+          break;
+        case TaskState.error:
+          // Handle unsuccessful uploads
+          break;
+        case TaskState.success:
+          // Handle successful uploads on complete
+          // ...
+          postUrl = await snapshot.ref.getDownloadURL();
+
+          break;
+      }
+    }
+
+    PostComment comment = PostComment(
+      id: commentId,
+      thumbnailUrl: thumbnailUrl,
+      postUrl: postUrl,
+      userId: userId,
+      replies: [],
+      commentedAt: DateTime.now(),
+      reaction: PostReaction(
+        log: {},
+        emp: {},
+      ),
+    );
+
+    postsCollectionRef.update({
+      updatePath: FieldValue.arrayUnion([comment])
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
+    User? user = BlocProvider.of<AuthenticationCubit>(context).getCurrentUser();
+
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) {
+        if (user == null) return;
+        setViewedPost(user.uid);
+      },
+    );
 
     return Card(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          ClipRRect(
-            borderRadius: const BorderRadius.vertical(
-              top: Radius.circular(16.0),
-            ),
-            child: Visibility(
-              replacement: const Icon(
-                Icons.newspaper,
-                size: 250,
+          Visibility(
+            visible: post.thumbnailUrl.isNotEmpty,
+            child: ClipRRect(
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(16.0),
               ),
               child: Image.network(
                 post.thumbnailUrl,
@@ -116,9 +265,9 @@ class NewsCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 8),
-                    const Text(
-                      "+2 Replies",
-                      style: TextStyle(fontSize: 14, color: Colors.blue),
+                    Text(
+                      "+${post.comments?.length ?? 0} Replies",
+                      style: const TextStyle(fontSize: 14, color: Colors.blue),
                     ),
                     const Spacer(),
                     IconButton(

@@ -54,6 +54,9 @@ class NewsPost {
   final String description;
   final Author author;
   final DateTime publishedAt;
+  Set<String>? viewers;
+  List<PostComment>? comments;
+  PostReaction? reaction;
 
   NewsPost({
     required this.id,
@@ -62,7 +65,10 @@ class NewsPost {
     required this.title,
     required this.description,
     required this.author,
+    this.comments,
+    this.viewers,
     required this.publishedAt,
+    this.reaction,
   });
 
   static const String collection = 'news_posts';
@@ -70,6 +76,46 @@ class NewsPost {
   factory NewsPost.fromJson(Map<String, dynamic> json) => _$NewsPostFromJson(json);
 
   Map<String, dynamic> toJson() => _$NewsPostToJson(this);
+}
+
+@JsonSerializable()
+class PostReaction {
+  final Set<String> log;
+  final Set<String> emp;
+
+  PostReaction({
+    required this.log,
+    required this.emp,
+  });
+
+  factory PostReaction.fromJson(Map<String, dynamic> json) => _$PostReactionFromJson(json);
+
+  Map<String, dynamic> toJson() => _$PostReactionToJson(this);
+}
+
+@JsonSerializable()
+class PostComment {
+  final String id;
+  final String thumbnailUrl;
+  final String postUrl;
+  final String userId;
+  final List<PostComment> replies;
+  final DateTime commentedAt;
+  PostReaction? reaction;
+
+  PostComment({
+    required this.id,
+    required this.thumbnailUrl,
+    required this.postUrl,
+    required this.userId,
+    required this.replies,
+    required this.commentedAt,
+    required this.reaction,
+  });
+
+  factory PostComment.fromJson(Map<String, dynamic> json) => _$PostCommentFromJson(json);
+
+  Map<String, dynamic> toJson() => _$PostCommentToJson(this);
 }
 
 @freezed
