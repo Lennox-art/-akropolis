@@ -1,0 +1,2 @@
+/home/vnsjaowmfaa/Projects/personal/-akropolis/android/app/.cxx/RelWithDebInfo/h1t66042/armeabi-v7a/CMakeFiles/edit_cache.dir
+/home/vnsjaowmfaa/Projects/personal/-akropolis/android/app/.cxx/RelWithDebInfo/h1t66042/armeabi-v7a/CMakeFiles/rebuild_cache.dir

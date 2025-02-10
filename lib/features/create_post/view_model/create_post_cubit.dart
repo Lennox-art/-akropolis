@@ -5,6 +5,7 @@ import 'package:akropolis/components/toast/toast.dart';
 import 'package:akropolis/features/authentication/models/authentication_models.dart';
 import 'package:akropolis/features/create_post/models/models.dart';
 import 'package:akropolis/features/news_feed/models/models.dart';
+import 'package:akropolis/main.dart';
 import 'package:akropolis/utils/constants.dart';
 import 'package:akropolis/utils/functions.dart';
 import 'package:camera/camera.dart';
@@ -40,9 +41,11 @@ class CreatePostCubit extends Cubit<CreatePostState> {
 
     Duration? duration;
     // = await getVideoDuration(file.path);
-    Uint8List? thumbnailData = await generateThumbnailBytes(
+    Uint8List? thumbnailData = await generateThumbnail(
       videoPath: file.path,
     );
+
+    log.debug("${thumbnailData != null} with data?");
 
     form = CreatePostForm.create(
       postId: generateTimeUuid(),
@@ -58,7 +61,6 @@ class CreatePostCubit extends Cubit<CreatePostState> {
   }
 
   void modifyThumbnail({
-
     Uint8List? thumbnail,
   }) {
     form = form?.copyWith(
