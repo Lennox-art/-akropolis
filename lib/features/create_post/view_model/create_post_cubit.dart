@@ -4,6 +4,8 @@ import 'dart:typed_data';
 import 'package:akropolis/components/toast/toast.dart';
 import 'package:akropolis/features/authentication/models/authentication_models.dart';
 import 'package:akropolis/features/create_post/models/models.dart';
+import 'package:akropolis/features/news_feed/models/models.dart';
+import 'package:akropolis/utils/constants.dart';
 import 'package:akropolis/utils/functions.dart';
 import 'package:camera/camera.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -21,7 +23,7 @@ class CreatePostCubit extends Cubit<CreatePostState> {
   CreatePostForm? form;
   final thumbnailsRef = FirebaseStorage.instance.ref().child("thumbnails");
   final postsRef = FirebaseStorage.instance.ref().child("posts");
-  final CollectionReference postsCollectionRef = FirebaseFirestore.instance.collection(NewsPost.collection).withConverter<NewsPost>(
+  final CollectionReference postsCollectionRef = FirebaseFirestore.instance.collection(userPostsCollection).withConverter<NewsPost>(
         fromFirestore: (snapshot, _) => NewsPost.fromJson(snapshot.data()!),
         toFirestore: (model, _) => model.toJson(),
       );

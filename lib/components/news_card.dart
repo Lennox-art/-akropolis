@@ -2,7 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:akropolis/features/authentication/view_model/authentication_cubit/authentication_cubit.dart';
-import 'package:akropolis/features/create_post/models/models.dart';
+import 'package:akropolis/features/news_feed/models/models.dart';
 import 'package:akropolis/utils/functions.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:common_fn/common_fn.dart';
@@ -13,8 +13,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class NewsCard extends StatelessWidget {
   final NewsPost post;
+  final String collection;
 
-  DocumentReference get postsCollectionRef => FirebaseFirestore.instance.collection(NewsPost.collection).doc(post.id).withConverter<NewsPost>(
+  DocumentReference get postsCollectionRef => FirebaseFirestore.instance.collection(collection).doc(post.id).withConverter<NewsPost>(
         fromFirestore: (snapshot, _) => NewsPost.fromJson(snapshot.data()!),
         toFirestore: (model, _) => model.toJson(),
       );
@@ -22,10 +23,11 @@ class NewsCard extends StatelessWidget {
   const NewsCard({
     super.key,
     required this.post,
+    required this.collection,
   });
 
   void setViewedPost(String userId) {
-    bool isViewer = post.viewers.contains(userId) ?? false;
+    bool isViewer = post.viewers.contains(userId);
     if (isViewer) return;
 
     post.viewers.add(userId);
@@ -36,7 +38,7 @@ class NewsCard extends StatelessWidget {
   }
 
   void setLogicReaction(String userId) {
-    bool hasReacted = post.reaction.log.contains(userId) ?? false;
+    bool hasReacted = post.reaction.log.contains(userId);
     if (hasReacted) return;
 
     post.reaction.log.add(userId);

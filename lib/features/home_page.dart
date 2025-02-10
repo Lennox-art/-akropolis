@@ -1,9 +1,9 @@
 import 'package:akropolis/features/authentication/view_model/authentication_cubit/authentication_cubit.dart';
+import 'package:akropolis/features/news_feed/view/for_you.dart';
 import 'package:akropolis/utils/constants.dart';
-import 'package:akropolis/features/for_you_feed/view/for_you.dart';
-import 'package:akropolis/features/local_news_feed/views/local_news.dart';
-import 'package:akropolis/features/headlines_feed/views/headlines.dart';
-import 'package:akropolis/features/world_news_feed/views/world_news.dart';
+import 'package:akropolis/features/news_feed/view/local_news.dart';
+import 'package:akropolis/features/news_feed/view/headlines.dart';
+import 'package:akropolis/features/news_feed/view/world_news.dart';
 import 'package:akropolis/routes/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

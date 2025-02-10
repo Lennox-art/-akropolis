@@ -9,3 +9,8 @@ SHA1 fingerprint
 ```bash
 keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android -keypass android
 ```
+
+# Cloud functions locally from /functions directory
+```bash
+npm run serve
+```
