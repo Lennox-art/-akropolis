@@ -49,5 +49,7 @@
     <string>Allow Akropolis to use camera to record video</string>
     <key>NSMicrophoneUsageDescription</key>
     <string>Allow Akropolis to use microphone to record audio</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>Allow Akropolis to use videos from gallery</string>
 </dict>
 </plist>

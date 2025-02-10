@@ -28,6 +28,14 @@ class PostMetaDataPage extends StatelessWidget {
                     loading: (l) => const CircularProgressIndicator.adaptive(),
                     loaded: (l) {
 
+                      if(l.form == null) {
+                        return const Text("No video");
+                      }
+
+                      if(l.form?.thumbnailData == null) {
+                        return const Text("No thumbnail");
+                      }
+
                       return Visibility(
                         visible: l.form != null,
                         child: Image.memory(

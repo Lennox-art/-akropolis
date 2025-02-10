@@ -1,10 +1,10 @@
+enum AuthorType {
+  user,
+  publisher;
 
-import 'package:freezed_annotation/freezed_annotation.dart';
-part 'models.g.dart';
+  static Map<String, AuthorType> authorTypeEnumMap = {for(var e in values) e.name: e};
+}
 
-enum AuthorType { user, publisher }
-
-@JsonSerializable()
 class Author {
   final String id;
   final String name;
@@ -18,12 +18,21 @@ class Author {
     required this.type,
   });
 
-  factory Author.fromJson(Map<String, dynamic> json) => _$AuthorFromJson(json);
+  factory Author.fromJson(Map<String, dynamic> json) => Author(
+        id: json['id'] as String,
+        name: json['name'] as String,
+        imageUrl: json['imageUrl'] as String?,
+        type: AuthorType.authorTypeEnumMap[json['type']]!,
+      );
 
-  Map<String, dynamic> toJson() => _$AuthorToJson(this);
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'id': id,
+        'name': name,
+        'imageUrl': imageUrl,
+        'type': type.name,
+      };
 }
 
-@JsonSerializable()
 class NewsPost {
   final String id;
   final String thumbnailUrl;
@@ -49,13 +58,33 @@ class NewsPost {
     required this.reaction,
   });
 
+  factory NewsPost.fromJson(Map<String, dynamic> json) => NewsPost(
+        id: json['id'] as String,
+        thumbnailUrl: json['thumbnailUrl'] as String,
+        postUrl: json['postUrl'] as String,
+        title: json['title'] as String,
+        description: json['description'] as String,
+        author: Author.fromJson(json['author'] as Map<String, dynamic>),
+        comments: (json['comments'] as List<dynamic>).map((e) => PostComment.fromJson(e as Map<String, dynamic>)).toList(),
+        viewers: (json['viewers'] as List<dynamic>).map((e) => e as String).toSet(),
+        publishedAt: DateTime.parse(json['publishedAt'] as String),
+        reaction: PostReaction.fromJson(json['reaction'] as Map<String, dynamic>),
+      );
 
-  factory NewsPost.fromJson(Map<String, dynamic> json) => _$NewsPostFromJson(json);
-
-  Map<String, dynamic> toJson() => _$NewsPostToJson(this);
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'thumbnailUrl': thumbnailUrl,
+        'postUrl': postUrl,
+        'title': title,
+        'description': description,
+        'author': author.toJson(),
+        'publishedAt': publishedAt.toIso8601String(),
+        'viewers': viewers.toList(),
+        'comments': comments.map((c) => c.toJson()).toList(),
+        'reaction': reaction.toJson(),
+      };
 }
 
-@JsonSerializable()
 class PostReaction {
   final Set<String> log;
   final Set<String> emp;
@@ -65,12 +94,17 @@ class PostReaction {
     required this.emp,
   });
 
-  factory PostReaction.fromJson(Map<String, dynamic> json) => _$PostReactionFromJson(json);
+  factory PostReaction.fromJson(Map<String, dynamic> json) => PostReaction(
+        log: (json['log'] as List<dynamic>).map((e) => e as String).toSet(),
+        emp: (json['emp'] as List<dynamic>).map((e) => e as String).toSet(),
+      );
 
-  Map<String, dynamic> toJson() => _$PostReactionToJson(this);
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'log': log.toList(),
+        'emp': emp.toList(),
+      };
 }
 
-@JsonSerializable()
 class PostComment {
   final String id;
   final String thumbnailUrl;
@@ -90,7 +124,23 @@ class PostComment {
     required this.reaction,
   });
 
-  factory PostComment.fromJson(Map<String, dynamic> json) => _$PostCommentFromJson(json);
+  factory PostComment.fromJson(Map<String, dynamic> json) => PostComment(
+        id: json['id'] as String,
+        thumbnailUrl: json['thumbnailUrl'] as String,
+        postUrl: json['postUrl'] as String,
+        userId: json['userId'] as String,
+        replies: (json['replies'] as List<dynamic>).map((e) => PostComment.fromJson(e as Map<String, dynamic>)).toList(),
+        commentedAt: DateTime.parse(json['commentedAt'] as String),
+        reaction: json['reaction'] == null ? null : PostReaction.fromJson(json['reaction'] as Map<String, dynamic>),
+      );
 
-  Map<String, dynamic> toJson() => _$PostCommentToJson(this);
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'id': id,
+        'thumbnailUrl': thumbnailUrl,
+        'postUrl': postUrl,
+        'userId': userId,
+        'replies': replies.map((r) => r.toJson()).toList(),
+        'commentedAt': commentedAt.toIso8601String(),
+        'reaction': reaction,
+      };
 }

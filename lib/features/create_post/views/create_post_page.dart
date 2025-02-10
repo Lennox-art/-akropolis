@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:akropolis/features/authentication/models/authentication_models.dart';
@@ -68,7 +69,7 @@ class CreatePostPage extends StatelessWidget {
                         if (user == null || !context.mounted) return;
 
                         await BlocProvider.of<CreatePostCubit>(context).createNewPost(
-                          file: videoData,
+                          file: File(videoData.path)..writeAsBytesSync(await videoData.readAsBytes()),
                           user: user,
                         );
 
@@ -108,8 +109,9 @@ class CreatePostPage extends StatelessWidget {
                         AppUser? user = await BlocProvider.of<UserCubit>(context).getCurrentUser();
                         if (user == null || !context.mounted) return;
 
+
                         await BlocProvider.of<CreatePostCubit>(context).createNewPost(
-                          file: videoData,
+                          file: File(videoData.path)..writeAsBytesSync(await videoData.readAsBytes()),
                           user: user,
                         );
 
@@ -148,21 +150,40 @@ class CreatePostPage extends StatelessWidget {
                         return state.map(
                           loading: (_) => const CircularProgressIndicator.adaptive(),
                           loaded: (l) {
-                            bool hasDraft = l.form != null;
+                            bool hasDraft = l.form?.videoData != null;
 
-                            return Card(
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Icon(
-                                      Icons.circle_outlined,
-                                      color: hasDraft ? Colors.green : theme.iconTheme.color,
-                                    ),
-                                    Text("Draft"),
-                                  ],
+                            return GestureDetector(
+                              onTap: () async {
+                                if(!hasDraft) return;
+
+                                AppUser? user = await BlocProvider.of<UserCubit>(context).getCurrentUser();
+                                if (user == null || !context.mounted) return;
+
+                                await BlocProvider.of<CreatePostCubit>(context).createNewPost(
+                                  file: l.form!.videoData!,
+                                  user: user,
+                                );
+
+                                if (!context.mounted) return;
+
+                                Navigator.of(context).pushNamed(
+                                  AppRoutes.videoEditingPage.path,
+                                );
+                              },
+                              child: Card(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Icon(
+                                        Icons.circle_outlined,
+                                        color: hasDraft ? Colors.green : theme.iconTheme.color,
+                                      ),
+                                      Text("Draft"),
+                                    ],
+                                  ),
                                 ),
                               ),
                             );

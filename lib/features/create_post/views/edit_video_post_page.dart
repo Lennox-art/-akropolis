@@ -6,7 +6,6 @@ import 'package:akropolis/features/create_post/view_model/create_post_cubit.dart
 import 'package:akropolis/main.dart';
 import 'package:akropolis/routes/routes.dart';
 import 'package:akropolis/utils/duration_style.dart';
-import 'package:akropolis/utils/functions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:video_player/video_player.dart';
@@ -16,11 +15,17 @@ class EditVideoPostPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ValueNotifier<VideoEditingTools> currentToolNotifier = ValueNotifier(
+      VideoEditingTools.trimVideo,
+    );
+
     return Scaffold(
       body: BlocBuilder<CreatePostCubit, CreatePostState>(
         builder: (_, state) {
           return state.map(
-            loading: (_) => const CircularProgressIndicator.adaptive(),
+            loading: (_) => const Center(
+              child: CircularProgressIndicator.adaptive(),
+            ),
             loaded: (l) {
               return Flex(
                 direction: Axis.vertical,
@@ -32,6 +37,7 @@ class EditVideoPostPage extends StatelessWidget {
                       visible: l.form != null,
                       child: VideoEditingWidget(
                         data: l.form!.videoData!,
+                        currentToolNotifier: currentToolNotifier,
                       ),
                     ),
                   ),
@@ -57,17 +63,17 @@ class EditVideoPostPage extends StatelessWidget {
 
 class VideoEditingWidget extends StatelessWidget {
   const VideoEditingWidget({
+    required this.currentToolNotifier,
     required this.data,
     super.key,
   });
 
   final File data;
+  final ValueNotifier<VideoEditingTools> currentToolNotifier;
 
   @override
   Widget build(BuildContext context) {
-    final ValueNotifier<VideoEditingTools> currentToolNotifier = ValueNotifier(
-      VideoEditingTools.trimVideo,
-    );
+
 
     return Flex(
       direction: Axis.vertical,
@@ -79,14 +85,9 @@ class VideoEditingWidget extends StatelessWidget {
               return switch (tool) {
                 VideoEditingTools.trimVideo => TrimVideoWidget(
                     data: data,
-                    onTrim: (vid) {},
                   ),
                 VideoEditingTools.thumbnailPicker => ThumbnailVideoWidget(
                     data: data,
-                    onSelect: (data) {
-                      log.debug("Modifying thumbnail");
-                      BlocProvider.of<CreatePostCubit>(context).modifyThumbnail(thumbnail: data);
-                    },
                   ),
               };
             },
@@ -116,12 +117,10 @@ class VideoEditingWidget extends StatelessWidget {
 class TrimVideoWidget extends StatelessWidget {
   const TrimVideoWidget({
     required this.data,
-    required this.onTrim,
     super.key,
   });
 
   final File data;
-  final Function(File) onTrim;
 
   @override
   Widget build(BuildContext context) {
@@ -147,15 +146,20 @@ class TrimVideoWidget extends StatelessWidget {
         controller.addListener(
           () {
             Duration currentPosition = controller.value.position;
+            log.info("Start position ${videoDurationNotifier.value.start.format(DurationStyle.FORMAT_HH_MM_SS)}");
+            log.info("End position ${videoDurationNotifier.value.end.format(DurationStyle.FORMAT_HH_MM_SS)}");
+            log.info("Current position ${currentPosition.format(DurationStyle.FORMAT_HH_MM_SS)}");
 
             ///Correct trim
             if (currentPosition.compareTo(videoDurationNotifier.value.start) < 0) {
               controller.seekTo(videoDurationNotifier.value.start);
+              controller.pause();
               return;
             }
 
             if (currentPosition.compareTo(videoDurationNotifier.value.end) > 0) {
               controller.seekTo(videoDurationNotifier.value.end);
+              controller.pause();
               return;
             }
           },
@@ -174,6 +178,29 @@ class TrimVideoWidget extends StatelessWidget {
                   ),
                 ),
                 ValueListenableBuilder(
+                    valueListenable: controller,
+                    builder: (_, videoCtrl, __) {
+                      return Visibility(
+                        visible: videoCtrl.isPlaying,
+                        replacement: IconButton(
+                          onPressed: () {
+                            controller.play();
+                          },
+                          icon: const Icon(
+                            Icons.play_arrow,
+                          ),
+                        ),
+                        child: IconButton(
+                          onPressed: () {
+                            controller.pause();
+                          },
+                          icon: const Icon(
+                            Icons.pause,
+                          ),
+                        ),
+                      );
+                    }),
+                ValueListenableBuilder(
                   valueListenable: rangeNotifier,
                   builder: (_, values, __) {
                     return Column(
@@ -190,8 +217,15 @@ class TrimVideoWidget extends StatelessWidget {
                             double endTimeInS = (values.end * originalVideoDuration.inSeconds) / 1.0;
                             Duration endDuration = Duration(seconds: endTimeInS.round());
 
-                            videoDurationNotifier.value = (start: startDuration, end: endDuration);
+                            videoDurationNotifier.value = (
+                              start: startDuration,
+                              end: endDuration,
+                            );
                           },
+                          labels: RangeLabels(
+                            trimmedDuration.start.format(DurationStyle.FORMAT_HH_MM_SS),
+                            trimmedDuration.end.format(DurationStyle.FORMAT_HH_MM_SS),
+                          ),
                           activeColor: Colors.green,
                           inactiveColor: Colors.red,
                         ),
@@ -204,7 +238,14 @@ class TrimVideoWidget extends StatelessWidget {
                           ],
                         ),
                         ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            log.debug("Modifying trim video");
+
+                            BlocProvider.of<CreatePostCubit>(context).trimVideo(
+                              startTime: trimmedDuration.start,
+                              endTime: trimmedDuration.end,
+                            );
+                          },
                           child: const Text("Trim"),
                         ),
                       ],
@@ -223,12 +264,10 @@ class TrimVideoWidget extends StatelessWidget {
 class ThumbnailVideoWidget extends StatelessWidget {
   const ThumbnailVideoWidget({
     required this.data,
-    required this.onSelect,
     super.key,
   });
 
   final File data;
-  final Function(Uint8List) onSelect;
 
   @override
   Widget build(BuildContext context) {
@@ -247,8 +286,6 @@ class ThumbnailVideoWidget extends StatelessWidget {
         return ValueListenableBuilder(
           valueListenable: thumbnailPositionNotifier,
           builder: (__, thumbnailPosition, ___) {
-            //1.0 = originalVideoDuration
-            // thumbnailPosition
             double sliderPosition = (thumbnailPosition.inSeconds * 1.0) / originalVideoDuration.inSeconds;
 
             return Flex(
@@ -276,12 +313,10 @@ class ThumbnailVideoWidget extends StatelessWidget {
                     ),
                     ElevatedButton(
                       onPressed: () async {
-                        Uint8List? thumbnailData = await generateThumbnail(
-                          videoPath: data.path,
+                        BlocProvider.of<CreatePostCubit>(context).modifyThumbnail(
                           timeInSeconds: thumbnailPosition.inSeconds,
                         );
-                        if(thumbnailData == null) return;
-                        onSelect(thumbnailData);
+                        log.debug("Modifying thumbnail");
                       },
                       child: const Text("Select thumbnail"),
                     ),

@@ -5,12 +5,14 @@ import 'package:akropolis/main.dart';
 import 'package:ffmpeg_kit_flutter_full_gpl/ffmpeg_kit.dart';
 import 'package:ffmpeg_kit_flutter_full_gpl/ffmpeg_session.dart';
 import 'package:ffmpeg_kit_flutter_full_gpl/ffprobe_kit.dart';
+import 'package:ffmpeg_kit_flutter_full_gpl/media_information.dart';
 import 'package:ffmpeg_kit_flutter_full_gpl/media_information_session.dart';
 
 import 'dart:typed_data';
 import 'package:path/path.dart' as path;
 
 import 'package:ffmpeg_kit_flutter_full_gpl/return_code.dart';
+import 'package:path_provider/path_provider.dart';
 
 /// Converts `DateTime` to a "time ago" string
 String timeAgo(DateTime dateTime) {
@@ -43,34 +45,65 @@ Future<Uint8List?> generateThumbnail({
   required String videoPath,
   int timeInSeconds = 1,
 }) async {
-  Directory d = File(videoPath).parent;
-  String outputPath = path.join(d.path, "thumb_${Random().nextInt(2000)}.jpg");
+  try {
+    Directory d = File(videoPath).parent;
+    String outputPath = path.join(d.path, "thumb_${Random().nextInt(2000)}.jpg");
 
-  log.debug("Generating thumbnail to: $outputPath");
+    log.debug("Generating thumbnail to: $outputPath");
 
-  String command = '-ss $timeInSeconds -i "$videoPath" -frames:v 1 "$outputPath"';
+    String command = '-ss $timeInSeconds -i "$videoPath" -frames:v 1 "$outputPath"';
 
-  FFmpegSession session = await FFmpegKit.execute(command);
+    FFmpegSession session = await FFmpegKit.execute(command);
 
-  final ReturnCode? returnCode = await session.getReturnCode();
-  if (returnCode?.isValueSuccess() ?? false) {
-    log.debug("Thumbnail successfully generated: $outputPath");
-    return File(outputPath).readAsBytesSync();
-  } else {
-    log.debug("Thumbnail generation failed: $returnCode");
+    final ReturnCode? returnCode = await session.getReturnCode();
+    if (returnCode?.isValueSuccess() ?? false) {
+      log.debug("Thumbnail successfully generated: $outputPath");
+      return File(outputPath).readAsBytesSync();
+    } else {
+      log.debug("Thumbnail generation failed: $returnCode");
+      return null;
+    }
+  } catch (e, trace) {
+    log.error("Error generating thumbnail $e", trace: trace);
     return null;
   }
 }
 
 Future<Duration?> getVideoDuration(String videoPath) async {
   final MediaInformationSession session = await FFprobeKit.getMediaInformation(videoPath);
-  final mediaInfo = session.getMediaInformation();
+  final MediaInformation? mediaInfo = session.getMediaInformation();
 
   if (mediaInfo == null) return null;
 
   String? durationStr = mediaInfo.getDuration();
   double? durationInSeconds = durationStr != null ? double.tryParse(durationStr) : null;
   return durationInSeconds != null ? Duration(seconds: durationInSeconds.toInt()) : null;
+}
+
+Future<File?> trimVideoToTime({
+  required File file,
+  required Duration start,
+  required Duration end,
+}) async {
+  try {
+    final dir = file.parent;
+    final outputPath = '${dir.path}/trimmed_video_${Random().nextInt(2000)}.mp4';
+
+    String command = '-i "${file.path}" -ss ${start.inSeconds} -to ${end.inSeconds} -c copy "$outputPath"';
+
+    FFmpegSession session = await FFmpegKit.execute(command);
+    final ReturnCode? returnCode = await session.getReturnCode();
+    if (returnCode?.isValueSuccess() ?? false) {
+      log.debug("Video trimmed successfully: $outputPath");
+      return File(outputPath);
+    } else {
+      log.debug("Video trim failed: $returnCode");
+      return null;
+    }
+  } catch (e, trace) {
+    log.error("Error trimming video thumbnail $e", trace: trace);
+    return null;
+  }
 }
 
 final Uint8List kTransparentImage = Uint8List.fromList(<int>[

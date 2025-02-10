@@ -31,13 +31,12 @@ class CreatePostCubit extends Cubit<CreatePostState> {
 
   CreatePostCubit() : super(const CreatePostState.loaded());
 
+
   Future<void> createNewPost({
-    required XFile file,
+    required File file,
     required AppUser user,
   }) async {
-    File tempFilePath = await File(file.path).writeAsBytes(
-      await file.readAsBytes(),
-    );
+
 
     Duration? duration;
     // = await getVideoDuration(file.path);
@@ -50,7 +49,7 @@ class CreatePostCubit extends Cubit<CreatePostState> {
     form = CreatePostForm.create(
       postId: generateTimeUuid(),
       appUser: user,
-      videoData: tempFilePath,
+      videoData: file,
       videoDuration: duration,
       thumbnailData: thumbnailData,
     );
@@ -60,12 +59,43 @@ class CreatePostCubit extends Cubit<CreatePostState> {
     );
   }
 
-  void modifyThumbnail({
-    Uint8List? thumbnail,
-  }) {
-    form = form?.copyWith(
-      thumbnailData: thumbnail,
+  Future<void> trimVideo({
+    required Duration startTime,
+    required Duration endTime,
+  }) async {
+    emit(const LoadingPostState());
+
+    File? trimmedVideo = await trimVideoToTime(
+      file: form!.videoData!,
+      start: startTime,
+      end: endTime,
     );
+
+    if (trimmedVideo != null) {
+      form = form?.copyWith(
+        videoData: trimmedVideo,
+      );
+    }
+
+    emit(
+      LoadedPostState(form: form),
+    );
+  }
+
+  Future<void> modifyThumbnail({
+    required int timeInSeconds,
+  }) async {
+    emit(const LoadingPostState());
+
+    Uint8List? thumbnailData = await generateThumbnail(
+      videoPath: form!.videoData!.path,
+      timeInSeconds: timeInSeconds,
+    );
+    if (thumbnailData != null) {
+      form = form?.copyWith(
+        thumbnailData: thumbnailData,
+      );
+    }
     emit(
       LoadedPostState(form: form),
     );
@@ -74,7 +104,7 @@ class CreatePostCubit extends Cubit<CreatePostState> {
   Future<void> doPost({
     required String description,
     required String title,
-}) async {
+  }) async {
     if (form == null) return;
     if (form!.thumbnailData == null) return;
     if (form!.videoData == null) return;
