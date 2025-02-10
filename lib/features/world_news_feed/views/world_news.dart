@@ -1,4 +1,5 @@
 import 'package:akropolis/components/news_card.dart';
+import 'package:akropolis/features/create_post/models/models.dart';
 import 'package:akropolis/utils/enums.dart';
 import 'package:akropolis/features/world_news_feed/models/enums.dart';
 import 'package:akropolis/features/world_news_feed/models/world_news_models.dart';
@@ -17,20 +18,14 @@ class WorldNewsContent extends StatelessWidget {
 
     return RefreshIndicator(
       onRefresh: () => pagedListKey.currentState!.refresh(),
-      child: PagedList<NewsApiArticleModel>(
+      child: PagedList<NewsPost>(
         key: pagedListKey,
         firstPageProgressIndicatorBuilder: (_) => const CircularProgressIndicator.adaptive(),
         newPageProgressIndicatorBuilder: (_) => const CircularProgressIndicator.adaptive(),
-        itemBuilder: (_, news, i) => NewsCard(post: news.toNewsPost),
+        itemBuilder: (_, news, i) => NewsCard(post: news),
         fetchPage: (int page, int pageSize, bool initialFetch) async {
           if(page == 0) page = 1;
-          return BlocProvider.of<WorldNewsCubit>(context).fetchNews(
-            page: page,
-            pageSize: pageSize,
-            fromCache: initialFetch,
-            language: Language.en,
-            sources: NewsSourceEnum.values.map((s) => s.name).toList(),
-          );
+          return [];
         },
       ),
     );

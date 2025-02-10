@@ -88,18 +88,3 @@ class MediaStackArticleModel {
   """;
 }
 
-extension MediaStackArticleModelToNewsPost on MediaStackArticleModel {
-  NewsPost get toPostModel => NewsPost(
-    id: generateRandomUuid(),
-    thumbnailUrl: url,
-    postUrl: url,
-    title: title,
-    description: description,
-    author: Author(
-      id: source,
-      name: author ?? 'Unknown',
-      type: AuthorType.publisher,
-    ),
-    publishedAt: publishedAt,
-  );
-}

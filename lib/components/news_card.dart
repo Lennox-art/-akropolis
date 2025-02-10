@@ -25,11 +25,10 @@ class NewsCard extends StatelessWidget {
   });
 
   void setViewedPost(String userId) {
-    bool isViewer = post.viewers?.contains(userId) ?? false;
+    bool isViewer = post.viewers.contains(userId) ?? false;
     if (isViewer) return;
 
-    post.viewers ??= {};
-    post.viewers!.add(userId);
+    post.viewers.add(userId);
 
     postsCollectionRef.update({
       'viewers': FieldValue.arrayUnion([userId])
@@ -37,11 +36,10 @@ class NewsCard extends StatelessWidget {
   }
 
   void setLogicReaction(String userId) {
-    bool hasReacted = post.reaction?.log.contains(userId) ?? false;
+    bool hasReacted = post.reaction.log.contains(userId) ?? false;
     if (hasReacted) return;
 
-    post.reaction ??= PostReaction(log: {}, emp: {});
-    post.reaction!.log.add(userId);
+    post.reaction.log.add(userId);
 
     postsCollectionRef.update({
       'reaction.log': FieldValue.arrayUnion([userId])
@@ -52,11 +50,10 @@ class NewsCard extends StatelessWidget {
   }
 
   void setEmpReaction(String userId) {
-    bool hasReacted = post.reaction?.emp.contains(userId) ?? false;
+    bool hasReacted = post.reaction.emp.contains(userId) ?? false;
     if (hasReacted) return;
 
-    post.reaction ??= PostReaction(log: {}, emp: {});
-    post.reaction!.emp.add(userId);
+    post.reaction.emp.add(userId);
 
     postsCollectionRef.update({
       'reaction.log': FieldValue.arrayRemove([userId])

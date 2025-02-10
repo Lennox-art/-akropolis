@@ -54,9 +54,9 @@ class NewsPost {
   final String description;
   final Author author;
   final DateTime publishedAt;
-  Set<String>? viewers;
-  List<PostComment>? comments;
-  PostReaction? reaction;
+  final Set<String> viewers;
+  final List<PostComment> comments;
+  final PostReaction reaction;
 
   NewsPost({
     required this.id,
@@ -65,10 +65,10 @@ class NewsPost {
     required this.title,
     required this.description,
     required this.author,
-    this.comments,
-    this.viewers,
+    required this.comments,
+    required this.viewers,
     required this.publishedAt,
-    this.reaction,
+    required this.reaction,
   });
 
   static const String collection = 'news_posts';

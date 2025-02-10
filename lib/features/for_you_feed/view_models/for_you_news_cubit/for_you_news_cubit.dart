@@ -27,7 +27,7 @@ class ForYouNewsCubit extends Cubit<ForYouNewsState> {
 
 
 
-  Future<List<NewsPost>?> fetchNews({
+  Future<List<MediaStackArticleModel>?> fetchNews({
     required int page,
     required int pageSize,
     required bool fromCache,
@@ -41,14 +41,6 @@ class ForYouNewsCubit extends Cubit<ForYouNewsState> {
   }) async {
     try {
 
-      if (fromCache && cachedNews.isNotEmpty) {
-
-        return pageList<NewsPost>(
-          cachedNews.take(pageSize).toList(),
-          page: page == 1 ? 0 : page,
-          pageSize: pageSize,
-        );
-      }
 
       var response = await sendGetMediaStackNews(
         page: page,
@@ -76,8 +68,6 @@ class ForYouNewsCubit extends Cubit<ForYouNewsState> {
         },
         success: (s) {
           MediaStackResponse apiResponse = MediaStackResponse.fromJson(s.data!);
-          List<NewsPost> data = apiResponse.data.map((e) => e.toPostModel).toList();
-          cachedNews.addAll(data);
 
           emit(
             ForYouNewsLoadedState(
@@ -87,7 +77,7 @@ class ForYouNewsCubit extends Cubit<ForYouNewsState> {
               ),
             ),
           );
-          return data;
+          return apiResponse.data;
         },
       );
 

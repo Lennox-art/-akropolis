@@ -174,6 +174,9 @@ class CreatePostCubit extends Cubit<CreatePostState> {
         imageUrl: form!.appUser.profilePicture,
         type: AuthorType.user,
       ),
+      comments: [],
+      viewers: {},
+      reaction: PostReaction(log: {}, emp: {}),
       publishedAt: DateTime.now(),
     );
     await postsCollectionRef.doc(newsPost.id).set(newsPost);

@@ -103,18 +103,3 @@ class NewsSource {
   String toString() => "id : $id, name : $name";
 }
 
-extension NewsApiArticleModelToNewsPost on NewsApiArticleModel {
-  NewsPost get toNewsPost =>  NewsPost(
-    id: generateRandomUuid(),
-    thumbnailUrl: urlToImage,
-    postUrl: url,
-    title: title,
-    description: description,
-    author: Author(
-      id: source.id,
-      name: source.name,
-      type: AuthorType.publisher,
-    ),
-    publishedAt: publishedAt,
-  );
-}

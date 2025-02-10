@@ -9,6 +9,23 @@ if (admin.apps.length === 0) {
   admin.initializeApp();
 }
 
+// Post Reaction Model
+export interface PostReaction {
+  log: string[]; // Users who reacted with 'log'
+  emp: string[]; // Users who reacted with 'emp'
+}
+
+// Post Comment Model
+export interface PostComment {
+  id: string;
+  userId: string;
+  postUrl: string;
+  thumbnailUrl: string;
+  replies: PostComment[];
+  commentedAt: string; // Store as ISO string for compatibility
+  reaction?: PostReaction;
+}
+
 // Author Model
 interface Author {
   id: string;
@@ -26,6 +43,9 @@ interface NewsPost {
   description: string;
   author: Author;
   publishedAt: string;
+  viewers: Set<string>; // Use Set to ensure unique viewers
+  comments: PostComment[];
+  reaction: PostReaction;
 }
 
 // Define article structure
@@ -75,6 +95,11 @@ const articleToNewsPost = (article: Article): NewsPost => ({
     type: "publisher",
   },
   publishedAt: generateTimestamp(new Date(article.published_at)), // Convert to Date object
+  viewers: new Set<string>(),
+  comments: [],
+  reaction: {
+    log: [],
+    emp: [],
 });
 
 function generateTimestamp(now: Date): string {

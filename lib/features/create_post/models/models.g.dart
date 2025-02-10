@@ -32,13 +32,13 @@ NewsPost _$NewsPostFromJson(Map<String, dynamic> json) => NewsPost(
       title: json['title'] as String,
       description: json['description'] as String,
       author: Author.fromJson(json['author'] as Map<String, dynamic>),
-      comments: (json['comments'] as List<dynamic>?)
-          ?.map((e) => PostComment.fromJson(e as Map<String, dynamic>))
+      comments: (json['comments'] as List<dynamic>)
+          .map((e) => PostComment.fromJson(e as Map<String, dynamic>))
           .toList(),
+      viewers:
+          (json['viewers'] as List<dynamic>).map((e) => e as String).toSet(),
       publishedAt: DateTime.parse(json['publishedAt'] as String),
-      reaction: json['reaction'] == null
-          ? null
-          : PostReaction.fromJson(json['reaction'] as Map<String, dynamic>),
+      reaction: PostReaction.fromJson(json['reaction'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$NewsPostToJson(NewsPost instance) => <String, dynamic>{
@@ -49,6 +49,7 @@ Map<String, dynamic> _$NewsPostToJson(NewsPost instance) => <String, dynamic>{
       'description': instance.description,
       'author': instance.author,
       'publishedAt': instance.publishedAt.toIso8601String(),
+      'viewers': instance.viewers.toList(),
       'comments': instance.comments,
       'reaction': instance.reaction,
     };
