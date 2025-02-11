@@ -109,7 +109,7 @@ class PostComment {
   final String id;
   final String thumbnailUrl;
   final String postUrl;
-  final String userId;
+  final Author author;
   final List<PostComment> replies;
   final DateTime commentedAt;
   PostReaction? reaction;
@@ -118,7 +118,7 @@ class PostComment {
     required this.id,
     required this.thumbnailUrl,
     required this.postUrl,
-    required this.userId,
+    required this.author,
     required this.replies,
     required this.commentedAt,
     required this.reaction,
@@ -128,7 +128,7 @@ class PostComment {
         id: json['id'] as String,
         thumbnailUrl: json['thumbnailUrl'] as String,
         postUrl: json['postUrl'] as String,
-        userId: json['userId'] as String,
+        author: Author.fromJson(json['author'] as Map<String, dynamic>),
         replies: (json['replies'] as List<dynamic>).map((e) => PostComment.fromJson(e as Map<String, dynamic>)).toList(),
         commentedAt: DateTime.parse(json['commentedAt'] as String),
         reaction: json['reaction'] == null ? null : PostReaction.fromJson(json['reaction'] as Map<String, dynamic>),
@@ -138,7 +138,7 @@ class PostComment {
         'id': id,
         'thumbnailUrl': thumbnailUrl,
         'postUrl': postUrl,
-        'userId': userId,
+        'author': author.toJson(),
         'replies': replies.map((r) => r.toJson()).toList(),
         'commentedAt': commentedAt.toIso8601String(),
         'reaction': reaction,

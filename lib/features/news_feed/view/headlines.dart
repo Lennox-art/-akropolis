@@ -1,4 +1,4 @@
-import 'package:akropolis/components/news_card.dart';
+import 'package:akropolis/features/news_feed/view/news_card.dart';
 import 'package:akropolis/features/news_feed/models/models.dart';
 import 'package:akropolis/features/news_feed/view_models/headlines_cubit/headlines_news_cubit.dart';
 import 'package:akropolis/utils/constants.dart';

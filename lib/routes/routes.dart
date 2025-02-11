@@ -7,6 +7,7 @@ import 'package:akropolis/features/create_post/views/create_post_page.dart';
 import 'package:akropolis/features/create_post/views/edit_video_post_page.dart';
 import 'package:akropolis/features/create_post/views/post_meta_data_page.dart';
 import 'package:akropolis/features/home_page.dart';
+import 'package:akropolis/features/news_feed/view/news_detailed_view.dart';
 import 'package:akropolis/features/on_boarding/presentation/select_default_preferences.dart';
 import 'package:akropolis/features/on_boarding/presentation/select_topic.dart';
 import 'package:akropolis/features/on_boarding/presentation/welcome_screen.dart';
@@ -26,9 +27,10 @@ enum AppRoutes {
   welcomeTopics("/welcomeTopics"),
   welcomePreferences("/welcomePreferences"),
   home("/home"),
-  createPost("/CreatePostPage"),
+  createPost("/createPostPage"),
   videoEditingPage("/videoEditingPage"),
-  finalizePost("/finalizePost");
+  finalizePost("/finalizePost"),
+  newsDetailsPage("/newsDetailsPage");
 
   final String path;
 
@@ -50,5 +52,6 @@ enum AppRoutes {
     AppRoutes.createPost => const CreatePostPage(),
     AppRoutes.videoEditingPage => const EditVideoPostPage(),
     AppRoutes.finalizePost => const PostMetaDataPage(),
+    AppRoutes.newsDetailsPage => const NewsDetailedViewPage(),
   };
 }

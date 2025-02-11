@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:math';
 
 import 'package:akropolis/features/authentication/models/authentication_models.dart';
 import 'package:akropolis/features/create_post/view_model/create_post_cubit.dart';
@@ -7,7 +6,6 @@ import 'package:akropolis/features/on_boarding/view_model/user_cubit/user_cubit.
 import 'package:akropolis/gen/assets.gen.dart';
 import 'package:akropolis/main.dart';
 import 'package:akropolis/routes/routes.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
