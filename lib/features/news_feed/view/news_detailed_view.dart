@@ -25,6 +25,7 @@ class NewsDetailedViewPage extends StatelessWidget {
       ),
       body: SingleChildScrollView(
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
@@ -135,6 +136,7 @@ class NewsDetailedViewPage extends StatelessWidget {
             ),
             const Divider(),
             ListView.builder(
+              shrinkWrap: true,
               itemCount: newsPost.comments.length,
               itemBuilder: (_, i) {
                 PostComment comment = newsPost.comments[i];
