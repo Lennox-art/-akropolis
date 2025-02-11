@@ -2,7 +2,23 @@ enum AuthorType {
   user,
   publisher;
 
-  static Map<String, AuthorType> authorTypeEnumMap = {for(var e in values) e.name: e};
+  static Map<String, AuthorType> authorTypeEnumMap = {
+    for (var e in values) e.name: e
+  };
+}
+
+enum NewsChannel {
+  worldNews("world_news"),
+  userPosts("news_posts"),
+  newsHeadlines("news_headlines");
+
+  const NewsChannel(this.collection);
+
+  final String collection;
+
+  static Map<String, NewsChannel> newsChannelEnumMap = {
+    for (var e in values) e.collection: e
+  };
 }
 
 class Author {
@@ -44,6 +60,7 @@ class NewsPost {
   final Set<String> viewers;
   final List<PostComment> comments;
   final PostReaction reaction;
+  final NewsChannel channel;
 
   NewsPost({
     required this.id,
@@ -56,6 +73,7 @@ class NewsPost {
     required this.viewers,
     required this.publishedAt,
     required this.reaction,
+    required this.channel,
   });
 
   factory NewsPost.fromJson(Map<String, dynamic> json) => NewsPost(
@@ -65,10 +83,15 @@ class NewsPost {
         title: json['title'] as String,
         description: json['description'] as String,
         author: Author.fromJson(json['author'] as Map<String, dynamic>),
-        comments: (json['comments'] as List<dynamic>).map((e) => PostComment.fromJson(e as Map<String, dynamic>)).toList(),
-        viewers: (json['viewers'] as List<dynamic>).map((e) => e as String).toSet(),
+        comments: (json['comments'] as List<dynamic>)
+            .map((e) => PostComment.fromJson(e as Map<String, dynamic>))
+            .toList(),
+        viewers:
+            (json['viewers'] as List<dynamic>).map((e) => e as String).toSet(),
         publishedAt: DateTime.parse(json['publishedAt'] as String),
-        reaction: PostReaction.fromJson(json['reaction'] as Map<String, dynamic>),
+        reaction:
+            PostReaction.fromJson(json['reaction'] as Map<String, dynamic>),
+        channel: NewsChannel.newsChannelEnumMap[json['channel']]!,
       );
 
   Map<String, dynamic> toJson() => {
@@ -82,6 +105,7 @@ class NewsPost {
         'viewers': viewers.toList(),
         'comments': comments.map((c) => c.toJson()).toList(),
         'reaction': reaction.toJson(),
+        'channel': channel.collection,
       };
 }
 
@@ -129,9 +153,13 @@ class PostComment {
         thumbnailUrl: json['thumbnailUrl'] as String,
         postUrl: json['postUrl'] as String,
         author: Author.fromJson(json['author'] as Map<String, dynamic>),
-        replies: (json['replies'] as List<dynamic>).map((e) => PostComment.fromJson(e as Map<String, dynamic>)).toList(),
+        replies: (json['replies'] as List<dynamic>)
+            .map((e) => PostComment.fromJson(e as Map<String, dynamic>))
+            .toList(),
         commentedAt: DateTime.parse(json['commentedAt'] as String),
-        reaction: json['reaction'] == null ? null : PostReaction.fromJson(json['reaction'] as Map<String, dynamic>),
+        reaction: json['reaction'] == null
+            ? null
+            : PostReaction.fromJson(json['reaction'] as Map<String, dynamic>),
       );
 
   Map<String, dynamic> toJson() => <String, dynamic>{

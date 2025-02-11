@@ -15,9 +15,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class NewsCard extends StatelessWidget {
   final NewsPost post;
-  final String collection;
+  final NewsChannel newsChannel;
 
-  DocumentReference get postsCollectionRef => FirebaseFirestore.instance.collection(collection).doc(post.id).withConverter<NewsPost>(
+  DocumentReference get postsCollectionRef => FirebaseFirestore.instance.collection(newsChannel.collection).doc(post.id).withConverter<NewsPost>(
         fromFirestore: (snapshot, _) => NewsPost.fromJson(snapshot.data()!),
         toFirestore: (model, _) => model.toJson(),
       );
@@ -25,7 +25,7 @@ class NewsCard extends StatelessWidget {
   const NewsCard({
     super.key,
     required this.post,
-    required this.collection,
+    required this.newsChannel,
   });
 
   void setViewedPost(String userId) {
@@ -39,34 +39,7 @@ class NewsCard extends StatelessWidget {
     });
   }
 
-  void setLogicReaction(String userId) {
-    bool hasReacted = post.reaction.log.contains(userId);
-    if (hasReacted) return;
 
-    post.reaction.log.add(userId);
-
-    postsCollectionRef.update({
-      'reaction.log': FieldValue.arrayUnion([userId])
-    });
-    postsCollectionRef.update({
-      'reaction.emp': FieldValue.arrayRemove([userId])
-    });
-  }
-
-  void setEmpReaction(String userId) {
-    bool hasReacted = post.reaction.emp.contains(userId);
-    if (hasReacted) return;
-
-    post.reaction.emp.add(userId);
-
-    postsCollectionRef.update({
-      'reaction.log': FieldValue.arrayRemove([userId])
-    });
-
-    postsCollectionRef.update({
-      'reaction.emp': FieldValue.arrayUnion([userId])
-    });
-  }
 
   Future<void> setCommentReaction({
     required AppUser user,

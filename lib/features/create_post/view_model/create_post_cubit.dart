@@ -24,7 +24,7 @@ class CreatePostCubit extends Cubit<CreatePostState> {
   CreatePostForm? form;
   final thumbnailsRef = FirebaseStorage.instance.ref().child("thumbnails");
   final postsRef = FirebaseStorage.instance.ref().child("posts");
-  final CollectionReference postsCollectionRef = FirebaseFirestore.instance.collection(userPostsCollection).withConverter<NewsPost>(
+  final CollectionReference postsCollectionRef = FirebaseFirestore.instance.collection(NewsChannel.userPosts.collection).withConverter<NewsPost>(
         fromFirestore: (snapshot, _) => NewsPost.fromJson(snapshot.data()!),
         toFirestore: (model, _) => model.toJson(),
       );
@@ -32,12 +32,12 @@ class CreatePostCubit extends Cubit<CreatePostState> {
   CreatePostCubit() : super(const CreatePostState.loaded());
 
 
+
+
   Future<void> createNewPost({
     required File file,
     required AppUser user,
   }) async {
-
-
     Duration? duration;
     // = await getVideoDuration(file.path);
     Uint8List? thumbnailData = await generateThumbnail(
@@ -212,6 +212,7 @@ class CreatePostCubit extends Cubit<CreatePostState> {
       viewers: {},
       reaction: PostReaction(log: {}, emp: {}),
       publishedAt: DateTime.now(),
+      channel: NewsChannel.userPosts,
     );
     await postsCollectionRef.doc(newsPost.id).set(newsPost);
     form = null;

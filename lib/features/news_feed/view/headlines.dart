@@ -21,7 +21,7 @@ class HeadlinesContent extends StatelessWidget {
         newPageProgressIndicatorBuilder: (_) => const CircularProgressIndicator.adaptive(),
         itemBuilder: (_, news, i) => NewsCard(
           post: news,
-          collection: newsHeadlinesCollection,
+          newsChannel: NewsChannel.newsHeadlines,
         ),
         fetchPage: (int page, int pageSize, bool initialFetch) async {
           return BlocProvider.of<HeadlinesNewsCubit>(context).fetchHeadlines(

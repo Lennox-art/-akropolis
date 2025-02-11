@@ -1,9 +1,12 @@
 import 'package:akropolis/features/authentication/view_model/authentication_cubit/authentication_cubit.dart';
 import 'package:akropolis/features/create_post/view_model/create_post_cubit.dart';
+import 'package:akropolis/features/news_feed/models/models.dart';
 import 'package:akropolis/features/news_feed/view_models/headlines_cubit/headlines_news_cubit.dart';
 import 'package:akropolis/features/on_boarding/view_model/user_cubit/user_cubit.dart';
 import 'package:akropolis/routes/routes.dart';
 import 'package:akropolis/theme/themes.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 //import 'package:ffmpeg_helper/helpers/ffmpeg_helper_class.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -53,6 +56,7 @@ class AkropolisApplication extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return MultiBlocProvider(
       providers: [
         BlocProvider(

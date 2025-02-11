@@ -13,7 +13,6 @@ class EditVideoPostPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     final ValueNotifier<VideoEditingTools> currentToolNotifier = ValueNotifier(
       VideoEditingTools.trimVideo,
     );
@@ -82,7 +81,10 @@ class VideoEditingWidget extends StatelessWidget {
               return switch (tool) {
                 VideoEditingTools.trimVideo => TrimVideoWidget(
                     data: data,
-                    onConfirm: ({required Duration start, required Duration end}) {
+                    onConfirm: ({
+                      required Duration start,
+                      required Duration end,
+                    }) {
                       log.debug("Modifying trim video");
 
                       BlocProvider.of<CreatePostCubit>(context).trimVideo(

@@ -21,7 +21,7 @@ class ForYouContent extends StatelessWidget {
         newPageProgressIndicatorBuilder: (_) => const CircularProgressIndicator.adaptive(),
         itemBuilder: (_, news, i) => NewsCard(
           post: news,
-          collection: userPostsCollection,
+          newsChannel: NewsChannel.userPosts,
         ),
         fetchPage: (int page, int pageSize, bool initialFetch) async {
           /*return BlocProvider.of<ForYouNewsCubit>(context).fetchNews(

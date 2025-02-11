@@ -15,7 +15,7 @@ part 'world_news_cubit.freezed.dart';
 
 class WorldNewsCubit extends Cubit<WorldNewsState> {
   final LinkedHashSet<NewsPost> cachedNews = LinkedHashSet();
-  final CollectionReference postsCollectionRef = FirebaseFirestore.instance.collection(worldNewsCollection).withConverter<NewsPost>(
+  final CollectionReference postsCollectionRef = FirebaseFirestore.instance.collection(NewsChannel.worldNews.collection,).withConverter<NewsPost>(
     fromFirestore: (snapshot, _) => NewsPost.fromJson(snapshot.data()!),
     toFirestore: (model, _) => model.toJson(),
   );

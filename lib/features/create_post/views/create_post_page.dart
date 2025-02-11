@@ -1,11 +1,15 @@
 import 'dart:io';
 
+import 'package:akropolis/components/duration_picker.dart';
+import 'package:akropolis/components/toast/toast.dart';
 import 'package:akropolis/features/authentication/models/authentication_models.dart';
 import 'package:akropolis/features/create_post/view_model/create_post_cubit.dart';
 import 'package:akropolis/features/on_boarding/view_model/user_cubit/user_cubit.dart';
 import 'package:akropolis/gen/assets.gen.dart';
 import 'package:akropolis/main.dart';
 import 'package:akropolis/routes/routes.dart';
+import 'package:akropolis/utils/constants.dart';
+import 'package:akropolis/utils/validations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
@@ -56,15 +60,29 @@ class CreatePostPage extends StatelessWidget {
                     width: 150,
                     child: GestureDetector(
                       onTap: () async {
+                        Duration? videoDuration = await showDurationPickerDialog(
+                          context,
+                          maxDuration: maxVideoDuration,
+                        );
+                        if (videoDuration == null || !context.mounted) return;
+
                         XFile? videoData = await getIt<ImagePicker>().pickVideo(
                           source: ImageSource.camera,
                           preferredCameraDevice: CameraDevice.rear,
-                          maxDuration: const Duration(minutes: 1),
+                          maxDuration: videoDuration,
                         );
                         if (videoData == null || !context.mounted) return;
 
                         AppUser? user = await BlocProvider.of<UserCubit>(context).getCurrentUser();
                         if (user == null || !context.mounted) return;
+
+                        String? videoError = await validateVideo(videoData.path);
+                        if (!context.mounted) return;
+
+                        if (videoError != null) {
+                          ToastError(title: "Post Video", message: videoError).show();
+                          return;
+                        }
 
                         await BlocProvider.of<CreatePostCubit>(context).createNewPost(
                           file: File(videoData.path)..writeAsBytesSync(await videoData.readAsBytes()),
@@ -107,6 +125,13 @@ class CreatePostPage extends StatelessWidget {
                         AppUser? user = await BlocProvider.of<UserCubit>(context).getCurrentUser();
                         if (user == null || !context.mounted) return;
 
+                        String? videoError = await validateVideo(videoData.path);
+                        if (!context.mounted) return;
+
+                        if (videoError != null) {
+                          ToastError(title: "Post Video", message: videoError).show();
+                          return;
+                        }
 
                         await BlocProvider.of<CreatePostCubit>(context).createNewPost(
                           file: File(videoData.path)..writeAsBytesSync(await videoData.readAsBytes()),
@@ -148,17 +173,26 @@ class CreatePostPage extends StatelessWidget {
                         return state.map(
                           loading: (_) => const CircularProgressIndicator.adaptive(),
                           loaded: (l) {
-                            bool hasDraft = l.form?.videoData != null;
+                            File? draftVideo = l.form?.videoData;
+                            bool hasDraft = draftVideo != null;
 
                             return GestureDetector(
                               onTap: () async {
-                                if(!hasDraft) return;
+                                if (!hasDraft) return;
 
                                 AppUser? user = await BlocProvider.of<UserCubit>(context).getCurrentUser();
                                 if (user == null || !context.mounted) return;
 
+                                String? videoError = await validateVideo(draftVideo.path);
+                                if (!context.mounted) return;
+
+                                if (videoError != null) {
+                                  ToastError(title: "Post Video", message: videoError).show();
+                                  return;
+                                }
+
                                 await BlocProvider.of<CreatePostCubit>(context).createNewPost(
-                                  file: l.form!.videoData!,
+                                  file: draftVideo,
                                   user: user,
                                 );
 

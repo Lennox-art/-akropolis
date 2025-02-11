@@ -1,11 +1,10 @@
 import 'dart:collection';
 
 import 'package:akropolis/components/toast/toast.dart';
-import 'package:akropolis/features/create_post/models/models.dart';
 import 'package:akropolis/features/news_feed/models/models.dart';
 import 'package:akropolis/main.dart';
 import 'package:akropolis/utils/constants.dart';
-import 'package:bloc/bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:common_fn/common_fn.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -15,7 +14,7 @@ part 'headlines_news_cubit.freezed.dart';
 
 class HeadlinesNewsCubit extends Cubit<HeadlinesNewsState> {
   final LinkedHashSet<NewsPost> cachedNews = LinkedHashSet();
-  final CollectionReference postsCollectionRef = FirebaseFirestore.instance.collection(newsHeadlinesCollection).withConverter<NewsPost>(
+  final CollectionReference postsCollectionRef = FirebaseFirestore.instance.collection(NewsChannel.newsHeadlines.collection).withConverter<NewsPost>(
     fromFirestore: (snapshot, _) => NewsPost.fromJson(snapshot.data()!),
     toFirestore: (model, _) => model.toJson(),
   );

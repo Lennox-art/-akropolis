@@ -5,8 +5,11 @@ import 'package:akropolis/features/news_feed/view/local_news.dart';
 import 'package:akropolis/features/news_feed/view/headlines.dart';
 import 'package:akropolis/features/news_feed/view/world_news.dart';
 import 'package:akropolis/routes/routes.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'news_feed/models/models.dart';
 
 enum HomeTabs {
   forYou("For you"),

@@ -1,6 +1,19 @@
+import 'package:akropolis/components/news_post_components.dart';
 import 'package:akropolis/features/news_feed/models/models.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
+
+enum PostMenu {
+  share("Share"),
+  bookmark("Bookmark"),
+  notInterested("Not interested"),
+  report("Report");
+
+  final String title;
+
+  const PostMenu(this.title);
+}
 
 class NewsDetailedViewPage extends StatelessWidget {
   const NewsDetailedViewPage({super.key});
@@ -16,12 +29,31 @@ class NewsDetailedViewPage extends StatelessWidget {
       );
     }
 
-    final VideoPlayerController videoController = VideoPlayerController.networkUrl(Uri.parse(newsPost.postUrl));
+    final VideoPlayerController videoController = VideoPlayerController.networkUrl(
+      Uri.parse(newsPost.postUrl),
+    );
+
+    final DocumentReference newsPostRef = FirebaseFirestore.instance.collection(newsPost.channel.collection).doc(newsPost.id).withConverter<NewsPost>(
+          fromFirestore: (snapshot, _) => NewsPost.fromJson(snapshot.data()!),
+          toFirestore: (model, _) => model.toJson(),
+        );
+
     final ThemeData theme = Theme.of(context);
 
     return Scaffold(
       appBar: AppBar(
         title: null,
+        actions: [
+          ElevatedButton(
+            onPressed: () {},
+            style: theme.elevatedButtonTheme.style?.copyWith(
+              fixedSize: const WidgetStatePropertyAll(
+                Size(100, 50),
+              ),
+            ),
+            child: const Text("Reply"),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -42,36 +74,67 @@ class NewsDetailedViewPage extends StatelessWidget {
                 },
               ),
               title: Text(newsPost.author.name),
-              trailing: IconButton(
-                onPressed: () {},
-                icon: const Icon(
-                  Icons.more_vert,
-                ),
+              trailing: MenuAnchor(
+                builder: (_, controller, __) {
+                  return IconButton(
+                    onPressed: () {
+                      if (controller.isOpen) {
+                        controller.close();
+                        return;
+                      }
+                      controller.open();
+                    },
+                    icon: const Icon(Icons.more_vert),
+                    tooltip: 'Post options',
+                  );
+                },
+                menuChildren: PostMenu.values
+                    .map(
+                      (menu) => MenuItemButton(
+                        onPressed: () {},
+                        style: theme.menuButtonTheme.style?.copyWith(
+                          backgroundColor: WidgetStatePropertyAll(
+                            menu == PostMenu.report ? Colors.red : null,
+                          ),
+                        ),
+                        child: Text(menu.title),
+                      ),
+                    )
+                    .toList(),
               ),
             ),
-            FutureBuilder(
-              future: videoController.initialize(),
-              builder: (_, snap) {
-                if (snap.connectionState != ConnectionState.done) {
-                  return const CircularProgressIndicator.adaptive();
-                }
+            Container(
+              constraints: const BoxConstraints(
+                minHeight: 400,
+                maxHeight: 600,
+                minWidth: 500,
+                maxWidth: 700,
+              ),
+              color: Colors.black12,
+              child: FutureBuilder(
+                future: videoController.initialize(),
+                builder: (_, snap) {
+                  if (snap.connectionState != ConnectionState.done) {
+                    return const CircularProgressIndicator.adaptive();
+                  }
 
-                videoController.play();
+                  //videoController.play();
 
-                return ValueListenableBuilder(
-                  valueListenable: videoController,
-                  builder: (_, videoValue, __) {
-                    return AspectRatio(
-                      aspectRatio: videoValue.aspectRatio,
-                      child: VideoPlayer(videoController),
-                    );
-                  },
-                );
-              },
+                  return ValueListenableBuilder(
+                    valueListenable: videoController,
+                    builder: (_, videoValue, __) {
+                      return AspectRatio(
+                        aspectRatio: videoValue.aspectRatio,
+                        child: VideoPlayer(videoController),
+                      );
+                    },
+                  );
+                },
+              ),
             ),
             Text(
               newsPost.description,
-              style: theme.textTheme.bodyLarge,
+              style: theme.textTheme.labelLarge,
             ),
             Text(
               newsPost.publishedAt.toIso8601String(),
@@ -80,71 +143,91 @@ class NewsDetailedViewPage extends StatelessWidget {
                 color: Colors.grey,
               ),
             ),
-            Flex(
-              direction: Axis.horizontal,
-              children: [
-                Expanded(
-                  child: Row(
+            StreamBuilder(
+                stream: newsPostRef.snapshots(includeMetadataChanges: true),
+                builder: (_, snap) {
+                  NewsPost updatedPost = snap.data?.data() as NewsPost? ?? newsPost;
+
+                  return Column(
                     mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      Card(
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            Icon(Icons.arrow_upward),
-                            Text("LOG"),
-                            Text(newsPost.reaction.log.length.toString()),
-                            Text("EMP"),
-                            Text(newsPost.reaction.emp.length.toString()),
-                            Expanded(
-                              child: SizedBox(
-                                width: double.infinity,
-                              ),
+                      Flex(
+                        direction: Axis.horizontal,
+                        mainAxisSize: MainAxisSize.max,
+                        children: [
+                          Expanded(
+                            child: Flex(
+                              direction: Axis.horizontal,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Expanded(
+                                  child: PostReactionWidget(
+                                    newsPost: updatedPost,
+                                    postsCollectionRef: newsPostRef,
+                                  ),
+                                ),
+                                Card(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                      children: [
+                                        const Icon(Icons.chat_outlined),
+                                        Text(updatedPost.comments.length.toString()),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                const Card(
+                                  child: Padding(
+                                    padding: EdgeInsets.all(8.0),
+                                    child: Icon(Icons.circle_outlined),
+                                  ),
+                                ),
+                              ],
                             ),
-                            Icon(Icons.arrow_upward),
-                          ],
-                        ),
+                          ),
+                          const Card(
+                            child: Padding(
+                              padding: EdgeInsets.all(
+                                8.0,
+                              ),
+                              child: Icon(Icons.share),
+                            ),
+                          ),
+                        ],
                       ),
-                      Card(
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.chat_outlined),
-                            Text(newsPost.comments.length.toString()),
-                          ],
-                        ),
+                      const Divider(),
+                      const Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Text("Replies"),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Text("View Activity"),
+                          ),
+                        ],
                       ),
-                      Card(
-                        child: Icon(Icons.circle_outlined),
+                      const Divider(),
+                      ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: updatedPost.comments.length,
+                        itemBuilder: (_, i) {
+                          PostComment comment = updatedPost.comments[i];
+                          return ListTile(
+                            title: Text(comment.author.name),
+                          );
+                        },
                       ),
                     ],
-                  ),
-                ),
-                SizedBox(
-                  width: 50,
-                ),
-                Card(
-                  child: Icon(Icons.share),
-                ),
-              ],
-            ),
-            const Divider(),
-            const ListTile(
-              title: Text("Replies"),
-              trailing: Text("View Activity"),
-            ),
-            const Divider(),
-            ListView.builder(
-              shrinkWrap: true,
-              itemCount: newsPost.comments.length,
-              itemBuilder: (_, i) {
-                PostComment comment = newsPost.comments[i];
-                return ListTile(
-                  title: Text(comment.author.name),
-                );
-              },
-            ),
+                  );
+                }),
           ],
         ),
       ),

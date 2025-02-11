@@ -12,5 +12,5 @@ keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -sto
 
 # Cloud functions locally from /functions directory
 ```bash
-npm run serve
+(cd functions && npm run serve)
 ```

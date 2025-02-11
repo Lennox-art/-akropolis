@@ -290,6 +290,12 @@ CardTheme get cardTheme {
   );
 }
 
+SliderThemeData get sliderTheme {
+  return SliderThemeData(
+  showValueIndicator: ShowValueIndicator.always,
+  );
+}
+
 ThemeData get lightTheme {
   return ThemeData(
     useMaterial3: true,
@@ -316,6 +322,7 @@ ThemeData get lightTheme {
     scaffoldBackgroundColor: backgroundColor,
     appBarTheme: appBarTheme,
     tabBarTheme: tabTheme,
+    sliderTheme: sliderTheme,
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: elevatedButtonStyle,
     ),
