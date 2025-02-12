@@ -1,17 +1,17 @@
-import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:akropolis/features/authentication/models/authentication_models.dart';
+import 'package:akropolis/components/news_post_components.dart';
 import 'package:akropolis/features/authentication/view_model/authentication_cubit/authentication_cubit.dart';
 import 'package:akropolis/features/news_feed/models/models.dart';
+import 'package:akropolis/local_storage/media_cache.dart';
+import 'package:akropolis/main.dart';
 import 'package:akropolis/routes/routes.dart';
 import 'package:akropolis/utils/functions.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:common_fn/common_fn.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:akropolis/components/loader.dart';
 
 class NewsCard extends StatelessWidget {
   final NewsPost post;
@@ -39,106 +39,6 @@ class NewsCard extends StatelessWidget {
     });
   }
 
-
-
-  Future<void> setCommentReaction({
-    required AppUser user,
-    required String updatePath,
-    required File videoData,
-    required Uint8List thumbnail,
-  }) async {
-    String commentId = "${post.id}-${generateTimeUuid()}";
-
-    final thumbnailsRef = FirebaseStorage.instance.ref().child("thumbnails");
-    final postsRef = FirebaseStorage.instance.ref().child("comments");
-
-    late String thumbnailUrl;
-    UploadTask thumbTask = thumbnailsRef.child(commentId).putFile(
-          videoData,
-          SettableMetadata(
-            customMetadata: {
-              "postId": post.id,
-              "commentId": commentId,
-            },
-          ),
-        );
-    await for (var snapshot in thumbTask.snapshotEvents) {
-      switch (snapshot.state) {
-        case TaskState.running:
-          final progress = 100.0 * (snapshot.bytesTransferred / snapshot.totalBytes);
-          print("Post Upload is $progress% complete.");
-          break;
-        case TaskState.paused:
-          print("Upload is paused.");
-          break;
-        case TaskState.canceled:
-          print("Upload was canceled");
-          break;
-        case TaskState.error:
-          // Handle unsuccessful uploads
-          break;
-        case TaskState.success:
-          thumbnailUrl = await snapshot.ref.getDownloadURL();
-          break;
-      }
-    }
-
-    late String postUrl;
-    UploadTask postTask = postsRef.child(commentId).putFile(
-          videoData,
-          SettableMetadata(
-            customMetadata: {
-              "postId": post.id,
-              "commentId": commentId,
-            },
-          ),
-        );
-    await for (var snapshot in postTask.snapshotEvents) {
-      switch (snapshot.state) {
-        case TaskState.running:
-          final progress = 100.0 * (snapshot.bytesTransferred / snapshot.totalBytes);
-          print("Post Upload is $progress% complete.");
-          break;
-        case TaskState.paused:
-          print("Upload is paused.");
-          break;
-        case TaskState.canceled:
-          print("Upload was canceled");
-          break;
-        case TaskState.error:
-          // Handle unsuccessful uploads
-          break;
-        case TaskState.success:
-          // Handle successful uploads on complete
-          // ...
-          postUrl = await snapshot.ref.getDownloadURL();
-
-          break;
-      }
-    }
-
-    PostComment comment = PostComment(
-      id: commentId,
-      thumbnailUrl: thumbnailUrl,
-      postUrl: postUrl,
-      author: Author(
-        id: user.id,
-        name: user.username,
-        type: AuthorType.user,
-      ),
-      replies: [],
-      commentedAt: DateTime.now(),
-      reaction: PostReaction(
-        log: {},
-        emp: {},
-      ),
-    );
-
-    postsCollectionRef.update({
-      updatePath: FieldValue.arrayUnion([comment])
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
@@ -155,7 +55,7 @@ class NewsCard extends StatelessWidget {
       onTap: () {
         Navigator.of(context).pushNamed(
           AppRoutes.newsDetailsPage.path,
-          arguments: post,
+          arguments: NewsPostDto(post, newsChannel),
         );
       },
       child: Card(
@@ -169,15 +69,38 @@ class NewsCard extends StatelessWidget {
                 borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(16.0),
                 ),
-                child: Image.network(
-                  post.thumbnailUrl,
-                  height: 180,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) => const Icon(
-                    Icons.broken_image,
-                    size: 50,
-                  ),
+                child: StreamBuilder(
+                  stream: MediaCache.downloadMedia(post.thumbnailUrl),
+                  builder: (_, snap) {
+
+                    log.info(snap.connectionState);
+
+                    if(snap.connectionState != ConnectionState.done) {
+                      return const InfiniteLoader();
+                    }
+
+                    Uint8List? thumbnailData = snap.data;
+                    if(thumbnailData == null) {
+                      return const Icon(
+                        Icons.image_not_supported_outlined,
+                        size: 180,
+                      );
+                    }
+
+                    return Image.memory(
+                      thumbnailData,
+                      height: 180,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        log.error(error.toString(), trace: stackTrace);
+                        return const Icon(
+                          Icons.broken_image,
+                          size: 180,
+                        );
+                      },
+                    );
+                  },
                 ),
               ),
             ),
@@ -241,7 +164,7 @@ class NewsCard extends StatelessWidget {
                         visible: post.author.imageUrl != null,
                         replacement: const CircleAvatar(
                           radius: 12,
-                          backgroundColor: Colors.yellow,
+                          child: Icon(Icons.person),
                         ),
                         child: CircleAvatar(
                           radius: 12,
@@ -251,14 +174,28 @@ class NewsCard extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 8),
-                      Visibility(
-                        visible: post.comments.isNotEmpty,
-                        replacement: const Text("Be the first to comment"),
-                        child: Text(
-                          "+${post.comments.length} Replies",
-                          style: const TextStyle(fontSize: 14, color: Colors.blue),
-                        ),
-                      ),
+                      FutureBuilder(
+                          future: postsCollectionRef.collection(PostComment.collection).count().get(),
+                          builder: (_, commentsCountSnap) {
+                            if (commentsCountSnap.connectionState != ConnectionState.done) {
+                              return const InfiniteLoader();
+                            }
+
+                            int? commentsCount = commentsCountSnap.data?.count;
+
+                            if (commentsCount == null) {
+                              return const Icon(Icons.question_mark);
+                            }
+
+                            return Visibility(
+                              visible: commentsCount > 0,
+                              replacement: const Text("Be the first to comment"),
+                              child: Text(
+                                "+$commentsCount Replies",
+                                style: const TextStyle(fontSize: 14, color: Colors.blue),
+                              ),
+                            );
+                          }),
                       const Spacer(),
                       IconButton(
                         onPressed: () {},
@@ -275,6 +212,93 @@ class NewsCard extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class PostCommentCard extends StatelessWidget {
+  const PostCommentCard({
+    required this.post,
+    required this.comment,
+    required this.newsPostRef,
+    super.key,
+  });
+
+  final NewsPost post;
+  final PostComment comment;
+  final DocumentReference newsPostRef;
+
+  @override
+  Widget build(BuildContext context) {
+    ThemeData theme = Theme.of(context);
+
+    return Card(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ListTile(
+            leading: Builder(
+              builder: (context) {
+                if (comment.author.imageUrl == null) {
+                  return const Icon(Icons.person);
+                }
+
+                return CircleAvatar(
+                  backgroundImage: NetworkImage(comment.author.imageUrl!),
+                );
+              },
+            ),
+            title: Text(comment.author.name),
+            trailing: Text(timeAgo(comment.commentedAt)),
+          ),
+          SizedBox(
+            height: 400,
+            child: Image.network(
+              comment.thumbnailUrl,
+              fit: BoxFit.fill,
+            ),
+          ),
+          Flex(
+            direction: Axis.horizontal,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: StreamBuilder(
+                  stream: newsPostRef
+                      .collection(PostComment.collection)
+                      .doc(comment.id)
+                      .withConverter<PostComment>(
+                        fromFirestore: (snapshot, _) => PostComment.fromJson(snapshot.data()!),
+                        toFirestore: (model, _) => model.toJson(),
+                      )
+                      .snapshots(includeMetadataChanges: true),
+                  builder: (_, commentSnap) {
+                    final PostComment comment = commentSnap.data?.data() ?? this.comment;
+
+                    return CommentReactionWidget(
+                      newsPost: post,
+                      postComment: comment,
+                      postsCollectionRef: newsPostRef,
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(
+                width: 50,
+              ),
+              const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.show_chart),
+                  Icon(Icons.more_vert),
+                ],
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

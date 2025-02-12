@@ -1,31 +1,32 @@
 import 'dart:collection';
 
 import 'package:akropolis/components/toast/toast.dart';
+import 'package:akropolis/features/create_post/models/models.dart';
 import 'package:akropolis/features/news_feed/models/models.dart';
 import 'package:akropolis/main.dart';
+import 'package:akropolis/networking/media_stack_network_requests.dart';
 import 'package:akropolis/utils/constants.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:akropolis/utils/enums.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:common_fn/common_fn.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-part 'headlines_news_state.dart';
-part 'headlines_news_cubit.freezed.dart';
-
-class HeadlinesNewsCubit extends Cubit<HeadlinesNewsState> {
-  final LinkedHashSet<NewsPost> cachedNews = LinkedHashSet();
-  final CollectionReference postsCollectionRef = FirebaseFirestore.instance.collection(NewsChannel.newsHeadlines.collection).withConverter<NewsPost>(
+ class ForYouNewsFetcher{
+  static final LinkedHashSet<NewsPost> cachedNews = LinkedHashSet();
+  static final CollectionReference postsCollectionRef = FirebaseFirestore.instance.collection(NewsChannel.userPosts.collection).withConverter<NewsPost>(
     fromFirestore: (snapshot, _) => NewsPost.fromJson(snapshot.data()!),
     toFirestore: (model, _) => model.toJson(),
   );
-  DocumentSnapshot? lastFetchedUserPost;
+  static DocumentSnapshot? lastFetchedUserPost;
 
-  HeadlinesNewsCubit() : super(const HeadlinesNewsState.loaded());
+  ForYouNewsFetcher._();
 
-  Future<List<NewsPost>?> fetchHeadlines({
+  static Future<List<NewsPost>?> fetchUserPostsNews({
     required int pageSize,
     required bool fromCache,
     List<String> keywords = const [],
+    Function(String)? onError,
   }) async {
     try {
 
@@ -50,14 +51,10 @@ class HeadlinesNewsCubit extends Cubit<HeadlinesNewsState> {
 
       return data;
     } catch(e, trace) {
-      addError(e, trace);
+      log.error(e, trace: trace);
+      onError?.call(e.toString());
       return null;
     }
   }
 
-  @override
-  void onError(Object error, StackTrace stackTrace) {
-    log.error(error, trace: stackTrace);
-    super.onError(error, stackTrace);
-  }
 }

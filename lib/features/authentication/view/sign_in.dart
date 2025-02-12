@@ -12,6 +12,8 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:akropolis/components/loader.dart';
+
 
 class SignInScreen extends StatelessWidget {
   const SignInScreen({super.key});
@@ -71,7 +73,7 @@ class SignInScreen extends StatelessWidget {
                   );
                 }, builder: (_, state) {
                   return state.map(
-                    loading: (_) => const CircularProgressIndicator.adaptive(),
+                    loading: (_) => const InfiniteLoader(),
                     loaded: (_) => ElevatedButton.icon(
                       icon: Assets.google.svg(),
                       onPressed: () async {
@@ -313,7 +315,7 @@ class SignInWithEmailScreen extends StatelessWidget {
             },
             builder: (context, state) {
               return state.map(
-                loading: (_) => const CircularProgressIndicator.adaptive(),
+                loading: (_) => const InfiniteLoader(),
                 loaded: (l) {
                   return ElevatedButton(
                     onPressed: () async {

@@ -37,13 +37,17 @@ dependencies:
     git:
       url: https://bruc3balo:glpat-45CSRAxm48QD31nbADxz@gitlab.com/flutter_starter/paged_list_view.git
       ref: main
+  hive_database_service:
+    git:
+      url: https://bruc3balo:glpat-45CSRAxm48QD31nbADxz@gitlab.com/flutter_starter/hive_database_service.git
+      ref: main
   camera: ^0.11.1
   video_player:
-  # video_compress:
   path_provider:
   image_picker: ^1.1.2
-  #video_compress:
   get_thumbnail_video: ^0.7.3
+  loading_animation_widget:
+  dio:
   ffmpeg_kit_flutter_full_gpl:
     path: ../ffmpeg_kit_flutter_full_gpl-6.0.3
 
@@ -56,6 +60,7 @@ dev_dependencies:
   flutter_gen_runner:
   build_runner:
   json_serializable:
+  hive_generator:
 
 
 flutter_gen:

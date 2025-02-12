@@ -296,6 +296,8 @@ SliderThemeData get sliderTheme {
   );
 }
 
+
+
 ThemeData get lightTheme {
   return ThemeData(
     useMaterial3: true,

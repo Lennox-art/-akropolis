@@ -1,3 +1,4 @@
+import 'package:akropolis/components/loader.dart';
 import 'package:akropolis/components/toast/toast.dart';
 import 'package:akropolis/features/authentication/view_model/authentication_cubit/authentication_cubit.dart';
 import 'package:flutter/material.dart';
@@ -47,7 +48,7 @@ class ForgotPasswordScreen extends StatelessWidget {
             },
             builder: (context, state) {
               return state.map(
-                loading: (_) => const CircularProgressIndicator.adaptive(),
+                loading: (_) => const InfiniteLoader(),
                 loaded: (_) => ElevatedButton(
                   onPressed: () {
                     BlocProvider.of<AuthenticationCubit>(context).resetPassword(

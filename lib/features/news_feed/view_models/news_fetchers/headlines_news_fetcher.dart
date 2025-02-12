@@ -1,33 +1,26 @@
 import 'dart:collection';
 
-import 'package:akropolis/components/toast/toast.dart';
 import 'package:akropolis/features/news_feed/models/models.dart';
 import 'package:akropolis/main.dart';
-import 'package:akropolis/utils/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:common_fn/common_fn.dart';
-import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
-part 'world_news_state.dart';
 
-part 'world_news_cubit.freezed.dart';
-
-class WorldNewsCubit extends Cubit<WorldNewsState> {
-  final LinkedHashSet<NewsPost> cachedNews = LinkedHashSet();
-  final CollectionReference postsCollectionRef = FirebaseFirestore.instance.collection(NewsChannel.worldNews.collection,).withConverter<NewsPost>(
+class HeadlinesNewsFetcher  {
+  static final LinkedHashSet<NewsPost> cachedNews = LinkedHashSet();
+  static final CollectionReference postsCollectionRef = FirebaseFirestore.instance.collection(NewsChannel.newsHeadlines.collection).withConverter<NewsPost>(
     fromFirestore: (snapshot, _) => NewsPost.fromJson(snapshot.data()!),
     toFirestore: (model, _) => model.toJson(),
   );
-  DocumentSnapshot? lastFetchedUserPost;
+  static DocumentSnapshot? lastFetchedUserPost;
 
-  WorldNewsCubit() : super(const WorldNewsState.loaded());
+  HeadlinesNewsFetcher._();
 
-
-  Future<List<NewsPost>?> fetchWorldNews({
+  static Future<List<NewsPost>?> fetchHeadlines({
     required int pageSize,
     required bool fromCache,
     List<String> keywords = const [],
+    Function(String)? onError,
   }) async {
     try {
 
@@ -52,14 +45,10 @@ class WorldNewsCubit extends Cubit<WorldNewsState> {
 
       return data;
     } catch(e, trace) {
-      addError(e, trace);
+      log.error(e, trace:trace);
+      onError?.call(e.toString());
       return null;
     }
   }
 
-  @override
-  void onError(Object error, StackTrace stackTrace) {
-    log.error(error, trace: stackTrace);
-    super.onError(error, stackTrace);
-  }
 }

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 enum AuthorType {
   user,
   publisher;
@@ -58,9 +60,7 @@ class NewsPost {
   final Author author;
   final DateTime publishedAt;
   final Set<String> viewers;
-  final List<PostComment> comments;
   final PostReaction reaction;
-  final NewsChannel channel;
 
   NewsPost({
     required this.id,
@@ -69,11 +69,9 @@ class NewsPost {
     required this.title,
     required this.description,
     required this.author,
-    required this.comments,
     required this.viewers,
     required this.publishedAt,
     required this.reaction,
-    required this.channel,
   });
 
   factory NewsPost.fromJson(Map<String, dynamic> json) => NewsPost(
@@ -83,15 +81,11 @@ class NewsPost {
         title: json['title'] as String,
         description: json['description'] as String,
         author: Author.fromJson(json['author'] as Map<String, dynamic>),
-        comments: (json['comments'] as List<dynamic>)
-            .map((e) => PostComment.fromJson(e as Map<String, dynamic>))
-            .toList(),
         viewers:
             (json['viewers'] as List<dynamic>).map((e) => e as String).toSet(),
         publishedAt: DateTime.parse(json['publishedAt'] as String),
         reaction:
             PostReaction.fromJson(json['reaction'] as Map<String, dynamic>),
-        channel: NewsChannel.newsChannelEnumMap[json['channel']]!,
       );
 
   Map<String, dynamic> toJson() => {
@@ -103,9 +97,7 @@ class NewsPost {
         'author': author.toJson(),
         'publishedAt': publishedAt.toIso8601String(),
         'viewers': viewers.toList(),
-        'comments': comments.map((c) => c.toJson()).toList(),
         'reaction': reaction.toJson(),
-        'channel': channel.collection,
       };
 }
 
@@ -131,44 +123,94 @@ class PostReaction {
 
 class PostComment {
   final String id;
+  final String postId;
   final String thumbnailUrl;
   final String postUrl;
   final Author author;
-  final List<PostComment> replies;
   final DateTime commentedAt;
-  PostReaction? reaction;
+  final PostReaction reaction;
 
   PostComment({
     required this.id,
+    required this.postId,
     required this.thumbnailUrl,
     required this.postUrl,
     required this.author,
-    required this.replies,
     required this.commentedAt,
     required this.reaction,
   });
 
+  static const collection = 'comments';
+
   factory PostComment.fromJson(Map<String, dynamic> json) => PostComment(
         id: json['id'] as String,
+        postId: json['postId'] as String,
         thumbnailUrl: json['thumbnailUrl'] as String,
         postUrl: json['postUrl'] as String,
         author: Author.fromJson(json['author'] as Map<String, dynamic>),
-        replies: (json['replies'] as List<dynamic>)
-            .map((e) => PostComment.fromJson(e as Map<String, dynamic>))
-            .toList(),
         commentedAt: DateTime.parse(json['commentedAt'] as String),
-        reaction: json['reaction'] == null
-            ? null
-            : PostReaction.fromJson(json['reaction'] as Map<String, dynamic>),
+        reaction: PostReaction.fromJson(json['reaction'] as Map<String, dynamic>),
       );
 
   Map<String, dynamic> toJson() => <String, dynamic>{
         'id': id,
+        'postId': postId,
         'thumbnailUrl': thumbnailUrl,
         'postUrl': postUrl,
         'author': author.toJson(),
-        'replies': replies.map((r) => r.toJson()).toList(),
         'commentedAt': commentedAt.toIso8601String(),
-        'reaction': reaction,
+        'reaction': reaction.toJson(),
       };
+}
+
+/*
+  TODO nested replies
+class PostReply {
+  final String id;
+  final String commentId; // ID of the parent comment
+  final String text;
+  final Author author;
+  final DateTime repliedAt;
+  final PostReaction reaction;
+
+  PostReply({
+    required this.id,
+    required this.commentId,
+    required this.text,
+    required this.author,
+    required this.repliedAt,
+    required this.reaction,
+  });
+
+  factory PostReply.fromJson(Map<String, dynamic> json) => PostReply(
+    id: json['id'] as String,
+    commentId: json['commentId'] as String,
+    text: json['text'] as String,
+    author: Author.fromJson(json['author'] as Map<String, dynamic>),
+    repliedAt: DateTime.parse(json['repliedAt'] as String),
+    reaction: PostReaction.fromJson(json['reaction'] as Map<String, dynamic>),
+  );
+
+  Map<String, dynamic> toJson() => <String, dynamic>{
+    'id': id,
+    'commentId': commentId,
+    'text': text,
+    'author': author.toJson(),
+    'repliedAt': repliedAt.toIso8601String(),
+    'reaction': reaction.toJson(),
+  };
+}*/
+
+class NewsPostDto {
+  final NewsPost newsPost;
+  final NewsChannel channel;
+
+  NewsPostDto(this.newsPost, this.channel);
+}
+
+class CommentReplyDto {
+  final NewsPost newsPost;
+  final File commentVideo;
+
+  CommentReplyDto(this.newsPost, this.commentVideo);
 }

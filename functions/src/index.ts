@@ -44,9 +44,7 @@ interface NewsPost {
   author: Author;
   publishedAt: string;
   viewers: Array<string>; // Use Set to ensure unique viewers
-  comments: PostComment[];
   reaction: PostReaction;
-  channel: string,
 }
 
 // Define article structure
@@ -84,7 +82,7 @@ interface MediaStackResponse {
 // Ensure Firebase is initialized only once
 const db = firestore();
 
-const articleToNewsPost = (article: Article, channel: string): NewsPost => ({
+const articleToNewsPost = (article: Article): NewsPost => ({
   id: generateTimestampId(), // Assuming a function to generate unique IDs
   thumbnailUrl: article.image || "", // Use an empty string if no image
   postUrl: article.url,
@@ -97,12 +95,10 @@ const articleToNewsPost = (article: Article, channel: string): NewsPost => ({
   },
   publishedAt: generateTimestamp(new Date(article.published_at)), // Convert to Date object
   viewers: [],
-  comments: [],
   reaction: {
     log: [],
     emp: [],
   }, 
-  channel: channel,
 });
 
 function generateTimestamp(now: Date): string {
@@ -181,7 +177,7 @@ export const fetchMediaStackArticles = functions.https.onRequest(async (request)
 
     // Commit batch operation
     response.data.data.forEach((article: Article) => {
-      const newsPost = articleToNewsPost(article, collection); // Convert to NewsPost
+      const newsPost = articleToNewsPost(article); // Convert to NewsPost
       const docRef = newsCollection.doc(newsPost.id); // Reference to document
       batch.set(docRef, newsPost); // Add to batch operation
       logger.info(`Commited to ${article}`);
@@ -228,7 +224,7 @@ interface NewsAPIResponse {
 }
 
 // Add this conversion function after your existing articleToNewsPost function
-const newsAPIArticleToNewsPost = (article: NewsAPIArticle, channel: string): NewsPost => ({
+const newsAPIArticleToNewsPost = (article: NewsAPIArticle): NewsPost => ({
   id: generateTimestampId(),
   thumbnailUrl: article.urlToImage || "",
   postUrl: article.url,
@@ -241,12 +237,10 @@ const newsAPIArticleToNewsPost = (article: NewsAPIArticle, channel: string): New
   },
   publishedAt: generateTimestamp(new Date(article.publishedAt)),
   viewers: [],
-  comments: [],
   reaction: {
     log: [],
     emp: [],
   },
-  channel: channel,
 });
 
 export const fetchNewsAPIHeadlines = functions.https.onRequest(async (request) => {
@@ -299,7 +293,7 @@ export const fetchNewsAPIHeadlines = functions.https.onRequest(async (request) =
     const batch = db.batch();
 
     response.data.articles.forEach((article: NewsAPIArticle) => {
-      const newsPost = newsAPIArticleToNewsPost(article, collection);
+      const newsPost = newsAPIArticleToNewsPost(article);
       const docRef = newsCollection.doc(newsPost.id);
       batch.set(docRef, newsPost);
       logger.info(`Added article to batch: ${article.title}`);
@@ -379,7 +373,7 @@ export const fetchWorldNewsNewsApi = functions.https.onRequest(async (request) =
     const batch = db.batch();
 
     response.data.articles.forEach((article: NewsAPIArticle) => {
-      const newsPost = newsAPIArticleToNewsPost(article, collection);
+      const newsPost = newsAPIArticleToNewsPost(article);
       const docRef = newsCollection.doc(newsPost.id);
       batch.set(docRef, newsPost);
       logger.info(`Added article to batch: ${article.title}`);

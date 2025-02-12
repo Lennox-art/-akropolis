@@ -7,22 +7,20 @@ import 'package:akropolis/features/create_post/models/models.dart';
 import 'package:akropolis/features/news_feed/models/models.dart';
 import 'package:akropolis/local_storage/media_cache.dart';
 import 'package:akropolis/main.dart';
-import 'package:akropolis/utils/constants.dart';
 import 'package:akropolis/utils/functions.dart';
-import 'package:camera/camera.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:common_fn/common_fn.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:network_service/network_service.dart';
 
-part 'create_post_state.dart';
+part 'post_news_post_reply_state.dart';
 
-part 'create_post_cubit.freezed.dart';
+part 'post_news_post_reply_cubit.freezed.dart';
 
-class CreatePostCubit extends Cubit<CreatePostState> {
-  CreatePostForm? form;
+class PostVideoReplyCubit extends Cubit<PostVideoReplyState> {
+  CreatePostForm? replyForm;
   final thumbnailsRef = FirebaseStorage.instance.ref().child("thumbnails");
   final postsRef = FirebaseStorage.instance.ref().child("posts");
   final CollectionReference postsCollectionRef = FirebaseFirestore.instance.collection(NewsChannel.userPosts.collection).withConverter<NewsPost>(
@@ -30,9 +28,10 @@ class CreatePostCubit extends Cubit<CreatePostState> {
         toFirestore: (model, _) => model.toJson(),
       );
 
-  CreatePostCubit() : super(const CreatePostState.loaded());
+  PostVideoReplyCubit() : super(const PostVideoReplyState.loaded());
 
-  Future<void> createNewPost({
+  Future<void> createVideoReply({
+    required NewsPost post,
     required File file,
     required AppUser user,
   }) async {
@@ -44,8 +43,8 @@ class CreatePostCubit extends Cubit<CreatePostState> {
 
     log.debug("${thumbnailData != null} with data?");
 
-    form = CreatePostForm.create(
-      postId: generateTimeUuid(),
+    replyForm = CreatePostForm.create(
+      postId: post.id,
       appUser: user,
       videoData: file,
       videoDuration: duration,
@@ -53,7 +52,7 @@ class CreatePostCubit extends Cubit<CreatePostState> {
     );
 
     emit(
-      LoadedPostState(form: form),
+      LoadedPostVideoReplyState(replyForm: replyForm),
     );
   }
 
@@ -61,67 +60,65 @@ class CreatePostCubit extends Cubit<CreatePostState> {
     required Duration startTime,
     required Duration endTime,
   }) async {
-    emit(const LoadingPostState());
+    emit(const LoadingPostVideoReplyState());
 
     File? trimmedVideo = await trimVideoToTime(
-      file: form!.videoData!,
+      file: replyForm!.videoData!,
       start: startTime,
       end: endTime,
     );
 
     if (trimmedVideo != null) {
-      form = form?.copyWith(
+      replyForm = replyForm?.copyWith(
         videoData: trimmedVideo,
       );
     }
 
     emit(
-      LoadedPostState(form: form),
+      LoadedPostVideoReplyState(replyForm: replyForm),
     );
   }
 
   Future<void> modifyThumbnail({
     required int timeInSeconds,
   }) async {
-    emit(const LoadingPostState());
+    emit(const LoadingPostVideoReplyState());
 
     Uint8List? thumbnailData = await generateThumbnail(
-      videoPath: form!.videoData!.path,
+      videoPath: replyForm!.videoData!.path,
       timeInSeconds: timeInSeconds,
     );
     if (thumbnailData != null) {
-      form = form?.copyWith(
+      replyForm = replyForm?.copyWith(
         thumbnailData: thumbnailData,
       );
     }
     emit(
-      LoadedPostState(form: form),
+      LoadedPostVideoReplyState(replyForm: replyForm),
     );
   }
 
-  Future<void> doPost({
-    required String description,
-    required String title,
-  }) async {
-    if (form == null) return;
-    if (form!.thumbnailData == null) return;
-    if (form!.videoData == null) return;
+  Future<void> doPost() async {
+    if (replyForm == null) return;
+    if (replyForm!.thumbnailData == null) return;
+    if (replyForm!.videoData == null) return;
 
-    emit(const LoadingPostState());
+    emit(const LoadingPostVideoReplyState());
 
-    String postId = form!.postId;
+    String postId = replyForm!.postId;
+    String commentId = generateTimeUuid();
 
     //Upload thumbnail
     String thumbnailUrl = '';
-    if (form!.thumbnailUploaded) {
+    if (replyForm!.thumbnailUploaded) {
       thumbnailUrl = await thumbnailsRef.child(postId).getDownloadURL();
     } else {
       UploadTask thumbnailTask = thumbnailsRef.child(postId).putData(
-            form!.thumbnailData!,
+            replyForm!.thumbnailData!,
             SettableMetadata(
               customMetadata: {
+                "commentId": commentId,
                 "postId": postId,
-                "title": title,
               },
             ),
           );
@@ -130,16 +127,16 @@ class CreatePostCubit extends Cubit<CreatePostState> {
         if(snapshot.totalBytes == 0) continue;
 
         final progress = UploadProgress(sent: snapshot.bytesTransferred, total: snapshot.totalBytes);
-        log.info("Transferred ${snapshot.bytesTransferred} out of ${snapshot.totalBytes} complete.");
 
         switch (snapshot.state) {
           case TaskState.running:
-            log.info("Thumbnail Upload is ${progress.percent.toInt()}% complete.");
+            log.info("Thumbnail upload is ${progress.percent.toInt()}% complete.");
 
             emit(
-              LoadingPostState(
+              LoadingPostVideoReplyState(
+                postId: postId,
                 message: ToastInfo(
-                  message: "(2/2) Thumbnail Upload is ${progress.percent.toInt()}% complete.",
+                  message: "(1/2) Thumbnail Upload is ${progress.percent.toInt()}% complete.",
                 ),
                 progress: progress,
               ),
@@ -148,9 +145,10 @@ class CreatePostCubit extends Cubit<CreatePostState> {
           case TaskState.paused:
             log.info("Upload paused");
             emit(
-              LoadingPostState(
+              LoadingPostVideoReplyState(
+                postId: postId,
                 message: ToastInfo(
-                  message: "(2/2) Upload paused at ${progress.percent.toInt()}%",
+                  message: "(1/2) Upload paused at ${progress.percent.toInt()}%",
                 ),
                 progress: progress,
               ),
@@ -159,9 +157,10 @@ class CreatePostCubit extends Cubit<CreatePostState> {
           case TaskState.canceled:
             log.info("Upload was canceled");
             emit(
-              LoadingPostState(
+              LoadingPostVideoReplyState(
+                postId: postId,
                 message: ToastError(
-                  message: "(2/2) Upload cancelled at ${progress.percent.toInt()}%",
+                  message: "(1/2) Upload cancelled at ${progress.percent.toInt()}%",
                 ),
                 progress: progress,
               ),
@@ -169,9 +168,10 @@ class CreatePostCubit extends Cubit<CreatePostState> {
             break;
           case TaskState.error:
             emit(
-              LoadingPostState(
+              LoadingPostVideoReplyState(
+                postId: postId,
                 message: ToastError(
-                  message: "(2/2) Error uploading thumbnail at ${progress.percent.toInt()}%",
+                  message: "(1/2) Error uploading thumbnail at ${progress.percent.toInt()}%",
                 ),
                 progress: progress,
               ),
@@ -179,17 +179,17 @@ class CreatePostCubit extends Cubit<CreatePostState> {
             break;
           case TaskState.success:
             thumbnailUrl = await snapshot.ref.getDownloadURL();
-            form = form?.copyWith(thumbnailUploaded: true);
+            replyForm = replyForm?.copyWith(thumbnailUploaded: true);
 
             emit(
-              LoadingPostState(
+              LoadingPostVideoReplyState(
+                postId: postId,
                 message: const ToastSuccess(
-                  message: "(2/2) Thumbnail uploaded successfully",
+                  message: "(1/2) Thumbnail uploaded successfully",
                 ),
                 progress: progress,
               ),
             );
-
             break;
         }
       }
@@ -197,22 +197,20 @@ class CreatePostCubit extends Cubit<CreatePostState> {
 
     //Upload post data
     String postUrl = '';
-    if (form!.videoDataUploaded) {
+    if (replyForm!.videoDataUploaded) {
       postUrl = await postsRef.child(postId).getDownloadURL();
     } else {
       UploadTask postTask = postsRef.child(postId).putFile(
-            form!.videoData!,
+            replyForm!.videoData!,
             SettableMetadata(
               customMetadata: {
                 "postId": postId,
-                "title": title,
-                "description": description,
               },
             ),
           );
+
       await for (var snapshot in postTask.snapshotEvents) {
         if(snapshot.totalBytes == 0) continue;
-
         final progress = UploadProgress(sent: snapshot.bytesTransferred, total: snapshot.totalBytes);
 
         switch (snapshot.state) {
@@ -220,7 +218,8 @@ class CreatePostCubit extends Cubit<CreatePostState> {
             log.info("Post upload is ${progress.percent.toInt()}% complete.");
 
             emit(
-              LoadingPostState(
+              LoadingPostVideoReplyState(
+                postId: postId,
                 message: ToastInfo(
                   message: "(2/2) Post Upload is ${progress.percent.toInt()}% complete.",
                 ),
@@ -231,7 +230,8 @@ class CreatePostCubit extends Cubit<CreatePostState> {
           case TaskState.paused:
             log.info("Upload paused");
             emit(
-              LoadingPostState(
+              LoadingPostVideoReplyState(
+                postId: postId,
                 message: ToastInfo(
                   message: "(2/2) Upload paused at ${progress.percent.toInt()}%",
                 ),
@@ -242,7 +242,8 @@ class CreatePostCubit extends Cubit<CreatePostState> {
           case TaskState.canceled:
             log.info("Upload was canceled");
             emit(
-              LoadingPostState(
+              LoadingPostVideoReplyState(
+                postId: postId,
                 message: ToastError(
                   message: "(2/2) Upload cancelled at ${progress.percent.toInt()}%",
                 ),
@@ -252,7 +253,8 @@ class CreatePostCubit extends Cubit<CreatePostState> {
             break;
           case TaskState.error:
             emit(
-              LoadingPostState(
+              LoadingPostVideoReplyState(
+                postId: postId,
                 message: ToastError(
                   message: "(2/2) Error uploading post at ${progress.percent.toInt()}%",
                 ),
@@ -261,11 +263,12 @@ class CreatePostCubit extends Cubit<CreatePostState> {
             );
             break;
           case TaskState.success:
-            postUrl = await snapshot.ref.getDownloadURL();
-            form = form?.copyWith(thumbnailUploaded: true);
+            thumbnailUrl = await snapshot.ref.getDownloadURL();
+            replyForm = replyForm?.copyWith(thumbnailUploaded: true);
 
             emit(
-              LoadingPostState(
+              LoadingPostVideoReplyState(
+                postId: postId,
                 message: const ToastSuccess(
                   message: "(2/2) Post uploaded successfully",
                 ),
@@ -278,39 +281,40 @@ class CreatePostCubit extends Cubit<CreatePostState> {
     }
 
     //Upload posts
-    NewsPost newsPost = NewsPost(
-      id: postId,
+    PostComment newComment = PostComment(
+      id: commentId,
+      postId: replyForm!.postId,
       thumbnailUrl: thumbnailUrl,
       postUrl: postUrl,
-      title: title,
-      description: description,
       author: Author(
-        id: form!.appUser.id,
-        name: form!.appUser.displayName,
-        imageUrl: form!.appUser.profilePicture,
+        id: replyForm!.appUser.id,
+        name: replyForm!.appUser.username,
+        imageUrl: replyForm!.appUser.profilePicture,
         type: AuthorType.user,
       ),
-      viewers: {},
-      reaction: PostReaction(
-        log: {},
-        emp: {},
-      ),
-      publishedAt: DateTime.now(),
+      commentedAt: DateTime.now(),
+      reaction: PostReaction(log: {}, emp: {}),
     );
-    await postsCollectionRef.doc(newsPost.id).set(newsPost);
-    form = null;
+
+    await postsCollectionRef
+        .doc(replyForm!.postId)
+        .collection(PostComment.collection)
+        .doc(newComment.id)
+        .set(newComment.toJson());
+
 
     emit(
-      const LoadedPostState(
-        toast: ToastSuccess(
-          message: "Post uploaded successfully",
+      const LoadedPostVideoReplyState(
+        message: ToastSuccess(
+          title: "Post Reply",
+          message: "Comment posted",
         ),
       ),
     );
 
-    MediaCache.addMedia(postUrl, form!.videoData!.readAsBytesSync());
-    MediaCache.addMedia(thumbnailUrl, form!.thumbnailData!);
+    MediaCache.addMedia(postUrl, replyForm!.videoData!.readAsBytesSync());
+    MediaCache.addMedia(thumbnailUrl, replyForm!.thumbnailData!);
 
-    form = null;
+    replyForm = null;
   }
 }

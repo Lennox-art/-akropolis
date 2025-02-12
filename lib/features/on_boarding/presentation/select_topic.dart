@@ -6,7 +6,8 @@ import 'package:akropolis/features/on_boarding/view_model/user_cubit/user_cubit.
 import 'package:akropolis/routes/routes.dart';
 import 'package:akropolis/theme/themes.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';import 'package:akropolis/components/loader.dart';
+
 
 class SelectTopicScreen extends StatelessWidget {
   const SelectTopicScreen({super.key});
@@ -117,7 +118,7 @@ class SelectTopicScreen extends StatelessWidget {
                       child: const Text("Next"),
                     );
                   },
-                  loading: (_) => const CircularProgressIndicator.adaptive(),
+                  loading: (_) => const InfiniteLoader(),
                 );
               },
             ),

@@ -1,26 +1,25 @@
 import 'dart:io';
 
 import 'package:akropolis/features/create_post/models/models.dart';
-import 'package:akropolis/features/create_post/view_model/create_post_cubit.dart';
+import 'package:akropolis/features/news_feed/view_models/post_news_post_reply_cubit/post_news_post_reply_cubit.dart';
 import 'package:akropolis/features/video_editing/view/video_editing.dart';
 import 'package:akropolis/main.dart';
-import 'package:akropolis/routes/routes.dart';
-import 'package:akropolis/theme/themes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:akropolis/components/loader.dart';
 
-class EditVideoPostPage extends StatelessWidget {
-  const EditVideoPostPage({super.key});
+class PostReplyScreenPage extends StatelessWidget {
+  const PostReplyScreenPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+
     final ValueNotifier<VideoEditingTools> currentToolNotifier = ValueNotifier(
       VideoEditingTools.trimVideo,
     );
 
     return Scaffold(
-      body: BlocBuilder<CreatePostCubit, CreatePostState>(
+      body: BlocBuilder<PostVideoReplyCubit, PostVideoReplyState>(
         builder: (_, state) {
           return state.map(
             loading: (_) => const Center(
@@ -34,9 +33,9 @@ class EditVideoPostPage extends StatelessWidget {
                 children: [
                   Expanded(
                     child: Visibility(
-                      visible: l.form != null,
+                      visible: l.replyForm != null,
                       child: VideoEditingWidget(
-                        data: l.form!.videoData!,
+                        data: l.replyForm!.videoData!,
                         currentToolNotifier: currentToolNotifier,
                       ),
                     ),
@@ -44,11 +43,10 @@ class EditVideoPostPage extends StatelessWidget {
                   ListTile(
                     trailing: TextButton(
                       onPressed: () {
-                        Navigator.of(context).pushNamed(
-                          AppRoutes.finalizePost.path,
-                        );
+                        BlocProvider.of<PostVideoReplyCubit>(context).doPost();
+                        Navigator.of(context).pop();
                       },
-                      child: const Text("Next"),
+                      child: const Text("Post"),
                     ),
                   ),
                 ],
@@ -73,14 +71,15 @@ class VideoEditingWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder(
-      valueListenable: currentToolNotifier,
-      builder: (_, tool, __) {
-        return Flex(
-          direction: Axis.vertical,
-          children: [
-            Expanded(
-              child: switch (tool) {
+    return Flex(
+      direction: Axis.vertical,
+      children: [
+
+        Expanded(
+          child: ValueListenableBuilder(
+            valueListenable: currentToolNotifier,
+            builder: (_, tool, __) {
+              return switch (tool) {
                 VideoEditingTools.trimVideo => TrimVideoWidget(
                     data: data,
                     onConfirm: ({
@@ -89,7 +88,7 @@ class VideoEditingWidget extends StatelessWidget {
                     }) {
                       log.debug("Modifying trim video");
 
-                      BlocProvider.of<CreatePostCubit>(context).trimVideo(
+                      BlocProvider.of<PostVideoReplyCubit>(context).trimVideo(
                         startTime: start,
                         endTime: end,
                       );
@@ -98,42 +97,35 @@ class VideoEditingWidget extends StatelessWidget {
                 VideoEditingTools.thumbnailPicker => ThumbnailVideoWidget(
                     data: data,
                     onConfirm: (p) {
-                      BlocProvider.of<CreatePostCubit>(context).modifyThumbnail(
+                      BlocProvider.of<PostVideoReplyCubit>(context).modifyThumbnail(
                         timeInSeconds: p.inSeconds,
                       );
                       log.debug("Modifying thumbnail");
                     },
                   ),
-              },
-            ),
-            SizedBox(
-              height: 80,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: VideoEditingTools.values
-                    .map(
-                      (t) => Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          IconButton(
-                            onPressed: () {
-                              currentToolNotifier.value = t;
-                            },
-                            icon: Icon(t.iconData),
-                            color: t == tool ? primaryColor : Colors.white70,
-                          ),
-                          Text(t.title),
-                        ],
-                      ),
-                    )
-                    .toList(),
-              ),
-            ),
-          ],
-        );
-      },
+              };
+            },
+          ),
+        ),
+
+        SizedBox(
+          height: 80,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: VideoEditingTools.values
+                .map(
+                  (t) => IconButton(
+                    onPressed: () {
+                      currentToolNotifier.value = t;
+                    },
+                    icon: Icon(t.iconData),
+                  ),
+                )
+                .toList(),
+          ),
+        ),
+
+      ],
     );
   }
 }

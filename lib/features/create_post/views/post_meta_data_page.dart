@@ -2,6 +2,8 @@ import 'package:akropolis/features/create_post/view_model/create_post_cubit.dart
 import 'package:akropolis/routes/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:akropolis/components/loader.dart';
+
 
 class PostMetaDataPage extends StatelessWidget {
   const PostMetaDataPage({super.key});
@@ -25,7 +27,7 @@ class PostMetaDataPage extends StatelessWidget {
               Expanded(
                 child: Card(
                   child: state.map(
-                    loading: (l) => const CircularProgressIndicator.adaptive(),
+                    loading: (l) => const InfiniteLoader(),
                     loaded: (l) {
 
                       if(l.form == null) {
@@ -71,12 +73,10 @@ class PostMetaDataPage extends StatelessWidget {
                     String title = titleController.text;
                     String description = descriptionController.text;
 
-                    await BlocProvider.of<CreatePostCubit>(context).doPost(
+                    BlocProvider.of<CreatePostCubit>(context).doPost(
                       title: title,
                       description: description,
                     );
-
-                    if (!context.mounted) return;
 
                     Navigator.of(context).pushNamedAndRemoveUntil(
                       AppRoutes.home.path,

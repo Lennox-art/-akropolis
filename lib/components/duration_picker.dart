@@ -1,11 +1,12 @@
 import 'dart:core';
 
+import 'package:akropolis/theme/themes.dart';
 import 'package:akropolis/utils/duration_style.dart';
 import 'package:flutter/material.dart';
 
 class DurationPickerBottomSheet extends StatelessWidget {
   DurationPickerBottomSheet({
-    this.divisions = 10,
+    this.divisions = 8,
     required this.onConfirm,
     required this.maxDuration,
     required this.minDuration,
@@ -69,21 +70,39 @@ class DurationPickerBottomSheet extends StatelessWidget {
                   ),
                 ],
               ),
-              ValueListenableBuilder(
-                valueListenable: durationNotifier,
-                builder: (_, duration, __) {
-                  return Slider(
-                    
-                    label: duration.format(DurationStyle.FORMAT_MM_SS),
-                    min: Duration.zero.inSeconds.toDouble(),
-                    max: maxDuration.inSeconds.toDouble(),
-                    value: duration.inSeconds.toDouble(),
-                    onChanged: (newDuration) {
-                      durationNotifier.value = Duration(seconds: newDuration.round());
-                    },
-                    divisions: divisions,
-                  );
-                },
+              SizedBox(
+                height: 120,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    DurationBackground(
+                      divisions: divisions,
+                    ),
+                    ValueListenableBuilder(
+                      valueListenable: durationNotifier,
+                      builder: (_, duration, __) {
+                        return SliderTheme(
+                          data: SliderTheme.of(context).copyWith(
+                            // overlayShape: SliderComponentShape.noOverlay,
+                            activeTrackColor: primaryColor.withValues(alpha: 0.5),
+                            trackHeight: 40,
+                            inactiveTrackColor: Colors.transparent,
+                          ),
+                          child: Slider(
+                            label: duration.format(DurationStyle.FORMAT_MM_SS),
+                            min: Duration.zero.inSeconds.toDouble(),
+                            max: maxDuration.inSeconds.toDouble(),
+                            value: duration.inSeconds.toDouble(),
+                            onChanged: (newDuration) {
+                              durationNotifier.value = Duration(seconds: newDuration.round());
+                            },
+                            divisions: divisions,
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
               ),
               ElevatedButton(
                 onPressed: () => onConfirm(durationNotifier.value),
@@ -112,4 +131,42 @@ Future<Duration?> showDurationPickerDialog(
       minDuration: minDuration,
     ),
   );
+}
+
+class DurationBackground extends StatelessWidget {
+  const DurationBackground({required this.divisions,super.key});
+
+  final int divisions;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(4.0),
+      decoration: BoxDecoration(
+        borderRadius: const BorderRadius.all(Radius.circular(20)),
+        border: Border.all(
+          color: Colors.grey,
+        ),
+      ),
+      child: Flex(
+        direction: Axis.horizontal,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: List.generate(
+          divisions,
+          (i) {
+            bool isEven = i % 2 == 0;
+            double height = 35;
+            return Flexible(
+              child: Container(
+                width: 5,
+                height: isEven ? height : height / 2,
+                decoration: const BoxDecoration(color: Colors.grey, borderRadius: BorderRadius.all(Radius.circular(20))),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
 }

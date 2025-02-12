@@ -69,6 +69,27 @@ Future<Uint8List?> generateThumbnail({
   }
 }
 
+Future<List<Uint8List>> generateThumbnails({
+  required String videoPath,
+  required int count,
+}) async {
+  List<Uint8List> thumbnails = [];
+
+  Duration? duration = await getVideoDuration(videoPath);
+  if (duration == null || duration.inSeconds == 0) return [];
+
+  double interval = duration.inSeconds / count;
+
+  for (int i = 0; i < count; i++) {
+    int timeInSeconds = (interval * i).round();
+    Uint8List? thumbnail = await generateThumbnail(videoPath: videoPath, timeInSeconds: timeInSeconds);
+    if (thumbnail == null) continue;
+    thumbnails.add(thumbnail);
+  }
+
+  return thumbnails;
+}
+
 Future<Duration?> getVideoDuration(String videoPath) async {
   final MediaInformationSession session = await FFprobeKit.getMediaInformation(videoPath);
   final MediaInformation? mediaInfo = session.getMediaInformation();

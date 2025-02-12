@@ -1,4 +1,6 @@
+import 'package:akropolis/components/loader.dart';
 import 'package:akropolis/features/authentication/view_model/authentication_cubit/authentication_cubit.dart';
+import 'package:akropolis/features/create_post/view_model/create_post_cubit.dart';
 import 'package:akropolis/features/news_feed/view/for_you.dart';
 import 'package:akropolis/utils/constants.dart';
 import 'package:akropolis/features/news_feed/view/local_news.dart';
@@ -8,6 +10,7 @@ import 'package:akropolis/routes/routes.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:network_service/network_service.dart';
 
 import 'news_feed/models/models.dart';
 
@@ -77,7 +80,7 @@ class HomePage extends StatelessWidget {
               child: ListView(
                 scrollDirection: Axis.horizontal,
                 children: [
-                  const SizedBox(
+                  SizedBox(
                     width: 150,
                     child: Card(
                       child: Text("Emblems"),
@@ -97,6 +100,30 @@ class HomePage extends StatelessWidget {
                   ),
                 ],
               ),
+            ),
+            BlocBuilder<CreatePostCubit, CreatePostState>(
+              builder: (context, state) {
+                return state.map(
+                  loading: (l) {
+                    return Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          l.message?.message ?? "...",
+                        ),
+                        Builder(builder: (context) {
+                          if (l.progress == null) {
+                            return const SizedBox.shrink();
+                          }
+                          return FiniteLoader(progress: l.progress!);
+                        }),
+                      ],
+                    );
+                  },
+                  loaded: (l) => const SizedBox.shrink(),
+                );
+              },
             ),
             TabBar(
               isScrollable: true,
@@ -141,13 +168,15 @@ class HomePage extends StatelessWidget {
                 break;
             }
           },
-          items: bottomTabs.map(
+          items: bottomTabs
+              .map(
                 (e) => BottomNavigationBarItem(
                   label: e.title,
                   icon: Icon(e.icon),
                   tooltip: e.title,
                 ),
-              ).toList(),
+              )
+              .toList(),
         ),
       ),
     );

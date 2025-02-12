@@ -2,6 +2,8 @@ import 'package:akropolis/features/authentication/models/authentication_models.d
 import 'package:akropolis/features/authentication/view_model/authentication_cubit/authentication_cubit.dart';
 import 'package:akropolis/components/toast/toast.dart';
 import 'package:akropolis/utils/constants.dart';
+import 'package:akropolis/components/loader.dart';
+
 import 'package:akropolis/utils/validations.dart';
 import 'package:akropolis/gen/assets.gen.dart';
 import 'package:akropolis/features/on_boarding/view_model/user_cubit/user_cubit.dart';
@@ -73,7 +75,7 @@ class SignUpPage extends StatelessWidget {
                   },
                   builder: (_, state) {
                     return state.map(
-                      loading: (_) => const CircularProgressIndicator.adaptive(),
+                      loading: (_) => const InfiniteLoader(),
                       loaded: (_) => ElevatedButton.icon(
                         icon: Assets.google.svg(),
                         onPressed: () async {
@@ -329,7 +331,7 @@ class SignUpWithEmailScreen extends StatelessWidget {
             },
             builder: (context, state) {
               return state.map(
-                loading: (_) => const CircularProgressIndicator.adaptive(),
+                loading: (_) => const InfiniteLoader(),
                 loaded: (l) {
                   return ElevatedButton(
                     onPressed: () async {
