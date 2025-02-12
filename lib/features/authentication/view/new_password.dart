@@ -28,15 +28,15 @@ class NewPasswordScreen extends StatelessWidget {
           ListTile(
             title: const Text("New Password"),
             subtitle: TextFormField(
-              decoration:
-                  const InputDecoration(hintText: "Enter your new password"),
+              decoration: const InputDecoration(hintText: "Enter your new password"),
             ),
           ),
           ListTile(
             title: const Text("Confirm New Password"),
             subtitle: TextFormField(
-              decoration:
-                  const InputDecoration(hintText: "Enter your new password"),
+              decoration: const InputDecoration(
+                hintText: "Enter your new password",
+              ),
             ),
           ),
           ElevatedButton(

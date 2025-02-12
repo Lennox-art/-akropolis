@@ -32,8 +32,6 @@ class CreatePostForm with _$CreatePostForm {
     required AppUser appUser,
     File? videoData,
     @Default(false) bool videoDataUploaded,
-
-    Duration? videoDuration,
     Uint8List? thumbnailData,
     @Default(false) bool thumbnailUploaded,
   }) = _CreatePostForm;

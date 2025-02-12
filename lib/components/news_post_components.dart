@@ -1,6 +1,7 @@
 import 'package:akropolis/features/authentication/models/authentication_models.dart';
 import 'package:akropolis/features/news_feed/models/models.dart';
 import 'package:akropolis/features/on_boarding/view_model/user_cubit/user_cubit.dart';
+import 'package:akropolis/gen/assets.gen.dart';
 import 'package:akropolis/main.dart';
 import 'package:akropolis/theme/themes.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -20,24 +21,19 @@ class NewsPostReactionWidget extends StatelessWidget {
   Future<void> setLogicReaction(AppUser user) async {
     log.info("User clicked logic reaction for post ${newsPost.id}");
 
-    bool hasReacted = newsPost.reaction.log.contains(user.id) || newsPost.reaction.emp.contains(user.id);
-    if (hasReacted) return;
 
     newsPost.reaction.log.add(user.id);
 
     await postsCollectionRef.update({
       'reaction.log': FieldValue.arrayUnion([user.id])
     });
- /*   await postsCollectionRef.update({
+    /*   await postsCollectionRef.update({
       'reaction.emp': FieldValue.arrayRemove([user.id])
     });*/
   }
 
   Future<void> setEmpathyReaction(AppUser user) async {
     log.info("User clicked emp reaction for post ${newsPost.id}");
-
-    bool hasReacted = newsPost.reaction.log.contains(user.id) || newsPost.reaction.emp.contains(user.id);
-    if (hasReacted) return;
 
     newsPost.reaction.emp.add(user.id);
 
@@ -52,19 +48,24 @@ class NewsPostReactionWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return PostReactionWidget(
-      empathyCount: newsPost.reaction.emp.length,
-      onEmpathy: () async {
-        AppUser? currentUser = await BlocProvider.of<UserCubit>(context).getCurrentUser();
-        if (currentUser == null) return;
-        setEmpathyReaction(currentUser);
-      },
-      logicCount: newsPost.reaction.log.length,
-      onLogic: () async {
-        AppUser? currentUser = await BlocProvider.of<UserCubit>(context).getCurrentUser();
-        if (currentUser == null) return;
-        setLogicReaction(currentUser);
-      },
+    return FutureBuilder(
+        future: BlocProvider.of<UserCubit>(context).getCurrentUser(),
+        builder: (_, snap) {
+
+          if (!snap.hasData) return const SizedBox.shrink();
+
+          AppUser currentUser = snap.data!;
+
+          bool alreadyVoted = newsPost.reaction.log.contains(currentUser.id) || newsPost.reaction.emp.contains(currentUser.id);
+
+          return PostReactionWidget(
+          alreadyVoted: alreadyVoted,
+          empathyCount: newsPost.reaction.emp.length,
+          onEmpathy: () => setEmpathyReaction(currentUser),
+          logicCount: newsPost.reaction.log.length,
+          onLogic: () => setLogicReaction(currentUser),
+        );
+      }
     );
   }
 }
@@ -89,14 +90,10 @@ class CommentReactionWidget extends StatelessWidget {
 
     postComment.reaction.log.add(user.id);
 
-    // 'comments.$commentIndex.reaction.log': FieldValue.arrayUnion([user.id])
-
     await postsCollectionRef.collection(PostComment.collection).doc(postComment.id).update({
       'reaction.log': FieldValue.arrayUnion([user.id])
     });
-   /* await postsCollectionRef.collection(PostComment.collection).doc(postComment.id).update({
-      'reaction.emp': FieldValue.arrayRemove([user.id])
-    });*/
+
   }
 
   Future<void> setEmpathyReaction(AppUser user) async {
@@ -107,9 +104,6 @@ class CommentReactionWidget extends StatelessWidget {
 
     postComment.reaction.emp.add(user.id);
 
-/*    await postsCollectionRef.collection(PostComment.collection).doc(postComment.id).update({
-      'reaction.log': FieldValue.arrayRemove([user.id])
-    });*/
 
     await postsCollectionRef.collection(PostComment.collection).doc(postComment.id).update({
       'reaction.emp': FieldValue.arrayUnion([user.id])
@@ -118,25 +112,31 @@ class CommentReactionWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return PostReactionWidget(
-      empathyCount: postComment.reaction.emp.length,
-      onEmpathy: () async {
-        AppUser? currentUser = await BlocProvider.of<UserCubit>(context).getCurrentUser();
-        if (currentUser == null) return;
-        setEmpathyReaction(currentUser);
-      },
-      logicCount: postComment.reaction.log.length,
-      onLogic: () async {
-        AppUser? currentUser = await BlocProvider.of<UserCubit>(context).getCurrentUser();
-        if (currentUser == null) return;
-        setLogicReaction(currentUser);
-      },
+    return FutureBuilder(
+      future: BlocProvider.of<UserCubit>(context).getCurrentUser(),
+      builder: (_, snap) {
+
+        if (!snap.hasData) return const SizedBox.shrink();
+
+        AppUser currentUser = snap.data!;
+
+        bool alreadyVoted = postComment.reaction.log.contains(currentUser.id) || postComment.reaction.emp.contains(currentUser.id);
+
+        return PostReactionWidget(
+          alreadyVoted: alreadyVoted,
+          empathyCount: postComment.reaction.emp.length,
+          onEmpathy: () => setEmpathyReaction(currentUser),
+          logicCount: postComment.reaction.log.length,
+          onLogic: () => setLogicReaction(currentUser),
+        );
+      }
     );
   }
 }
 
 class PostReactionWidget extends StatelessWidget {
   const PostReactionWidget({
+    required this.alreadyVoted,
     required this.empathyCount,
     required this.logicCount,
     required this.onEmpathy,
@@ -144,6 +144,7 @@ class PostReactionWidget extends StatelessWidget {
     super.key,
   });
 
+  final bool alreadyVoted;
   final Function() onEmpathy;
   final int empathyCount;
 
@@ -163,13 +164,15 @@ class PostReactionWidget extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: GestureDetector(
-                onTap: onLogic,
+                onTap: alreadyVoted ? null : onLogic,
                 child: Flex(
                   direction: Axis.horizontal,
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    const Flexible(child: Icon(Icons.arrow_upward)),
+                    Flexible(
+                      child: Assets.fatArrowUp.svg(),
+                    ),
                     Text(
                       "LOG",
                       style: theme.textTheme.labelSmall?.copyWith(color: Colors.orange),
@@ -189,7 +192,7 @@ class PostReactionWidget extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: GestureDetector(
-                onTap: onEmpathy,
+                onTap: alreadyVoted ? null : onEmpathy,
                 child: Flex(
                   direction: Axis.horizontal,
                   mainAxisSize: MainAxisSize.min,
@@ -207,10 +210,8 @@ class PostReactionWidget extends StatelessWidget {
                         style: theme.textTheme.labelSmall,
                       ),
                     ),
-                    const Flexible(
-                      child: Icon(
-                        Icons.arrow_upward,
-                      ),
+                    Flexible(
+                      child: Assets.fatArrowUp.svg(),
                     ),
                   ],
                 ),

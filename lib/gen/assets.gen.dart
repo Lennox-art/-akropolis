@@ -15,12 +15,21 @@ import 'package:vector_graphics/vector_graphics.dart' as _vg;
 class Assets {
   Assets._();
 
+  static const SvgGenImage akropolisLogo =
+      SvgGenImage('assets/akropolis_logo.svg');
   static const AssetGenImage background =
       AssetGenImage('assets/background.png');
+  static const SvgGenImage chatTearDot =
+      SvgGenImage('assets/chat_tear_dot.svg');
   static const AssetGenImage connectionPeople =
       AssetGenImage('assets/connection_people.png');
+  static const SvgGenImage fatArrowUp = SvgGenImage('assets/fat_arrow_up.svg');
+  static const SvgGenImage flame = SvgGenImage('assets/flame.svg');
   static const SvgGenImage google = SvgGenImage('assets/google.svg');
   static const SvgGenImage home = SvgGenImage('assets/home.svg');
+  static const SvgGenImage medal = SvgGenImage('assets/medal.svg');
+  static const SvgGenImage present = SvgGenImage('assets/present.svg');
+  static const SvgGenImage share = SvgGenImage('assets/share.svg');
   static const AssetGenImage signInBg = AssetGenImage('assets/sign_in_bg.png');
   static const SvgGenImage splashScreen =
       SvgGenImage('assets/splash_screen.svg');
@@ -29,10 +38,17 @@ class Assets {
 
   /// List of all assets
   static List<dynamic> get values => [
+        akropolisLogo,
         background,
+        chatTearDot,
         connectionPeople,
+        fatArrowUp,
+        flame,
         google,
         home,
+        medal,
+        present,
+        share,
         signInBg,
         splashScreen,
         splashScreenBg

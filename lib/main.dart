@@ -11,19 +11,16 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
-import 'package:hive_database_service/hive_database_service.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:logging_service/logging_service.dart';
 import 'package:network_service/network_service.dart';
 import 'package:path_provider/path_provider.dart';
 import 'firebase_options.dart';
-import 'local_storage/media_cache.dart';
 
 final GetIt getIt = GetIt.I;
 final NetworkService ns = getIt<NetworkService>();
 final LoggingService log = getIt<LoggingService>();
 final ImagePicker picker = getIt<ImagePicker>();
-final LocalDatabaseService db = getIt<LocalDatabaseService>();
 late final Directory temporaryDirectory;
 
 Future<void> main() async {
@@ -52,14 +49,6 @@ Future<void> main() async {
   final ImagePicker picker = ImagePicker();
   getIt.registerSingleton(picker);
 
-  LocalDatabaseService db = LocalDatabaseServiceImpl(
-    cipher: HiveAesCipher(Hive.generateSecureKey()),
-    databasePath: docDir.path,
-  );
-  getIt.registerSingleton(db);
-
-
-  Hive.registerAdapter(CachedMediaAdapter());
 
   runApp(const AkropolisApplication());
 }

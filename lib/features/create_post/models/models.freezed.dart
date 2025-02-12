@@ -20,7 +20,6 @@ mixin _$CreatePostForm {
   AppUser get appUser => throw _privateConstructorUsedError;
   File? get videoData => throw _privateConstructorUsedError;
   bool get videoDataUploaded => throw _privateConstructorUsedError;
-  Duration? get videoDuration => throw _privateConstructorUsedError;
   Uint8List? get thumbnailData => throw _privateConstructorUsedError;
   bool get thumbnailUploaded => throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -30,7 +29,6 @@ mixin _$CreatePostForm {
             AppUser appUser,
             File? videoData,
             bool videoDataUploaded,
-            Duration? videoDuration,
             Uint8List? thumbnailData,
             bool thumbnailUploaded)
         create,
@@ -43,7 +41,6 @@ mixin _$CreatePostForm {
             AppUser appUser,
             File? videoData,
             bool videoDataUploaded,
-            Duration? videoDuration,
             Uint8List? thumbnailData,
             bool thumbnailUploaded)?
         create,
@@ -56,7 +53,6 @@ mixin _$CreatePostForm {
             AppUser appUser,
             File? videoData,
             bool videoDataUploaded,
-            Duration? videoDuration,
             Uint8List? thumbnailData,
             bool thumbnailUploaded)?
         create,
@@ -98,7 +94,6 @@ abstract class $CreatePostFormCopyWith<$Res> {
       AppUser appUser,
       File? videoData,
       bool videoDataUploaded,
-      Duration? videoDuration,
       Uint8List? thumbnailData,
       bool thumbnailUploaded});
 }
@@ -122,7 +117,6 @@ class _$CreatePostFormCopyWithImpl<$Res, $Val extends CreatePostForm>
     Object? appUser = null,
     Object? videoData = freezed,
     Object? videoDataUploaded = null,
-    Object? videoDuration = freezed,
     Object? thumbnailData = freezed,
     Object? thumbnailUploaded = null,
   }) {
@@ -143,10 +137,6 @@ class _$CreatePostFormCopyWithImpl<$Res, $Val extends CreatePostForm>
           ? _value.videoDataUploaded
           : videoDataUploaded // ignore: cast_nullable_to_non_nullable
               as bool,
-      videoDuration: freezed == videoDuration
-          ? _value.videoDuration
-          : videoDuration // ignore: cast_nullable_to_non_nullable
-              as Duration?,
       thumbnailData: freezed == thumbnailData
           ? _value.thumbnailData
           : thumbnailData // ignore: cast_nullable_to_non_nullable
@@ -172,7 +162,6 @@ abstract class _$$CreatePostFormImplCopyWith<$Res>
       AppUser appUser,
       File? videoData,
       bool videoDataUploaded,
-      Duration? videoDuration,
       Uint8List? thumbnailData,
       bool thumbnailUploaded});
 }
@@ -194,7 +183,6 @@ class __$$CreatePostFormImplCopyWithImpl<$Res>
     Object? appUser = null,
     Object? videoData = freezed,
     Object? videoDataUploaded = null,
-    Object? videoDuration = freezed,
     Object? thumbnailData = freezed,
     Object? thumbnailUploaded = null,
   }) {
@@ -215,10 +203,6 @@ class __$$CreatePostFormImplCopyWithImpl<$Res>
           ? _value.videoDataUploaded
           : videoDataUploaded // ignore: cast_nullable_to_non_nullable
               as bool,
-      videoDuration: freezed == videoDuration
-          ? _value.videoDuration
-          : videoDuration // ignore: cast_nullable_to_non_nullable
-              as Duration?,
       thumbnailData: freezed == thumbnailData
           ? _value.thumbnailData
           : thumbnailData // ignore: cast_nullable_to_non_nullable
@@ -239,7 +223,6 @@ class _$CreatePostFormImpl implements _CreatePostForm {
       required this.appUser,
       this.videoData,
       this.videoDataUploaded = false,
-      this.videoDuration,
       this.thumbnailData,
       this.thumbnailUploaded = false});
 
@@ -253,8 +236,6 @@ class _$CreatePostFormImpl implements _CreatePostForm {
   @JsonKey()
   final bool videoDataUploaded;
   @override
-  final Duration? videoDuration;
-  @override
   final Uint8List? thumbnailData;
   @override
   @JsonKey()
@@ -262,7 +243,7 @@ class _$CreatePostFormImpl implements _CreatePostForm {
 
   @override
   String toString() {
-    return 'CreatePostForm.create(postId: $postId, appUser: $appUser, videoData: $videoData, videoDataUploaded: $videoDataUploaded, videoDuration: $videoDuration, thumbnailData: $thumbnailData, thumbnailUploaded: $thumbnailUploaded)';
+    return 'CreatePostForm.create(postId: $postId, appUser: $appUser, videoData: $videoData, videoDataUploaded: $videoDataUploaded, thumbnailData: $thumbnailData, thumbnailUploaded: $thumbnailUploaded)';
   }
 
   @override
@@ -276,8 +257,6 @@ class _$CreatePostFormImpl implements _CreatePostForm {
                 other.videoData == videoData) &&
             (identical(other.videoDataUploaded, videoDataUploaded) ||
                 other.videoDataUploaded == videoDataUploaded) &&
-            (identical(other.videoDuration, videoDuration) ||
-                other.videoDuration == videoDuration) &&
             const DeepCollectionEquality()
                 .equals(other.thumbnailData, thumbnailData) &&
             (identical(other.thumbnailUploaded, thumbnailUploaded) ||
@@ -291,7 +270,6 @@ class _$CreatePostFormImpl implements _CreatePostForm {
       appUser,
       videoData,
       videoDataUploaded,
-      videoDuration,
       const DeepCollectionEquality().hash(thumbnailData),
       thumbnailUploaded);
 
@@ -312,13 +290,12 @@ class _$CreatePostFormImpl implements _CreatePostForm {
             AppUser appUser,
             File? videoData,
             bool videoDataUploaded,
-            Duration? videoDuration,
             Uint8List? thumbnailData,
             bool thumbnailUploaded)
         create,
   }) {
-    return create(postId, appUser, videoData, videoDataUploaded, videoDuration,
-        thumbnailData, thumbnailUploaded);
+    return create(postId, appUser, videoData, videoDataUploaded, thumbnailData,
+        thumbnailUploaded);
   }
 
   @override
@@ -329,13 +306,12 @@ class _$CreatePostFormImpl implements _CreatePostForm {
             AppUser appUser,
             File? videoData,
             bool videoDataUploaded,
-            Duration? videoDuration,
             Uint8List? thumbnailData,
             bool thumbnailUploaded)?
         create,
   }) {
     return create?.call(postId, appUser, videoData, videoDataUploaded,
-        videoDuration, thumbnailData, thumbnailUploaded);
+        thumbnailData, thumbnailUploaded);
   }
 
   @override
@@ -346,7 +322,6 @@ class _$CreatePostFormImpl implements _CreatePostForm {
             AppUser appUser,
             File? videoData,
             bool videoDataUploaded,
-            Duration? videoDuration,
             Uint8List? thumbnailData,
             bool thumbnailUploaded)?
         create,
@@ -354,7 +329,7 @@ class _$CreatePostFormImpl implements _CreatePostForm {
   }) {
     if (create != null) {
       return create(postId, appUser, videoData, videoDataUploaded,
-          videoDuration, thumbnailData, thumbnailUploaded);
+          thumbnailData, thumbnailUploaded);
     }
     return orElse();
   }
@@ -394,7 +369,6 @@ abstract class _CreatePostForm implements CreatePostForm {
       required final AppUser appUser,
       final File? videoData,
       final bool videoDataUploaded,
-      final Duration? videoDuration,
       final Uint8List? thumbnailData,
       final bool thumbnailUploaded}) = _$CreatePostFormImpl;
 
@@ -406,8 +380,6 @@ abstract class _CreatePostForm implements CreatePostForm {
   File? get videoData;
   @override
   bool get videoDataUploaded;
-  @override
-  Duration? get videoDuration;
   @override
   Uint8List? get thumbnailData;
   @override

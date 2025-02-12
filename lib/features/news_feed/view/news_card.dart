@@ -1,17 +1,20 @@
 import 'dart:typed_data';
 
+import 'package:akropolis/components/app_video_player.dart';
 import 'package:akropolis/components/news_post_components.dart';
 import 'package:akropolis/features/authentication/view_model/authentication_cubit/authentication_cubit.dart';
 import 'package:akropolis/features/news_feed/models/models.dart';
-import 'package:akropolis/local_storage/media_cache.dart';
 import 'package:akropolis/main.dart';
 import 'package:akropolis/routes/routes.dart';
 import 'package:akropolis/utils/functions.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:akropolis/components/loader.dart';
+
+import 'news_detailed_view.dart';
 
 class NewsCard extends StatelessWidget {
   final NewsPost post;
@@ -21,6 +24,8 @@ class NewsCard extends StatelessWidget {
         fromFirestore: (snapshot, _) => NewsPost.fromJson(snapshot.data()!),
         toFirestore: (model, _) => model.toJson(),
       );
+
+
 
   const NewsCard({
     super.key,
@@ -43,6 +48,8 @@ class NewsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
     User? user = BlocProvider.of<AuthenticationCubit>(context).getCurrentUser();
+    late Future<AggregateQuerySnapshot> commentsCountFuture = postsCollectionRef.collection(PostComment.collection).count().get();
+
 
     WidgetsBinding.instance.addPostFrameCallback(
       (_) {
@@ -50,6 +57,8 @@ class NewsCard extends StatelessWidget {
         setViewedPost(user.uid);
       },
     );
+
+
 
     return GestureDetector(
       onTap: () {
@@ -69,36 +78,16 @@ class NewsCard extends StatelessWidget {
                 borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(16.0),
                 ),
-                child: StreamBuilder(
-                  stream: MediaCache.downloadMedia(post.thumbnailUrl),
-                  builder: (_, snap) {
-
-                    log.info(snap.connectionState);
-
-                    if(snap.connectionState != ConnectionState.done) {
-                      return const InfiniteLoader();
-                    }
-
-                    Uint8List? thumbnailData = snap.data;
-                    if(thumbnailData == null) {
-                      return const Icon(
-                        Icons.image_not_supported_outlined,
-                        size: 180,
-                      );
-                    }
-
-                    return Image.memory(
-                      thumbnailData,
-                      height: 180,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        log.error(error.toString(), trace: stackTrace);
-                        return const Icon(
-                          Icons.broken_image,
-                          size: 180,
-                        );
-                      },
+                child: CachedNetworkImage(
+                  imageUrl: post.thumbnailUrl,
+                  height: 180,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  errorWidget: (context, url, error) {
+                    log.error(error.toString());
+                    return const Icon(
+                      Icons.broken_image,
+                      size: 180,
                     );
                   },
                 ),
@@ -175,27 +164,28 @@ class NewsCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 8),
                       FutureBuilder(
-                          future: postsCollectionRef.collection(PostComment.collection).count().get(),
-                          builder: (_, commentsCountSnap) {
-                            if (commentsCountSnap.connectionState != ConnectionState.done) {
-                              return const InfiniteLoader();
-                            }
+                        future: commentsCountFuture,
+                        builder: (_, commentsCountSnap) {
+                          if (commentsCountSnap.connectionState != ConnectionState.done) {
+                            return const InfiniteLoader();
+                          }
 
-                            int? commentsCount = commentsCountSnap.data?.count;
+                          int? commentsCount = commentsCountSnap.data?.count;
 
-                            if (commentsCount == null) {
-                              return const Icon(Icons.question_mark);
-                            }
+                          if (commentsCount == null) {
+                            return const Icon(Icons.question_mark);
+                          }
 
-                            return Visibility(
-                              visible: commentsCount > 0,
-                              replacement: const Text("Be the first to comment"),
-                              child: Text(
-                                "+$commentsCount Replies",
-                                style: const TextStyle(fontSize: 14, color: Colors.blue),
-                              ),
-                            );
-                          }),
+                          return Visibility(
+                            visible: commentsCount > 0,
+                            replacement: const Text("Be the first to comment"),
+                            child: Text(
+                              "+$commentsCount Replies",
+                              style: const TextStyle(fontSize: 14, color: Colors.blue),
+                            ),
+                          );
+                        },
+                      ),
                       const Spacer(),
                       IconButton(
                         onPressed: () {},
@@ -218,7 +208,7 @@ class NewsCard extends StatelessWidget {
 }
 
 class PostCommentCard extends StatelessWidget {
-  const PostCommentCard({
+  PostCommentCard({
     required this.post,
     required this.comment,
     required this.newsPostRef,
@@ -228,78 +218,131 @@ class PostCommentCard extends StatelessWidget {
   final NewsPost post;
   final PostComment comment;
   final DocumentReference newsPostRef;
+  final ValueNotifier<bool> clickedPlay = ValueNotifier(false);
 
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
 
-    return Card(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          ListTile(
-            leading: Builder(
-              builder: (context) {
-                if (comment.author.imageUrl == null) {
-                  return const Icon(Icons.person);
-                }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        ListTile(
+          leading: Builder(
+            builder: (context) {
+              if (comment.author.imageUrl == null) {
+                return const Icon(Icons.person);
+              }
 
-                return CircleAvatar(
-                  backgroundImage: NetworkImage(comment.author.imageUrl!),
+              return CircleAvatar(
+                backgroundImage: NetworkImage(comment.author.imageUrl!),
+              );
+            },
+          ),
+          title: Text(comment.author.name),
+          trailing: Text(timeAgo(comment.commentedAt)),
+        ),
+        SizedBox(
+          height: 400,
+          child: ValueListenableBuilder(
+            valueListenable: clickedPlay,
+            builder: (_, showVideo, __) {
+              if (!showVideo) {
+                return Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    CachedNetworkImage(
+                      imageUrl: comment.thumbnailUrl,
+                      fit: BoxFit.fill,
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        clickedPlay.value = true;
+                      },
+                      icon: const Icon(Icons.play_arrow),
+                    ),
+                  ],
                 );
-              },
-            ),
-            title: Text(comment.author.name),
-            trailing: Text(timeAgo(comment.commentedAt)),
-          ),
-          SizedBox(
-            height: 400,
-            child: Image.network(
-              comment.thumbnailUrl,
-              fit: BoxFit.fill,
-            ),
-          ),
-          Flex(
-            direction: Axis.horizontal,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: StreamBuilder(
-                  stream: newsPostRef
-                      .collection(PostComment.collection)
-                      .doc(comment.id)
-                      .withConverter<PostComment>(
-                        fromFirestore: (snapshot, _) => PostComment.fromJson(snapshot.data()!),
-                        toFirestore: (model, _) => model.toJson(),
-                      )
-                      .snapshots(includeMetadataChanges: true),
-                  builder: (_, commentSnap) {
-                    final PostComment comment = commentSnap.data?.data() ?? this.comment;
+              }
 
-                    return CommentReactionWidget(
-                      newsPost: post,
-                      postComment: comment,
-                      postsCollectionRef: newsPostRef,
-                    );
-                  },
-                ),
+              return CachedVideoPlayer(
+                videoUrl: comment.postUrl,
+                autoPlay: true,
+              );
+            },
+          ),
+        ),
+        Flex(
+          direction: Axis.horizontal,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: StreamBuilder(
+                stream: newsPostRef
+                    .collection(PostComment.collection)
+                    .doc(comment.id)
+                    .withConverter<PostComment>(
+                      fromFirestore: (snapshot, _) => PostComment.fromJson(snapshot.data()!),
+                      toFirestore: (model, _) => model.toJson(),
+                    )
+                    .snapshots(includeMetadataChanges: true),
+                builder: (_, commentSnap) {
+                  final PostComment comment = commentSnap.data?.data() ?? this.comment;
+
+                  return CommentReactionWidget(
+                    newsPost: post,
+                    postComment: comment,
+                    postsCollectionRef: newsPostRef,
+                  );
+                },
               ),
-              const SizedBox(
-                width: 50,
-              ),
-              const Row(
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 50.0, right: 8),
+              child: Row(
                 mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Icon(Icons.show_chart),
-                  Icon(Icons.more_vert),
+                  const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Icon(Icons.show_chart),
+                  ),
+                  MenuAnchor(
+                    builder: (_, controller, __) {
+                      return IconButton(
+                        onPressed: () {
+                          if (controller.isOpen) {
+                            controller.close();
+                            return;
+                          }
+                          controller.open();
+                        },
+                        icon: const Icon(Icons.more_vert),
+                        tooltip: 'Post options',
+                      );
+                    },
+                    menuChildren: PostMenu.values
+                        .where((e) => e != PostMenu.notInterested)
+                        .map(
+                          (menu) => MenuItemButton(
+                            onPressed: () {},
+                            child: Text(
+                              menu.title,
+                              style: TextStyle(color: menu == PostMenu.report ? Colors.red : Colors.white),
+                            ),
+                          ),
+                        )
+                        .toList(),
+                  ),
                 ],
               ),
-            ],
-          ),
-        ],
-      ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }

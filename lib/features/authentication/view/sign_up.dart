@@ -38,22 +38,8 @@ class SignUpPage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               direction: Axis.vertical,
               children: [
-                Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        appName.toUpperCase(),
-                        style: theme.textTheme.titleLarge,
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                    Text(
-                      appSlogan,
-                      style: theme.textTheme.headlineSmall,
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
+                Assets.akropolisLogo.svg(
+                  height: 150,
                 ),
                 Text(
                   "Well crafted Video-Based Engagements",
@@ -79,15 +65,13 @@ class SignUpPage extends StatelessWidget {
                       loaded: (_) => ElevatedButton.icon(
                         icon: Assets.google.svg(),
                         onPressed: () async {
-                          User? signedInUser =
-                              await BlocProvider.of<AuthenticationCubit>(context)
-                                  .signInWithGoogle();
+                          User? signedInUser = await BlocProvider.of<AuthenticationCubit>(context).signInWithGoogle();
                           if (signedInUser == null) return;
                           if (!context.mounted) return;
-            
+
                           UserCubit userCubit = BlocProvider.of<UserCubit>(context);
                           AppUser? appUser = await userCubit.getCurrentUser();
-            
+
                           if (appUser == null) {
                             await userCubit.saveAppUser(
                               AppUser(
@@ -99,26 +83,26 @@ class SignUpPage extends StatelessWidget {
                                 topics: {},
                               ),
                             );
-            
+
                             if (!context.mounted) return;
                             Navigator.of(context).pushNamedAndRemoveUntil(
                               AppRoutes.welcome.path,
-                                  (_) => false,
+                              (_) => false,
                             );
                             return;
                           }
-            
+
                           if (!context.mounted) return;
                           if (appUser.topics == null || (appUser.topics?.isEmpty ?? true)) {
                             Navigator.of(context).pushNamedAndRemoveUntil(
                               AppRoutes.welcomeTopics.path,
-                                  (_) => false,
+                              (_) => false,
                             );
                             return;
                           }
                           Navigator.of(context).pushNamedAndRemoveUntil(
                             AppRoutes.home.path,
-                                (_) => false,
+                            (_) => false,
                           );
                         },
                         label: const Text("Sign up with Google"),
@@ -152,8 +136,7 @@ class SignUpPage extends StatelessWidget {
                   },
                   label: const Text("Sign up with Email"),
                   style: theme.elevatedButtonTheme.style?.copyWith(
-                    backgroundColor:
-                        const WidgetStatePropertyAll(Colors.transparent),
+                    backgroundColor: const WidgetStatePropertyAll(Colors.transparent),
                     side: const WidgetStatePropertyAll(
                       BorderSide(
                         width: 1.0,
@@ -222,17 +205,16 @@ class SignUpWithEmailScreen extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              appName.toUpperCase(),
-              style: theme.textTheme.titleLarge,
-            ),
+
+          Assets.akropolisLogo.svg(
+            height: 150,
           ),
+
           Text(
             "Sign up with email",
             style: theme.textTheme.headlineSmall,
           ),
+
           Expanded(
             child: Form(
               key: formKey,
@@ -248,8 +230,7 @@ class SignUpWithEmailScreen extends StatelessWidget {
                           validator: validateDisplayName,
                           autovalidateMode: AutovalidateMode.onUserInteraction,
                           controller: displayNameController,
-                          decoration:
-                              const InputDecoration(hintText: "John Doe"),
+                          decoration: const InputDecoration(hintText: "John Doe"),
                         ),
                       ),
                       ListTile(
@@ -282,8 +263,7 @@ class SignUpWithEmailScreen extends StatelessWidget {
                             return TextFormField(
                               controller: passwordController,
                               validator: validatePassword,
-                              autovalidateMode:
-                                  AutovalidateMode.onUserInteraction,
+                              autovalidateMode: AutovalidateMode.onUserInteraction,
                               obscureText: obscure,
                               maxLength: 16,
                               minLines: 1,
@@ -293,8 +273,7 @@ class SignUpWithEmailScreen extends StatelessWidget {
                                   visible: obscure,
                                   replacement: IconButton(
                                     onPressed: () {
-                                      hidePasswordNotifier.value =
-                                          !hidePasswordNotifier.value;
+                                      hidePasswordNotifier.value = !hidePasswordNotifier.value;
                                     },
                                     icon: const Icon(
                                       Icons.password_outlined,
@@ -302,8 +281,7 @@ class SignUpWithEmailScreen extends StatelessWidget {
                                   ),
                                   child: IconButton(
                                     onPressed: () {
-                                      hidePasswordNotifier.value =
-                                          !hidePasswordNotifier.value;
+                                      hidePasswordNotifier.value = !hidePasswordNotifier.value;
                                     },
                                     icon: const Icon(
                                       Icons.remove_red_eye_outlined,
@@ -342,13 +320,11 @@ class SignUpWithEmailScreen extends StatelessWidget {
                       String displayName = displayNameController.text;
                       String email = emailController.text;
 
-                      AuthenticationCubit authCubit =
-                          BlocProvider.of<AuthenticationCubit>(
+                      AuthenticationCubit authCubit = BlocProvider.of<AuthenticationCubit>(
                         context,
                       );
 
-                      User? newUser =
-                          await authCubit.signUpWithEmailAndPassword(
+                      User? newUser = await authCubit.signUpWithEmailAndPassword(
                         email: email,
                         password: password,
                       );
@@ -365,15 +341,13 @@ class SignUpWithEmailScreen extends StatelessWidget {
                       );
 
                       if (!context.mounted) return;
-                      if(appUser != null) {
-
-                        if(appUser.topics == null || (appUser.topics?.isEmpty ?? true)) {
+                      if (appUser != null) {
+                        if (appUser.topics == null || (appUser.topics?.isEmpty ?? true)) {
                           Navigator.of(context).pushNamed(
                             AppRoutes.welcomeTopics.path,
                           );
                           return;
                         }
-
 
                         Navigator.of(context).pushNamed(
                           AppRoutes.home.path,
@@ -422,8 +396,7 @@ class SignUpWithEmailScreen extends StatelessWidget {
             child: Text.rich(
               style: theme.textTheme.bodySmall,
               TextSpan(
-                text:
-                    "By clicking “Create Account”, you acknowledge that you have read and understood, and agree to Akropolis’ ",
+                text: "By clicking “Create Account”, you acknowledge that you have read and understood, and agree to Akropolis’ ",
                 children: [
                   TextSpan(
                     text: "Terms & Conditions",

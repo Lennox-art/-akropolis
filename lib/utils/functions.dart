@@ -12,7 +12,6 @@ import 'dart:typed_data';
 import 'package:path/path.dart' as path;
 
 import 'package:ffmpeg_kit_flutter_full_gpl/return_code.dart';
-import 'package:path_provider/path_provider.dart';
 
 /// Converts `DateTime` to a "time ago" string
 String timeAgo(DateTime dateTime) {
@@ -47,7 +46,7 @@ Future<Uint8List?> generateThumbnail({
 }) async {
   try {
     Directory d = File(videoPath).parent;
-    String outputPath = path.join(d.path, "thumb_${Random().nextInt(2000)}.jpg");
+    String outputPath = path.join(d.path, "thumb_${Random().nextInt(20000)}.jpg");
 
     log.debug("Generating thumbnail to: $outputPath");
 
@@ -58,7 +57,8 @@ Future<Uint8List?> generateThumbnail({
     final ReturnCode? returnCode = await session.getReturnCode();
     if (returnCode?.isValueSuccess() ?? false) {
       log.debug("Thumbnail successfully generated: $outputPath");
-      return File(outputPath).readAsBytesSync();
+      await Future.delayed(const Duration(seconds: 1));
+      return File(outputPath).readAsBytes();
     } else {
       log.debug("Thumbnail generation failed: $returnCode");
       return null;

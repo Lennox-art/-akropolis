@@ -39,20 +39,8 @@ class SignInScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               direction: Axis.vertical,
               children: [
-                Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        appName.toUpperCase(),
-                        style: theme.textTheme.titleLarge,
-                      ),
-                    ),
-                    Text(
-                      appSlogan,
-                      style: theme.textTheme.headlineSmall,
-                    ),
-                  ],
+                Assets.akropolisLogo.svg(
+                  height: 150,
                 ),
                 Text(
                   "Well crafted Video-Based Engagements",
@@ -219,12 +207,8 @@ class SignInWithEmailScreen extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              appName.toUpperCase(),
-              style: theme.textTheme.titleLarge,
-            ),
+          Assets.akropolisLogo.svg(
+            height: 150,
           ),
           Text(
             "Sign in with email",

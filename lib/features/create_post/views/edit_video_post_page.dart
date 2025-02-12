@@ -19,43 +19,56 @@ class EditVideoPostPage extends StatelessWidget {
       VideoEditingTools.trimVideo,
     );
 
-    return Scaffold(
-      body: BlocBuilder<CreatePostCubit, CreatePostState>(
-        builder: (_, state) {
-          return state.map(
-            loading: (_) => const Center(
-              child: InfiniteLoader(),
-            ),
-            loaded: (l) {
-              return Flex(
-                direction: Axis.vertical,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Visibility(
-                      visible: l.form != null,
-                      child: VideoEditingWidget(
-                        data: l.form!.videoData!,
-                        currentToolNotifier: currentToolNotifier,
+    return SafeArea(
+      child: Scaffold(
+        body: BlocBuilder<CreatePostCubit, CreatePostState>(
+          builder: (_, state) {
+            return state.map(
+              loading: (_) => const Center(
+                child: InfiniteLoader(),
+              ),
+              loaded: (l) {
+                return Flex(
+                  direction: Axis.vertical,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Visibility(
+                        visible: l.form != null,
+                        child: VideoEditingWidget(
+                          data: l.form!.videoData!,
+                          currentToolNotifier: currentToolNotifier,
+                        ),
                       ),
                     ),
-                  ),
-                  ListTile(
-                    trailing: TextButton(
-                      onPressed: () {
-                        Navigator.of(context).pushNamed(
-                          AppRoutes.finalizePost.path,
-                        );
-                      },
-                      child: const Text("Next"),
+                    ListTile(
+                      leading: TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text(
+                          "Cancel",
+                          style: TextStyle(
+                            color: Colors.red,
+                          ),
+                        ),
+                      ),
+                      trailing: TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pushNamed(
+                            AppRoutes.finalizePost.path,
+                          );
+                        },
+                        child: const Text("Next"),
+                      ),
                     ),
-                  ),
-                ],
-              );
-            },
-          );
-        },
+                  ],
+                );
+              },
+            );
+          },
+        ),
       ),
     );
   }

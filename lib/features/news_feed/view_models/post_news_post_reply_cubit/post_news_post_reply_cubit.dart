@@ -5,7 +5,6 @@ import 'package:akropolis/components/toast/toast.dart';
 import 'package:akropolis/features/authentication/models/authentication_models.dart';
 import 'package:akropolis/features/create_post/models/models.dart';
 import 'package:akropolis/features/news_feed/models/models.dart';
-import 'package:akropolis/local_storage/media_cache.dart';
 import 'package:akropolis/main.dart';
 import 'package:akropolis/utils/functions.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -35,8 +34,6 @@ class PostVideoReplyCubit extends Cubit<PostVideoReplyState> {
     required File file,
     required AppUser user,
   }) async {
-    Duration? duration;
-    // = await getVideoDuration(file.path);
     Uint8List? thumbnailData = await generateThumbnail(
       videoPath: file.path,
     );
@@ -47,7 +44,6 @@ class PostVideoReplyCubit extends Cubit<PostVideoReplyState> {
       postId: post.id,
       appUser: user,
       videoData: file,
-      videoDuration: duration,
       thumbnailData: thumbnailData,
     );
 
@@ -256,21 +252,21 @@ class PostVideoReplyCubit extends Cubit<PostVideoReplyState> {
               LoadingPostVideoReplyState(
                 postId: postId,
                 message: ToastError(
-                  message: "(2/2) Error uploading post at ${progress.percent.toInt()}%",
+                  message: "(2/2) Error uploading comment at ${progress.percent.toInt()}%",
                 ),
                 progress: progress,
               ),
             );
             break;
           case TaskState.success:
-            thumbnailUrl = await snapshot.ref.getDownloadURL();
+            postUrl = await snapshot.ref.getDownloadURL();
             replyForm = replyForm?.copyWith(thumbnailUploaded: true);
 
             emit(
               LoadingPostVideoReplyState(
                 postId: postId,
                 message: const ToastSuccess(
-                  message: "(2/2) Post uploaded successfully",
+                  message: "(2/2) Comment uploaded successfully",
                 ),
                 progress: progress,
               ),
@@ -312,8 +308,6 @@ class PostVideoReplyCubit extends Cubit<PostVideoReplyState> {
       ),
     );
 
-    MediaCache.addMedia(postUrl, replyForm!.videoData!.readAsBytesSync());
-    MediaCache.addMedia(thumbnailUrl, replyForm!.thumbnailData!);
 
     replyForm = null;
   }

@@ -31,19 +31,8 @@ class LoginScreen extends StatelessWidget {
                 children: [
                   const SizedBox(height: 20,),
 
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      appName.toUpperCase(),
-                      style: theme.textTheme.titleLarge,
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-
-                  Text(
-                    appSlogan,
-                    style: theme.textTheme.headlineSmall,
-                    textAlign: TextAlign.center,
+                  Assets.akropolisLogo.svg(
+                    height: 150,
                   ),
 
                    const Expanded(

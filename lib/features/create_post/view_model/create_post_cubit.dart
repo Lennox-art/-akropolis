@@ -5,11 +5,8 @@ import 'package:akropolis/components/toast/toast.dart';
 import 'package:akropolis/features/authentication/models/authentication_models.dart';
 import 'package:akropolis/features/create_post/models/models.dart';
 import 'package:akropolis/features/news_feed/models/models.dart';
-import 'package:akropolis/local_storage/media_cache.dart';
 import 'package:akropolis/main.dart';
-import 'package:akropolis/utils/constants.dart';
 import 'package:akropolis/utils/functions.dart';
-import 'package:camera/camera.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:common_fn/common_fn.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -36,8 +33,6 @@ class CreatePostCubit extends Cubit<CreatePostState> {
     required File file,
     required AppUser user,
   }) async {
-    Duration? duration;
-    // = await getVideoDuration(file.path);
     Uint8List? thumbnailData = await generateThumbnail(
       videoPath: file.path,
     );
@@ -48,7 +43,6 @@ class CreatePostCubit extends Cubit<CreatePostState> {
       postId: generateTimeUuid(),
       appUser: user,
       videoData: file,
-      videoDuration: duration,
       thumbnailData: thumbnailData,
     );
 
@@ -308,8 +302,6 @@ class CreatePostCubit extends Cubit<CreatePostState> {
       ),
     );
 
-    MediaCache.addMedia(postUrl, form!.videoData!.readAsBytesSync());
-    MediaCache.addMedia(thumbnailUrl, form!.thumbnailData!);
 
     form = null;
   }
