@@ -73,11 +73,23 @@ class _CachedVideoPlayerState extends State<CachedVideoPlayer> {
 
     return SizedBox(
       width: MediaQuery.of(context).size.width,
-      child: AspectRatio(
-        aspectRatio: 16 / 9,
-        child: Chewie(
-          controller: _chewieController!,
+      height: 300, // Fixed height
+      child: FittedBox(
+        fit: BoxFit.cover,
+        child: SizedBox(
+          width: _videoController?.value.size.width ?? 0,
+          height: _videoController?.value.size.height ?? 0,
+          child: Chewie(
+            controller: _chewieController!,
+          ),
         ),
+      ),
+    );
+
+    return SizedBox(
+      width: MediaQuery.of(context).size.width,
+      child: Chewie(
+        controller: _chewieController!,
       ),
     );
   }

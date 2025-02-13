@@ -19,6 +19,7 @@ import 'package:akropolis/utils/validations.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:paged_list_view/paged_list_view.dart';
@@ -72,57 +73,61 @@ class _NewsDetailedViewPageState extends State<NewsDetailedViewPage> {
 
     late Future<AggregateQuerySnapshot> commentCount = newsPostRef.collection(PostComment.collection).count().get();
 
-
     final ThemeData theme = Theme.of(context);
 
     return Scaffold(
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
         title: null,
         actions: [
-          ElevatedButton(
-            onPressed: () async {
-              Duration? videoDuration = await showDurationPickerDialog(
-                context,
-                maxDuration: maxVideoDuration,
-              );
-              if (videoDuration == null || !context.mounted) return;
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ElevatedButton(
+              onPressed: () async {
+                Duration? videoDuration = await showDurationPickerDialog(
+                  context,
+                  maxDuration: maxVideoDuration,
+                );
+                if (videoDuration == null || !context.mounted) return;
 
-              XFile? videoData = await getIt<ImagePicker>().pickVideo(
-                source: ImageSource.camera,
-                preferredCameraDevice: CameraDevice.rear,
-                maxDuration: videoDuration,
-              );
-              if (videoData == null || !context.mounted) return;
+                XFile? videoData = await getIt<ImagePicker>().pickVideo(
+                  source: ImageSource.camera,
+                  preferredCameraDevice: CameraDevice.rear,
+                  maxDuration: videoDuration,
+                );
+                if (videoData == null || !context.mounted) return;
 
-              AppUser? user = await BlocProvider.of<UserCubit>(context).getCurrentUser();
-              if (user == null || !context.mounted) return;
+                AppUser? user = await BlocProvider.of<UserCubit>(context).getCurrentUser();
+                if (user == null || !context.mounted) return;
 
-              String? videoError = await validateVideo(videoData.path);
-              if (!context.mounted) return;
+                String? videoError = await validateVideo(videoData.path);
+                if (!context.mounted) return;
 
-              if (videoError != null) {
-                ToastError(title: "Post Video", message: videoError).show();
-                return;
-              }
+                if (videoError != null) {
+                  ToastError(title: "Post Video", message: videoError).show();
+                  return;
+                }
 
-              await BlocProvider.of<PostVideoReplyCubit>(context).createVideoReply(
-                post: newsPost,
-                file: File(videoData.path)..writeAsBytesSync(await videoData.readAsBytes()),
-                user: user,
-              );
+                await BlocProvider.of<PostVideoReplyCubit>(context).createVideoReply(
+                  post: newsPost,
+                  file: File(videoData.path)..writeAsBytesSync(await videoData.readAsBytes()),
+                  user: user,
+                );
 
-              if (!context.mounted) return;
+                if (!context.mounted) return;
 
-              Navigator.of(context).pushNamed(
-                AppRoutes.postReplyScreen.path,
-              );
-            },
-            style: theme.elevatedButtonTheme.style?.copyWith(
-              fixedSize: const WidgetStatePropertyAll(
-                Size(100, 40),
+                Navigator.of(context).pushNamed(
+                  AppRoutes.postReplyScreen.path,
+                );
+              },
+              style: theme.elevatedButtonTheme.style?.copyWith(
+                fixedSize: const WidgetStatePropertyAll(
+                  Size(100, 40),
+                ),
               ),
+              child: const Text("Reply"),
             ),
-            child: const Text("Reply"),
           ),
         ],
       ),
@@ -135,45 +140,61 @@ class _NewsDetailedViewPageState extends State<NewsDetailedViewPage> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  ListTile(
-                    leading: Builder(
-                      builder: (context) {
-                        if (newsPost.author.imageUrl == null) {
-                          return const Icon(Icons.person);
-                        }
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Builder(
+                                builder: (context) {
+                                  if (newsPost.author.imageUrl == null) {
+                                    return const Icon(Icons.person);
+                                  }
 
-                        return CircleAvatar(
-                          backgroundImage: NetworkImage(newsPost.author.imageUrl!),
-                        );
-                      },
-                    ),
-                    title: Text(newsPost.author.name),
-                    trailing: MenuAnchor(
-                      builder: (_, controller, __) {
-                        return IconButton(
-                          onPressed: () {
-                            if (controller.isOpen) {
-                              controller.close();
-                              return;
-                            }
-                            controller.open();
-                          },
-                          icon: const Icon(Icons.more_vert),
-                          tooltip: 'Post options',
-                        );
-                      },
-                      menuChildren: PostMenu.values
-                          .map(
-                            (menu) => MenuItemButton(
-                              onPressed: () {},
-                              child: Text(
-                                menu.title,
-                                style: TextStyle(color: menu == PostMenu.report ? Colors.red : Colors.white),
+                                  return CircleAvatar(
+                                    backgroundImage: NetworkImage(newsPost.author.imageUrl!),
+                                  );
+                                },
                               ),
                             ),
-                          )
-                          .toList(),
-                    ),
+                            Text(newsPost.author.name),
+                          ],
+                        ),
+                      ),
+                      MenuAnchor(
+                        builder: (_, controller, __) {
+                          return IconButton(
+                            onPressed: () {
+                              if (controller.isOpen) {
+                                controller.close();
+                                return;
+                              }
+                              controller.open();
+                            },
+                            icon: const Icon(Icons.more_vert),
+                            tooltip: 'Post options',
+                          );
+                        },
+                        menuChildren: PostMenu.values
+                            .map(
+                              (menu) => MenuItemButton(
+                                onPressed: () {},
+                                child: Text(
+                                  menu.title,
+                                  style: TextStyle(color: menu == PostMenu.report ? Colors.red : Colors.white),
+                                ),
+                              ),
+                            )
+                            .toList(),
+                      )
+                    ],
                   ),
                   BlocConsumer<PostVideoReplyCubit, PostVideoReplyState>(
                     listener: (context, state) {
@@ -241,8 +262,7 @@ class _NewsDetailedViewPageState extends State<NewsDetailedViewPage> {
                               autoPlay: true,
                             );
                           case MediaType.unknown:
-
-                            if(channel == NewsChannel.userPosts) {
+                            if (channel == NewsChannel.userPosts) {
                               return const Icon(Icons.question_mark, size: 180);
                             }
 
@@ -350,21 +370,35 @@ class _NewsDetailedViewPageState extends State<NewsDetailedViewPage> {
                       ),
                     ],
                   ),
-                  const Divider(),
-                  const Row(
+                  const Divider(
+                    color: Colors.white12,
+                  ),
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Padding(
                         padding: EdgeInsets.all(8.0),
-                        child: Text("Replies"),
+                        child: Text(
+                          "Replies",
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: Colors.grey,
+                          )
+                        ),
                       ),
                       Padding(
                         padding: EdgeInsets.all(8.0),
-                        child: Text("View Activity"),
+                        child: Text(
+                          "View Activity",
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: Colors.grey,
+                          ),
+                        ),
                       ),
                     ],
                   ),
-                  const Divider(),
+                  const Divider(
+                    color: Colors.white12,
+                  ),
                 ],
               ),
             )
@@ -372,6 +406,8 @@ class _NewsDetailedViewPageState extends State<NewsDetailedViewPage> {
         },
         body: PagedList<PostComment>(
           key: commentPagedListKey,
+          noMoreItemsIndicatorBuilder: (_) => Text("No more comments"),
+          noItemsFoundIndicatorBuilder: (_) => Text("Post the first comment"),
           firstPageProgressIndicatorBuilder: (_) => const InfiniteLoader(),
           newPageProgressIndicatorBuilder: (_) => const InfiniteLoader(),
           itemBuilder: (_, comment, i) => PostCommentCard(

@@ -31,8 +31,11 @@ class LoginScreen extends StatelessWidget {
                 children: [
                   const SizedBox(height: 20,),
 
-                  Assets.akropolisLogo.svg(
-                    height: 150,
+                  Hero(
+                    tag: "logo",
+                    child: Assets.akropolisLogo.svg(
+                      height: 150,
+                    ),
                   ),
 
                    const Expanded(

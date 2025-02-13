@@ -25,8 +25,6 @@ class NewsCard extends StatelessWidget {
         toFirestore: (model, _) => model.toJson(),
       );
 
-
-
   const NewsCard({
     super.key,
     required this.post,
@@ -50,15 +48,12 @@ class NewsCard extends StatelessWidget {
     User? user = BlocProvider.of<AuthenticationCubit>(context).getCurrentUser();
     late Future<AggregateQuerySnapshot> commentsCountFuture = postsCollectionRef.collection(PostComment.collection).count().get();
 
-
     WidgetsBinding.instance.addPostFrameCallback(
       (_) {
         if (user == null) return;
         setViewedPost(user.uid);
       },
     );
-
-
 
     return GestureDetector(
       onTap: () {
@@ -113,10 +108,18 @@ class NewsCard extends StatelessWidget {
                     direction: Axis.horizontal,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Icon(
-                        Icons.person,
-                        size: 18,
-                        color: Colors.grey,
+                      Visibility(
+                        visible: post.author.imageUrl != null,
+                        replacement: const CircleAvatar(
+                          radius: 12,
+                          child: Icon(Icons.person),
+                        ),
+                        child: CircleAvatar(
+                          radius: 12,
+                          backgroundImage: NetworkImage(
+                            post.author.imageUrl ?? '',
+                          ),
+                        ),
                       ),
                       const SizedBox(width: 4),
                       Expanded(
@@ -343,6 +346,236 @@ class PostCommentCard extends StatelessWidget {
           ],
         ),
       ],
+    );
+  }
+}
+
+class ForYouHighlightCard extends StatelessWidget {
+  final NewsPost post;
+  final NewsChannel newsChannel;
+
+  DocumentReference get postsCollectionRef => FirebaseFirestore.instance.collection(newsChannel.collection).doc(post.id).withConverter<NewsPost>(
+        fromFirestore: (snapshot, _) => NewsPost.fromJson(snapshot.data()!),
+        toFirestore: (model, _) => model.toJson(),
+      );
+
+  const ForYouHighlightCard({
+    super.key,
+    required this.post,
+    required this.newsChannel,
+  });
+
+  void setViewedPost(String userId) {
+    bool isViewer = post.viewers.contains(userId);
+    if (isViewer) return;
+
+    post.viewers.add(userId);
+
+    postsCollectionRef.update({
+      'viewers': FieldValue.arrayUnion([userId])
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    ThemeData theme = Theme.of(context);
+    User? user = BlocProvider.of<AuthenticationCubit>(context).getCurrentUser();
+    late Future<AggregateQuerySnapshot> commentsCountFuture = postsCollectionRef.collection(PostComment.collection).count().get();
+
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) {
+        if (user == null) return;
+        setViewedPost(user.uid);
+      },
+    );
+
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context).pushNamed(
+          AppRoutes.newsDetailsPage.path,
+          arguments: NewsPostDto(post, newsChannel),
+        );
+      },
+      child: Card(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Visibility(
+              visible: post.thumbnailUrl.isNotEmpty,
+              child: ClipRRect(
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(16.0),
+                ),
+                child: CachedNetworkImage(
+                  imageUrl: post.thumbnailUrl,
+                  height: 180,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  errorWidget: (context, url, error) {
+                    log.error(error.toString());
+                    return const Icon(
+                      Icons.broken_image,
+                      size: 180,
+                    );
+                  },
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Flex(
+                    direction: Axis.horizontal,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          post.description,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        timeAgo(post.publishedAt),
+                        style: theme.textTheme.labelMedium?.copyWith(
+                          fontSize: 14,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Flex(
+                    direction: Axis.horizontal,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Flexible(
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Visibility(
+                              visible: post.author.imageUrl != null,
+                              replacement: const CircleAvatar(
+                                radius: 12,
+                                child: Icon(Icons.person),
+                              ),
+                              child: CircleAvatar(
+                                radius: 12,
+                                backgroundImage: NetworkImage(
+                                  post.author.imageUrl ?? '',
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 8.0),
+                              child: Text(
+                                post.author.name,
+                                overflow: TextOverflow.ellipsis,
+                                style: theme.textTheme.labelLarge?.copyWith(
+                                  fontSize: 12,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Flexible(
+
+                        child: Flex(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          direction: Axis.horizontal,
+                          children: [
+                            Flexible(
+                              child: Visibility(
+                                visible: post.author.imageUrl != null,
+                                replacement: const CircleAvatar(
+                                  radius: 12,
+                                  child: Icon(Icons.person),
+                                ),
+                                child: CircleAvatar(
+                                  radius: 12,
+                                  backgroundImage: NetworkImage(
+                                    post.author.imageUrl ?? '',
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              flex: 2,
+                              child: FutureBuilder(
+                                future: commentsCountFuture,
+                                builder: (_, commentsCountSnap) {
+                                  if (commentsCountSnap.connectionState != ConnectionState.done) {
+                                    return const InfiniteLoader();
+                                  }
+
+                                  int? commentsCount = commentsCountSnap.data?.count;
+
+                                  if (commentsCount == null) {
+                                    return const Icon(Icons.question_mark);
+                                  }
+
+                                  return Padding(
+                                    padding: const EdgeInsets.only(left: 8.0),
+                                    child: Visibility(
+                                      visible: commentsCount > 0,
+                                      replacement: const Text("Be the first to comment"),
+                                      child: Text(
+                                        "+$commentsCount Replies",
+                                        style: const TextStyle(fontSize: 12, color: Colors.blue),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                            Flexible(
+                              child: IconButton(
+                                onPressed: () {},
+                                icon: const Icon(
+                                  Icons.share,
+                                  size: 14,
+                                ),
+                              ),
+                            ),
+                            Flexible(
+                              child: IconButton(
+                                onPressed: () {},
+                                icon: const Icon(
+                                  Icons.more_vert,
+                                  size: 14,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

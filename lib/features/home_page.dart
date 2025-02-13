@@ -8,10 +8,11 @@ import 'package:akropolis/features/news_feed/view/local_news.dart';
 import 'package:akropolis/features/news_feed/view/headlines.dart';
 import 'package:akropolis/features/news_feed/view/world_news.dart';
 import 'package:akropolis/routes/routes.dart';
+import 'package:akropolis/theme/themes.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
+import 'package:infinite_carousel/infinite_carousel.dart';
 
 enum HomeTabs {
   forYou("For you"),
@@ -27,7 +28,7 @@ enum HomeTabs {
 enum BottomNavigationTabs {
   home("Home", Icons.home),
   search("Search", Icons.search),
-  post("New Post", Icons.add),
+  post("New Post", Icons.add_box),
   chat("Chat", Icons.chat),
   profile("Profile", Icons.person_outline);
 
@@ -42,12 +43,28 @@ class HomePage extends StatelessWidget {
 
   final List<HomeTabs> tabs = HomeTabs.values;
   final List<BottomNavigationTabs> bottomTabs = BottomNavigationTabs.values;
+  final List<({String imageurl, String title})> stories = const [
+    (
+      imageurl: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/CNN_International_logo.svg/2048px-CNN_International_logo.svg.png",
+      title: "CNN"
+    ),
+    (imageurl: "https://play-lh.googleusercontent.com/-kP0io9_T-LULzdpmtb4E-nFYFwDIKW7cwBhOSRwjn6T2ri0hKhz112s-ksI26NFCKOg", title: "Sky Sports"),
+    (imageurl: "https://mymodernmet.com/wp/wp-content/uploads/2019/09/100k-ai-faces-4.jpg", title: "Jhane k"),
+    (
+      imageurl:
+          "https://easy-peasy.ai/cdn-cgi/image/quality=80,format=auto,width=700/https://media.easy-peasy.ai/cd6f334c-db74-42d9-882b-b99d9e810dc0/e933bb79-b9b4-40a3-8417-2b15f44d5c45.png",
+      title: "Keliim.n"
+    ),
+  ];
 
   @override
   Widget build(BuildContext context) {
+    ThemeData theme = Theme.of(context);
     final ValueNotifier<BottomNavigationTabs> bottomValue = ValueNotifier(
       BottomNavigationTabs.home,
     );
+
+    final InfiniteScrollController carrouselController = InfiniteScrollController();
 
     return DefaultTabController(
       length: tabs.length,
@@ -65,23 +82,29 @@ class HomePage extends StatelessWidget {
                   return [
                     SliverAppBar(
                       title: null,
-                      expandedHeight: 200.0,
-                      leading: FutureBuilder(
-                        future: BlocProvider.of<UserCubit>(context).getCurrentUser(),
-                        builder: (_, snap) {
-                          if (snap.connectionState != ConnectionState.done) {
-                            return const InfiniteLoader();
-                          }
-        
-                          String? profilePhoto = snap.data?.profilePicture;
-                          if (profilePhoto == null || profilePhoto.isEmpty) {
-                            return const Icon(Icons.person);
-                          }
-        
-                          return CircleAvatar(
-                            backgroundImage: CachedNetworkImageProvider(profilePhoto),
-                          );
-                        },
+                      expandedHeight: 170.0,
+                      leading: Padding(
+                        padding: const EdgeInsets.only(
+                          left: 12.0,
+                          top: 12.0,
+                        ),
+                        child: FutureBuilder(
+                          future: BlocProvider.of<UserCubit>(context).getCurrentUser(),
+                          builder: (_, snap) {
+                            if (snap.connectionState != ConnectionState.done) {
+                              return const InfiniteLoader();
+                            }
+
+                            String? profilePhoto = snap.data?.profilePicture;
+                            if (profilePhoto == null || profilePhoto.isEmpty) {
+                              return Assets.profilePic.svg();
+                            }
+
+                            return CircleAvatar(
+                              backgroundImage: CachedNetworkImageProvider(profilePhoto),
+                            );
+                          },
+                        ),
                       ),
                       actions: [
                         IconButton(
@@ -89,7 +112,7 @@ class HomePage extends StatelessWidget {
                             BlocProvider.of<AuthenticationCubit>(context).logout();
                             Navigator.of(context).pushNamedAndRemoveUntil(
                               AppRoutes.login.path,
-                                  (_) => false,
+                              (_) => false,
                             );
                           },
                           icon: const Icon(
@@ -102,74 +125,196 @@ class HomePage extends StatelessWidget {
                       pinned: false,
                     ),
                     SliverToBoxAdapter(
+                      child: Padding(
+                        padding: EdgeInsets.only(
+                          left: 16.0,
+                          right: 16.0,
+                        ),
+                        child: SearchBar(
+                          leading: const Icon(Icons.search),
+                          shape: WidgetStatePropertyAll(
+                            RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          ),
+                          hintStyle: WidgetStatePropertyAll(
+                            TextStyle(
+                              fontSize: 16,
+                            ),
+                          ),
+                          hintText: "Search feeds",
+                        ),
+                      ),
+                    ),
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                          left: 15.0,
+                          right: 15.0,
+                          bottom: 0.0,
+                          top: 5.0,
+                        ),
+                        child: SizedBox(
+                          height: 120,
+                          child: ListView(
+                            scrollDirection: Axis.horizontal,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                  bottom: 22.0,
+                                ),
+                                child: const CircleAvatar(
+                                  backgroundColor: primaryColor,
+                                  radius: 33,
+                                  child: Icon(Icons.add),
+                                ),
+                              ),
+                              ...stories.map(
+                                (i) => Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      CircleAvatar(
+                                        backgroundColor: primaryColor,
+                                        backgroundImage: NetworkImage(i.imageurl),
+                                        radius: 33,
+                                      ),
+                                      Text(i.title),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SliverToBoxAdapter(
+                      child: Divider(
+                        color: Colors.white12,
+                      ),
+                    ),
+                    SliverToBoxAdapter(
                       child: SizedBox(
-                        height: 150,
-                        child: ListView(
-                          scrollDirection: Axis.horizontal,
-                          children: [
-                            SizedBox(
-                              width: 150,
-                              child: Card(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    const Text("Emblems"),
-                                    Row(
+                        height: 130,
+                        child: InfiniteCarousel.builder(
+                          itemCount: 3,
+                          itemExtent: 170,
+                          center: true,
+                          anchor: 0.0,
+                          velocityFactor: 0.2,
+                          onIndexChanged: (index) {},
+                          controller: carrouselController,
+                          axisDirection: Axis.horizontal,
+                          loop: true,
+                          itemBuilder: (context, itemIndex, realIndex) {
+                            return switch (itemIndex) {
+                              0 => Card(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Flex(
+                                      direction: Axis.horizontal,
                                       mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                      crossAxisAlignment: CrossAxisAlignment.end,
+                                      crossAxisAlignment: CrossAxisAlignment.stretch,
                                       children: [
-                                        const Text("0/38"),
-                                        Assets.present.svg(),
+                                         Expanded(
+                                          flex: 3,
+                                          child: Column(
+                                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              const Text("Emblems"),
+                                              Text(
+                                                "0/38",
+                                                style: theme.textTheme.headlineSmall?.copyWith(
+                                                  fontSize: 20,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: Align(
+                                            alignment: Alignment.bottomRight,
+                                            child: Padding(
+                                              padding: const EdgeInsets.only(bottom: 12.0),
+                                              child: Assets.present.svg(
+                                                width: 30,
+                                                height: 30,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
                                       ],
                                     ),
-                                  ],
+                                  ),
                                 ),
-                              ),
-                            ),
-                            SizedBox(
-                              width: 150,
-                              child: Card(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    const Text(
-                                      "See what's trending today",
-                                      textAlign: TextAlign.center,
-                                    ),
-                                    Row(
+                              1 => Card(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Flex(
+                                      direction: Axis.horizontal,
                                       mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                      crossAxisAlignment: CrossAxisAlignment.end,
+                                      crossAxisAlignment: CrossAxisAlignment.stretch,
                                       children: [
-                                        const SizedBox(),
-                                        Assets.flame.svg(),
+                                        const Expanded(
+                                          flex: 3,
+                                          child: Align(
+                                            alignment: Alignment.centerLeft,
+                                            child: Text(
+                                              "See what's trending today",
+                                              style: TextStyle(
+                                                height: 1.54,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: Align(
+                                            alignment: Alignment.bottomRight,
+                                            child: Padding(
+                                              padding: const EdgeInsets.only(bottom: 12.0),
+                                              child: Assets.flame.svg(
+                                                width: 30,
+                                                height: 30,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
                                       ],
                                     ),
-                                  ],
+                                  ),
                                 ),
-                              ),
-                            ),
-                            const SizedBox(
-                              width: 150,
-                              child: Card(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      "Today's view count",
-                                      textAlign: TextAlign.center,
+                              2 =>  Card(
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(
+                                      left: 8.0,
+                                      right: 8.0,
+                                      top: 18.0,
+                                      bottom: 18.0,
                                     ),
-                                    Text(
-                                      "1.1K views",
-                                      textAlign: TextAlign.center,
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        const Text(
+                                          "Today View Count",
+                                          textAlign: TextAlign.start,
+                                        ),
+                                        Text(
+                                          "1.1K views",
+                                          textAlign: TextAlign.start,
+                                          style: theme.textTheme.headlineSmall?.copyWith(
+                                            fontSize: 20,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ],
+                                  ),
                                 ),
-                              ),
-                            ),
-                          ],
+                              _ => const SizedBox.shrink(),
+                            };
+                          },
                         ),
                       ),
                     ),
@@ -199,33 +344,36 @@ class HomePage extends StatelessWidget {
                         },
                       ),
                     ),
+                    const SliverToBoxAdapter(
+                      child: Divider(
+                        color: Colors.white12,
+                      ),
+                    ),
                     SliverPersistentHeader(
                       floating: true,
-                      pinned: true, // Pins the tab bar
+                      pinned: false, // Pins the tab bar
                       delegate: _SliverAppBarDelegate(
                         TabBar(
                           isScrollable: true,
-                          tabs: tabs.map(
+                          tabs: tabs
+                              .map(
                                 (t) => Tab(
-                              text: t.title,
-                            ),
-                          ).toList(),
+                                  text: t.title,
+                                ),
+                              )
+                              .toList(),
                         ),
                       ),
                     ),
                   ];
                 },
                 body: TabBarView(
-                  children: tabs
-                      .map(
-                        (t) => switch (t) {
+                  children: tabs.map((t) => switch (t) {
                           HomeTabs.forYou => const ForYouContent(),
                           HomeTabs.worldNews => const WorldNewsContent(),
                           HomeTabs.headlines => const HeadlinesContent(),
                           HomeTabs.local => const LocalNewsContent(),
-                        },
-                      )
-                      .toList(),
+                        },).toList(),
                 ),
               ),
             ],
@@ -246,13 +394,23 @@ class HomePage extends StatelessWidget {
                     break;
                 }
               },
-              items: bottomTabs.map(
+              items: bottomTabs
+                  .map(
                     (e) => BottomNavigationBarItem(
                       label: e.title,
-                      icon: Icon(e.icon),
+                      icon: switch (e) {
+                        BottomNavigationTabs.chat => Assets.chatsCircle.svg(
+                            color: value == BottomNavigationTabs.chat ? primaryColor : null,
+                          ),
+                        BottomNavigationTabs.profile => Assets.userIcon.svg(
+                            color: value == BottomNavigationTabs.profile ? primaryColor : null,
+                          ),
+                        _ => Icon(e.icon),
+                      },
                       tooltip: e.title,
                     ),
-                  ).toList(),
+                  )
+                  .toList(),
             ),
           ),
         ),
@@ -276,6 +434,7 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   @override
   Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
     return Material(
+      color: Colors.transparent,
       child: _tabBar,
     );
   }

@@ -17,10 +17,15 @@ class Assets {
 
   static const SvgGenImage akropolisLogo =
       SvgGenImage('assets/akropolis_logo.svg');
+  static const SvgGenImage akropolisLogoMark =
+      SvgGenImage('assets/akropolis_logo_mark.svg');
   static const AssetGenImage background =
       AssetGenImage('assets/background.png');
   static const SvgGenImage chatTearDot =
       SvgGenImage('assets/chat_tear_dot.svg');
+  static const SvgGenImage chatsCircle = SvgGenImage('assets/chats_circle.svg');
+  static const SvgGenImage circlesThree =
+      SvgGenImage('assets/circles-three.svg');
   static const AssetGenImage connectionPeople =
       AssetGenImage('assets/connection_people.png');
   static const SvgGenImage fatArrowUp = SvgGenImage('assets/fat_arrow_up.svg');
@@ -29,18 +34,23 @@ class Assets {
   static const SvgGenImage home = SvgGenImage('assets/home.svg');
   static const SvgGenImage medal = SvgGenImage('assets/medal.svg');
   static const SvgGenImage present = SvgGenImage('assets/present.svg');
+  static const SvgGenImage profilePic = SvgGenImage('assets/profile_pic.svg');
   static const SvgGenImage share = SvgGenImage('assets/share.svg');
   static const AssetGenImage signInBg = AssetGenImage('assets/sign_in_bg.png');
   static const SvgGenImage splashScreen =
       SvgGenImage('assets/splash_screen.svg');
   static const AssetGenImage splashScreenBg =
       AssetGenImage('assets/splash_screen_bg.png');
+  static const SvgGenImage userIcon = SvgGenImage('assets/user_icon.svg');
 
   /// List of all assets
   static List<dynamic> get values => [
         akropolisLogo,
+        akropolisLogoMark,
         background,
         chatTearDot,
+        chatsCircle,
+        circlesThree,
         connectionPeople,
         fatArrowUp,
         flame,
@@ -48,10 +58,12 @@ class Assets {
         home,
         medal,
         present,
+        profilePic,
         share,
         signInBg,
         splashScreen,
-        splashScreenBg
+        splashScreenBg,
+        userIcon
       ];
 }
 

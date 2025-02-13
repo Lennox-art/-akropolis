@@ -155,6 +155,9 @@ class PostReactionWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
     return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
       child: Flex(
         direction: Axis.horizontal,
         mainAxisSize: MainAxisSize.min,
