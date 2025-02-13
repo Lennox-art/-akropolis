@@ -37,7 +37,7 @@ class LocalNewsFetcher  {
       var query = postsCollectionRef.orderBy("publishedAt", descending: true).limit(pageSize);
       if(country != null) {
         log.info("Fetching local news for $country");
-        query = query.where("country", isEqualTo: country);
+        query = query.where("country", isEqualTo: country.toLowerCase());
       }
 
       if(lastFetchedUserPost != null) query = query.startAfterDocument(lastFetchedUserPost!);

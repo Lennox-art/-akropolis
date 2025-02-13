@@ -1,18 +1,54 @@
+import 'package:akropolis/components/scroll_opacity_controller.dart';
+import 'package:akropolis/features/home_page.dart';
 import 'package:akropolis/features/news_feed/models/models.dart';
 import 'package:akropolis/features/news_feed/view/news_card.dart';
 import 'package:akropolis/features/news_feed/view_models/news_fetchers/for_you_news_fetcher.dart';
+import 'package:akropolis/main.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:infinite_carousel/infinite_carousel.dart';
 import 'package:paged_list_view/paged_list_view.dart';
 import 'package:akropolis/components/loader.dart';
 
-class ForYouContent extends StatelessWidget {
+class ForYouContent extends StatefulWidget {
   const ForYouContent({super.key});
 
   @override
+  State<ForYouContent> createState() => _ForYouContentState();
+}
+
+class _ForYouContentState extends State<ForYouContent> {
+
+  late final ScrollOpacityController _opacityController;
+  final ScrollController mainPageScrollController = ScrollController();
+  final GlobalKey<PagedListState> pagedListKey = GlobalKey<PagedListState>();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback(
+          (_) {
+        _opacityController = ScrollOpacityController(
+          debugName: "For you",
+          scrollController: mainPageScrollController,
+          onScroll: (newOpacity) {
+            log.info("From For you opacity is $newOpacity");
+            bottomNavigationOpacity.value = newOpacity;
+          },
+        );
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    _opacityController.dispose();
+    mainPageScrollController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final GlobalKey<PagedListState> pagedListKey = GlobalKey<PagedListState>();
     return SingleChildScrollView(
       child: Container(
         decoration: const BoxDecoration(
@@ -54,7 +90,8 @@ class ForYouContent extends StatelessWidget {
             PagedList<NewsPost>(
               shrinkWrap: true,
               key: pagedListKey,
-              physics: const ClampingScrollPhysics(),
+              scrollController: mainPageScrollController,
+              scrollPhysics: const ClampingScrollPhysics(),
               firstPageProgressIndicatorBuilder: (_) => const InfiniteLoader(),
               newPageProgressIndicatorBuilder: (_) => const InfiniteLoader(),
               itemBuilder: (_, news, i) => ForYouCard(

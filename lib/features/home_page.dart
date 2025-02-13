@@ -46,6 +46,8 @@ enum BottomNavigationTabs {
   const BottomNavigationTabs(this.title, this.icon);
 }
 
+final ValueNotifier<double> bottomNavigationOpacity = ValueNotifier(1.0);
+
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -57,13 +59,8 @@ class _HomePageState extends State<HomePage> {
   final ValueNotifier<BottomNavigationTabs> bottomValue = ValueNotifier(
     BottomNavigationTabs.home,
   );
-  final ValueNotifier<double> bottomNavigationOpacity = ValueNotifier(
-    1.0,
-  );
 
-  final ScrollController mainPageScrollController = ScrollController();
 
-  late final ScrollOpacityController _opacityController;
 
   final InfiniteScrollController carrouselController = InfiniteScrollController();
 
@@ -91,28 +88,7 @@ class _HomePageState extends State<HomePage> {
     ),
   ];
 
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback(
-      (_) {
-        _opacityController = ScrollOpacityController(
-          scrollController: mainPageScrollController,
-          onScroll: (newOpacity) {
-            log.info("New Opacity is $newOpacity");
-            bottomNavigationOpacity.value = newOpacity;
-          },
-        );
-      },
-    );
-  }
 
-  @override
-  void dispose() {
-    _opacityController.dispose();
-    mainPageScrollController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -130,7 +106,6 @@ class _HomePageState extends State<HomePage> {
                 fit: BoxFit.fill,
               ),
               NestedScrollView(
-                controller: mainPageScrollController,
                 headerSliverBuilder: (_, innerBoxIsScrolled) {
                   return [
                     SliverAppBar(

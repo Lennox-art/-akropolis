@@ -1077,7 +1077,7 @@ packages:
     description:
       path: "."
       ref: main
-      resolved-ref: d06b3c7bc42432db76e17177bd200bb5d4da25ae
+      resolved-ref: "5b08e5efd1b25dbc31c2693e54bf6e50b1dcb1d4"
       url: "https://bruc3balo:glpat-45CSRAxm48QD31nbADxz@gitlab.com/flutter_starter/paged_list_view.git"
     source: git
     version: "0.0.1"

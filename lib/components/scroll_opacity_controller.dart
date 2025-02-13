@@ -2,6 +2,7 @@ import 'package:akropolis/main.dart';
 import 'package:flutter/widgets.dart';
 
 class ScrollOpacityController {
+  final String debugName;
   final ScrollController scrollController;
   final void Function(double opacity) onScroll;
 
@@ -17,9 +18,11 @@ class ScrollOpacityController {
 
   ScrollOpacityController({
     required this.scrollController,
+    required this.debugName,
     required this.onScroll,
   }) {
     scrollController.addListener(_handleScroll);
+    log.debug("Attached to $debugName");
   }
 
   void _handleScroll() {
@@ -32,7 +35,10 @@ class ScrollOpacityController {
     bool hasChangedDirection = isNewScrollingDown != isScrollingDown;
 
     log.debug(
-      "Offset $offset, dy $dy, changeSinceLastScroll $changeSinceLastScroll, isScrollingDown $isScrollingDown, hasChangedDirection $hasChangedDirection",
+      """$debugName ==> Offset $offset, dy $dy, changeSinceLastScroll $changeSinceLastScroll,
+      isScrollingDown $isScrollingDown, hasChangedDirection $hasChangedDirection
+      _previousOffsetSinceChangeInDirection = $_previousOffsetSinceChangeInDirection
+      """,
     );
 
     //If has changed direction
@@ -46,7 +52,6 @@ class ScrollOpacityController {
     } else if (!hasChangedDirection && isScrollingDown && dy > threshold) {
       // Scrolling down past 300 pixels
       _updateOpacity(minOpacity);
-      return;
     } else if (!hasChangedDirection && !isScrollingDown && dy > threshold) {
       // Scrolling up past 300 pixels
       _updateOpacity(maxOpacity);
