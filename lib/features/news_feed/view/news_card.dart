@@ -167,7 +167,7 @@ class NewsCard extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 8),
-                      FutureBuilder(
+                      /*FutureBuilder(
                         future: commentsCountFuture,
                         builder: (_, commentsCountSnap) {
                           if (commentsCountSnap.connectionState != ConnectionState.done) {
@@ -189,7 +189,7 @@ class NewsCard extends StatelessWidget {
                             ),
                           );
                         },
-                      ),
+                      ),*/
                       const Spacer(),
                       IconButton(
                         onPressed: () {},

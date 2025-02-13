@@ -9,16 +9,10 @@ import 'package:paged_list_view/paged_list_view.dart';
 
 import 'news_card.dart';
 
-class LocalNewsContent extends StatefulWidget {
+class LocalNewsContent extends StatelessWidget {
   const LocalNewsContent({super.key});
 
-  @override
-  State<LocalNewsContent> createState() => _LocalNewsContentState();
-}
-
-class _LocalNewsContentState extends State<LocalNewsContent> {
-  final GlobalKey<PagedListState> pagedListKey = GlobalKey<PagedListState>();
-  late final ScrollOpacityController _opacityController;
+  /*late final ScrollOpacityController _opacityController;
   final ScrollController mainPageScrollController = ScrollController();
 
   @override
@@ -43,14 +37,13 @@ class _LocalNewsContentState extends State<LocalNewsContent> {
     _opacityController.dispose();
     mainPageScrollController.dispose();
     super.dispose();
-  }
-
+  }*/
   @override
   Widget build(BuildContext context) {
-
+    final GlobalKey<PagedListState> pagedListKey = GlobalKey<PagedListState>();
     return PagedList<NewsPost>(
       key: pagedListKey,
-      scrollController: mainPageScrollController,
+      scrollPhysics: const NeverScrollableScrollPhysics(),
       firstPageProgressIndicatorBuilder: (_) => const InfiniteLoader(),
       newPageProgressIndicatorBuilder: (_) => const InfiniteLoader(),
       itemBuilder: (_, news, i) => NewsCard(
