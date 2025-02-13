@@ -40,29 +40,35 @@ class PostMetaDataPage extends StatelessWidget {
 
                       return Visibility(
                         visible: l.form != null,
-                        child: Image.memory(
-                          l.form!.thumbnailData!,
+                        child: ClipRRect(
+                          borderRadius: const BorderRadius.all(
+                            Radius.circular(16.0),
+                          ),
+                          child: Image.memory(
+                            l.form!.thumbnailData!,
+                            fit: BoxFit.fill,
+                          ),
                         ),
                       );
                     },
                   ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextFormField(
+              ListTile(
+                title: const Text("Description"),
+                subtitle: TextFormField(
                   controller: titleController,
                   decoration: const InputDecoration(
-                    label: Text("Title"),
+                    hintText: "Title",
                   ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextFormField(
+              ListTile(
+                title: const Text("Description"),
+                subtitle: TextFormField(
                   controller: descriptionController,
                   decoration: const InputDecoration(
-                    label: Text("Description"),
+                    hintText: "Description",
                   ),
                 ),
               ),

@@ -7,15 +7,10 @@ import 'package:infinite_carousel/infinite_carousel.dart';
 import 'package:paged_list_view/paged_list_view.dart';
 import 'package:akropolis/components/loader.dart';
 
-class ForYouContent extends StatefulWidget {
+class ForYouContent extends StatelessWidget {
   const ForYouContent({super.key});
 
-  @override
-  State<ForYouContent> createState() => _ForYouContentState();
-}
 
-class _ForYouContentState extends State<ForYouContent> {
-  final GlobalKey<PagedListState> pagedListKey = GlobalKey<PagedListState>();
   /*late final ScrollOpacityController _opacityController;
   final ScrollController mainPageScrollController = ScrollController();
 
@@ -41,9 +36,10 @@ class _ForYouContentState extends State<ForYouContent> {
     mainPageScrollController.dispose();
     super.dispose();
   }*/
-
   @override
   Widget build(BuildContext context) {
+    final GlobalKey<PagedListState> pagedListKey = GlobalKey<PagedListState>();
+
     return SingleChildScrollView(
       child: Container(
         decoration: const BoxDecoration(
