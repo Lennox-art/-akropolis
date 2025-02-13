@@ -8,6 +8,7 @@ class CreatePostState with _$CreatePostState {
   }) = LoadingPostState;
 
   const factory CreatePostState.loaded({
+    NewsPost? newPost,
     ToastMessage? toast,
     CreatePostForm? form,
   }) = LoadedPostState;

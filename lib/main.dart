@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:akropolis/features/authentication/view_model/authentication_cubit/authentication_cubit.dart';
 import 'package:akropolis/features/create_post/view_model/create_post_cubit.dart';
@@ -22,6 +23,8 @@ final NetworkService ns = getIt<NetworkService>();
 final LoggingService log = getIt<LoggingService>();
 final ImagePicker picker = getIt<ImagePicker>();
 late final Directory temporaryDirectory;
+final String? deviceCountry = PlatformDispatcher.instance.locale.countryCode;
+
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

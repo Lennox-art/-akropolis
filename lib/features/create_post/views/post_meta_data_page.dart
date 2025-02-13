@@ -15,7 +15,7 @@ class PostMetaDataPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Finalize post"),
+        title: null,
       ),
       body: BlocBuilder<CreatePostCubit, CreatePostState>(
         builder: (_, state) {

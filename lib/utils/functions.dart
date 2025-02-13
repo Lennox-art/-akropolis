@@ -7,6 +7,7 @@ import 'package:ffmpeg_kit_flutter_full_gpl/ffmpeg_session.dart';
 import 'package:ffmpeg_kit_flutter_full_gpl/ffprobe_kit.dart';
 import 'package:ffmpeg_kit_flutter_full_gpl/media_information.dart';
 import 'package:ffmpeg_kit_flutter_full_gpl/media_information_session.dart';
+import 'package:flutter/material.dart';
 
 import 'dart:typed_data';
 import 'package:path/path.dart' as path;
@@ -196,3 +197,8 @@ final Uint8List kTransparentImage = Uint8List.fromList(<int>[
   0x60,
   0x82,
 ]);
+
+
+bool isTopRoute(BuildContext context) {
+  return ModalRoute.of(context)?.isCurrent ?? false;
+}

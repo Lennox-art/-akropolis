@@ -20,19 +20,25 @@ mixin _$CreatePostState {
   TResult when<TResult extends Object?>({
     required TResult Function(ToastMessage? message, UploadProgress? progress)
         loading,
-    required TResult Function(ToastMessage? toast, CreatePostForm? form) loaded,
+    required TResult Function(
+            NewsPost? newPost, ToastMessage? toast, CreatePostForm? form)
+        loaded,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(ToastMessage? message, UploadProgress? progress)? loading,
-    TResult? Function(ToastMessage? toast, CreatePostForm? form)? loaded,
+    TResult? Function(
+            NewsPost? newPost, ToastMessage? toast, CreatePostForm? form)?
+        loaded,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(ToastMessage? message, UploadProgress? progress)? loading,
-    TResult Function(ToastMessage? toast, CreatePostForm? form)? loaded,
+    TResult Function(
+            NewsPost? newPost, ToastMessage? toast, CreatePostForm? form)?
+        loaded,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -174,7 +180,9 @@ class _$LoadingPostStateImpl implements LoadingPostState {
   TResult when<TResult extends Object?>({
     required TResult Function(ToastMessage? message, UploadProgress? progress)
         loading,
-    required TResult Function(ToastMessage? toast, CreatePostForm? form) loaded,
+    required TResult Function(
+            NewsPost? newPost, ToastMessage? toast, CreatePostForm? form)
+        loaded,
   }) {
     return loading(message, progress);
   }
@@ -183,7 +191,9 @@ class _$LoadingPostStateImpl implements LoadingPostState {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(ToastMessage? message, UploadProgress? progress)? loading,
-    TResult? Function(ToastMessage? toast, CreatePostForm? form)? loaded,
+    TResult? Function(
+            NewsPost? newPost, ToastMessage? toast, CreatePostForm? form)?
+        loaded,
   }) {
     return loading?.call(message, progress);
   }
@@ -192,7 +202,9 @@ class _$LoadingPostStateImpl implements LoadingPostState {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(ToastMessage? message, UploadProgress? progress)? loading,
-    TResult Function(ToastMessage? toast, CreatePostForm? form)? loaded,
+    TResult Function(
+            NewsPost? newPost, ToastMessage? toast, CreatePostForm? form)?
+        loaded,
     required TResult orElse(),
   }) {
     if (loading != null) {
@@ -254,7 +266,7 @@ abstract class _$$LoadedPostStateImplCopyWith<$Res> {
           $Res Function(_$LoadedPostStateImpl) then) =
       __$$LoadedPostStateImplCopyWithImpl<$Res>;
   @useResult
-  $Res call({ToastMessage? toast, CreatePostForm? form});
+  $Res call({NewsPost? newPost, ToastMessage? toast, CreatePostForm? form});
 
   $ToastMessageCopyWith<$Res>? get toast;
   $CreatePostFormCopyWith<$Res>? get form;
@@ -273,10 +285,15 @@ class __$$LoadedPostStateImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? newPost = freezed,
     Object? toast = freezed,
     Object? form = freezed,
   }) {
     return _then(_$LoadedPostStateImpl(
+      newPost: freezed == newPost
+          ? _value.newPost
+          : newPost // ignore: cast_nullable_to_non_nullable
+              as NewsPost?,
       toast: freezed == toast
           ? _value.toast
           : toast // ignore: cast_nullable_to_non_nullable
@@ -320,8 +337,10 @@ class __$$LoadedPostStateImplCopyWithImpl<$Res>
 /// @nodoc
 
 class _$LoadedPostStateImpl implements LoadedPostState {
-  const _$LoadedPostStateImpl({this.toast, this.form});
+  const _$LoadedPostStateImpl({this.newPost, this.toast, this.form});
 
+  @override
+  final NewsPost? newPost;
   @override
   final ToastMessage? toast;
   @override
@@ -329,7 +348,7 @@ class _$LoadedPostStateImpl implements LoadedPostState {
 
   @override
   String toString() {
-    return 'CreatePostState.loaded(toast: $toast, form: $form)';
+    return 'CreatePostState.loaded(newPost: $newPost, toast: $toast, form: $form)';
   }
 
   @override
@@ -337,12 +356,13 @@ class _$LoadedPostStateImpl implements LoadedPostState {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$LoadedPostStateImpl &&
+            (identical(other.newPost, newPost) || other.newPost == newPost) &&
             (identical(other.toast, toast) || other.toast == toast) &&
             (identical(other.form, form) || other.form == form));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, toast, form);
+  int get hashCode => Object.hash(runtimeType, newPost, toast, form);
 
   /// Create a copy of CreatePostState
   /// with the given fields replaced by the non-null parameter values.
@@ -358,29 +378,35 @@ class _$LoadedPostStateImpl implements LoadedPostState {
   TResult when<TResult extends Object?>({
     required TResult Function(ToastMessage? message, UploadProgress? progress)
         loading,
-    required TResult Function(ToastMessage? toast, CreatePostForm? form) loaded,
+    required TResult Function(
+            NewsPost? newPost, ToastMessage? toast, CreatePostForm? form)
+        loaded,
   }) {
-    return loaded(toast, form);
+    return loaded(newPost, toast, form);
   }
 
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(ToastMessage? message, UploadProgress? progress)? loading,
-    TResult? Function(ToastMessage? toast, CreatePostForm? form)? loaded,
+    TResult? Function(
+            NewsPost? newPost, ToastMessage? toast, CreatePostForm? form)?
+        loaded,
   }) {
-    return loaded?.call(toast, form);
+    return loaded?.call(newPost, toast, form);
   }
 
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(ToastMessage? message, UploadProgress? progress)? loading,
-    TResult Function(ToastMessage? toast, CreatePostForm? form)? loaded,
+    TResult Function(
+            NewsPost? newPost, ToastMessage? toast, CreatePostForm? form)?
+        loaded,
     required TResult orElse(),
   }) {
     if (loaded != null) {
-      return loaded(toast, form);
+      return loaded(newPost, toast, form);
     }
     return orElse();
   }
@@ -419,9 +445,11 @@ class _$LoadedPostStateImpl implements LoadedPostState {
 
 abstract class LoadedPostState implements CreatePostState {
   const factory LoadedPostState(
-      {final ToastMessage? toast,
+      {final NewsPost? newPost,
+      final ToastMessage? toast,
       final CreatePostForm? form}) = _$LoadedPostStateImpl;
 
+  NewsPost? get newPost;
   ToastMessage? get toast;
   CreatePostForm? get form;
 

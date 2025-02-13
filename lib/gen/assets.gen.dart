@@ -33,6 +33,7 @@ class Assets {
   static const SvgGenImage google = SvgGenImage('assets/google.svg');
   static const SvgGenImage home = SvgGenImage('assets/home.svg');
   static const SvgGenImage medal = SvgGenImage('assets/medal.svg');
+  static const SvgGenImage minusCircle = SvgGenImage('assets/minus_circle.svg');
   static const SvgGenImage present = SvgGenImage('assets/present.svg');
   static const SvgGenImage profilePic = SvgGenImage('assets/profile_pic.svg');
   static const SvgGenImage share = SvgGenImage('assets/share.svg');
@@ -57,6 +58,7 @@ class Assets {
         google,
         home,
         medal,
+        minusCircle,
         present,
         profilePic,
         share,

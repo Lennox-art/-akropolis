@@ -27,325 +27,340 @@ class CreatePostPage extends StatelessWidget {
       appBar: AppBar(
         title: null,
       ),
-      body: BlocConsumer<CreatePostCubit, CreatePostState>(
-        listener: (_, state) {
-          state.mapOrNull(
-            loaded: (l) {
-              l.toast?.show();
-            },
-          );
-        },
-        builder: (_, state) {
-          return state.map(
-            loading: (l) {
-              return Center(
-                child: Column(
+      body: Padding(
+        padding: EdgeInsets.only(bottom: theme.appBarTheme.toolbarHeight ?? 0.0),
+        child: BlocConsumer<CreatePostCubit, CreatePostState>(
+          listener: (_, state) {
+            state.mapOrNull(
+              loaded: (l) {
+                l.toast?.show();
+              },
+            );
+          },
+          builder: (_, state) {
+            return state.map(
+              loading: (l) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        l.message?.message ?? "...",
+                      ),
+                      Builder(builder: (context) {
+                        if (l.progress == null) {
+                          return const SizedBox.shrink();
+                        }
+                        return CircularFiniteLoader(progress: l.progress!);
+                      }),
+                    ],
+                  ),
+                );
+              },
+              loaded: (l) {
+                return Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text(
-                      l.message?.message ?? "...",
-                    ),
-                    Builder(builder: (context) {
-                      if (l.progress == null) {
-                        return const SizedBox.shrink();
-                      }
-                      return CircularFiniteLoader(progress: l.progress!);
-                    }),
-                  ],
-                ),
-              );
-            },
-            loaded: (l) {
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Assets.akropolisLogo.svg(
-                            height: 80,
-                            width: 80,
-                          ),
-                        ),
-                        Text(
-                          "Create your post now.",
-                          style: theme.textTheme.headlineSmall,
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
-                  ),
-                  Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                    Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          SizedBox(
-                            height: 150,
-                            width: 180,
-                            child: Card(
-                              color: Colors.black,
-                              shape: const RoundedRectangleBorder(
-                                side: BorderSide(
-                                  color: Colors.white,
-                                ),
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(10),
-                                ),
-                              ),
-                              child: InkWell(
-                                onTap: () async {
-                                  Duration? videoDuration = await showDurationPickerDialog(
-                                    context,
-                                    maxDuration: maxVideoDuration,
-                                  );
-                                  if (videoDuration == null || !context.mounted) return;
-
-                                  XFile? videoData = await getIt<ImagePicker>().pickVideo(
-                                    source: ImageSource.camera,
-                                    preferredCameraDevice: CameraDevice.rear,
-                                    maxDuration: videoDuration,
-                                  );
-                                  if (videoData == null || !context.mounted) return;
-
-                                  AppUser? user = await BlocProvider.of<UserCubit>(context).getCurrentUser();
-                                  if (user == null || !context.mounted) return;
-
-                                  String? videoError = await validateVideo(videoData.path);
-                                  if (!context.mounted) return;
-
-                                  if (videoError != null) {
-                                    ToastError(title: "Post Video", message: videoError).show();
-                                    return;
-                                  }
-
-                                  await BlocProvider.of<CreatePostCubit>(context).createNewPost(
-                                    file: File(videoData.path)..writeAsBytesSync(await videoData.readAsBytes()),
-                                    user: user,
-                                  );
-
-                                  if (!context.mounted) return;
-
-                                  Navigator.of(context).pushNamed(
-                                    AppRoutes.videoEditingPage.path,
-                                  );
-                                },
-                                splashColor: primaryColor,
-                                highlightColor: primaryColor,
-                                child: Padding(
-                                  padding: EdgeInsets.all(8.0),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Icon(Icons.camera_alt_outlined),
-                                      Text("Use camera"),
-                                    ],
-                                  ),
-                                ),
-                              ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Assets.akropolisLogo.svg(
+                              height: 80,
+                              width: 80,
                             ),
                           ),
-                          SizedBox(
-                            height: 150,
-                            width: 180,
-                            child: Card(
-                              color: Colors.black,
-                              shape: const RoundedRectangleBorder(
-                                side: BorderSide(
-                                  color: Colors.white,
-                                ),
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(10),
-                                ),
-                              ),
-                              child: InkWell(
-                                onTap: () async {
-                                  XFile? videoData = await getIt<ImagePicker>().pickVideo(
-                                    source: ImageSource.gallery,
-                                    preferredCameraDevice: CameraDevice.rear,
-                                    maxDuration: const Duration(minutes: 1),
-                                  );
-                                  if (videoData == null || !context.mounted) return;
-
-                                  AppUser? user = await BlocProvider.of<UserCubit>(context).getCurrentUser();
-                                  if (user == null || !context.mounted) return;
-
-                                  String? videoError = await validateVideo(videoData.path);
-                                  if (!context.mounted) return;
-
-                                  if (videoError != null) {
-                                    ToastError(title: "Post Video", message: videoError).show();
-                                    return;
-                                  }
-
-                                  await BlocProvider.of<CreatePostCubit>(context).createNewPost(
-                                    file: File(videoData.path)..writeAsBytesSync(await videoData.readAsBytes()),
-                                    user: user,
-                                  );
-
-                                  if (!context.mounted) return;
-
-                                  Navigator.of(context).pushNamed(
-                                    AppRoutes.videoEditingPage.path,
-                                  );
-                                },
-                                splashColor: primaryColor,
-                                highlightColor: primaryColor,
-                                child: const Padding(
-                                  padding: EdgeInsets.all(8.0),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Icon(Icons.file_upload_outlined),
-                                      Text("Upload a video"),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
+                          Text(
+                            "Create your post now.",
+                            style: theme.textTheme.headlineSmall,
+                            textAlign: TextAlign.center,
                           ),
                         ],
                       ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          SizedBox(
-                            height: 150,
-                            width: 180,
-                            child: BlocBuilder<CreatePostCubit, CreatePostState>(
-                              builder: (_, state) {
-                                return state.map(
-                                  loading: (_) => const InfiniteLoader(),
-                                  loaded: (l) {
-                                    File? draftVideo = l.form?.videoData;
-                                    bool hasDraft = draftVideo != null;
+                    ),
+                    Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            SizedBox(
+                              height: 150,
+                              width: 180,
+                              child: Card(
+                                color: Colors.black,
+                                shape: const RoundedRectangleBorder(
+                                  side: BorderSide(
+                                    color: Colors.white,
+                                  ),
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(10),
+                                  ),
+                                ),
+                                child: InkWell(
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(10),
+                                  ),
+                                  onTap: () async {
+                                    Duration? videoDuration = await showDurationPickerDialog(
+                                      context,
+                                      maxDuration: maxVideoDuration,
+                                    );
+                                    if (videoDuration == null || !context.mounted) return;
 
-                                    return GestureDetector(
-                                      child: Card(
-                                        color: Colors.black,
-                                        shape: const RoundedRectangleBorder(
-                                          side: BorderSide(
-                                            color: Colors.white,
+                                    XFile? videoData = await getIt<ImagePicker>().pickVideo(
+                                      source: ImageSource.camera,
+                                      preferredCameraDevice: CameraDevice.rear,
+                                      maxDuration: videoDuration,
+                                    );
+                                    if (videoData == null || !context.mounted) return;
+
+                                    AppUser? user = await BlocProvider.of<UserCubit>(context).getCurrentUser();
+                                    if (user == null || !context.mounted) return;
+
+                                    String? videoError = await validateVideo(videoData.path);
+                                    if (!context.mounted) return;
+
+                                    if (videoError != null) {
+                                      ToastError(title: "Post Video", message: videoError).show();
+                                      return;
+                                    }
+
+                                    await BlocProvider.of<CreatePostCubit>(context).createNewPost(
+                                      file: File(videoData.path)..writeAsBytesSync(await videoData.readAsBytes()),
+                                      user: user,
+                                    );
+
+                                    if (!context.mounted) return;
+
+                                    Navigator.of(context).pushNamed(
+                                      AppRoutes.videoEditingPage.path,
+                                    );
+                                  },
+                                  splashColor: primaryColor,
+                                  highlightColor: primaryColor,
+                                  child: Padding(
+                                    padding: EdgeInsets.all(8.0),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Icon(Icons.camera_alt_outlined),
+                                        Text("Use camera"),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(
+                              height: 150,
+                              width: 180,
+                              child: Card(
+                                color: Colors.black,
+                                shape: const RoundedRectangleBorder(
+                                  side: BorderSide(
+                                    color: Colors.white,
+                                  ),
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(10),
+                                  ),
+                                ),
+                                child: InkWell(
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(10),
+                                  ),
+                                  onTap: () async {
+                                    XFile? videoData = await getIt<ImagePicker>().pickVideo(
+                                      source: ImageSource.gallery,
+                                      preferredCameraDevice: CameraDevice.rear,
+                                      maxDuration: const Duration(minutes: 1),
+                                    );
+                                    if (videoData == null || !context.mounted) return;
+
+                                    AppUser? user = await BlocProvider.of<UserCubit>(context).getCurrentUser();
+                                    if (user == null || !context.mounted) return;
+
+                                    String? videoError = await validateVideo(videoData.path);
+                                    if (!context.mounted) return;
+
+                                    if (videoError != null) {
+                                      ToastError(title: "Post Video", message: videoError).show();
+                                      return;
+                                    }
+
+                                    await BlocProvider.of<CreatePostCubit>(context).createNewPost(
+                                      file: File(videoData.path)..writeAsBytesSync(await videoData.readAsBytes()),
+                                      user: user,
+                                    );
+
+                                    if (!context.mounted) return;
+
+                                    Navigator.of(context).pushNamed(
+                                      AppRoutes.videoEditingPage.path,
+                                    );
+                                  },
+                                  splashColor: primaryColor,
+                                  highlightColor: primaryColor,
+                                  child: const Padding(
+                                    padding: EdgeInsets.all(8.0),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Icon(Icons.file_upload_outlined),
+                                        Text("Upload a video"),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            SizedBox(
+                              height: 150,
+                              width: 180,
+                              child: BlocBuilder<CreatePostCubit, CreatePostState>(
+                                builder: (_, state) {
+                                  return state.map(
+                                    loading: (_) => const InfiniteLoader(),
+                                    loaded: (l) {
+                                      File? draftVideo = l.form?.videoData;
+                                      bool hasDraft = draftVideo != null;
+
+                                      return GestureDetector(
+                                        child: Card(
+                                          color: Colors.black,
+                                          shape: const RoundedRectangleBorder(
+                                            side: BorderSide(
+                                              color: Colors.white,
+                                            ),
+                                            borderRadius: BorderRadius.all(
+                                              Radius.circular(10),
+                                            ),
                                           ),
-                                          borderRadius: BorderRadius.all(
-                                            Radius.circular(10),
-                                          ),
-                                        ),
-                                        child: InkWell(
-                                          onTap: () async {
-                                            if (!hasDraft) return;
+                                          child: InkWell(
+                                            borderRadius: BorderRadius.all(
+                                              Radius.circular(10),
+                                            ),
+                                            onTap: () async {
+                                              if (!hasDraft) return;
 
-                                            AppUser? user = await BlocProvider.of<UserCubit>(context).getCurrentUser();
-                                            if (user == null || !context.mounted) return;
+                                              AppUser? user = await BlocProvider.of<UserCubit>(context).getCurrentUser();
+                                              if (user == null || !context.mounted) return;
 
-                                            String? videoError = await validateVideo(draftVideo.path);
-                                            if (!context.mounted) return;
+                                              String? videoError = await validateVideo(draftVideo.path);
+                                              if (!context.mounted) return;
 
-                                            if (videoError != null) {
-                                              ToastError(title: "Post Video", message: videoError).show();
-                                              return;
-                                            }
+                                              if (videoError != null) {
+                                                ToastError(title: "Post Video", message: videoError).show();
+                                                return;
+                                              }
 
-                                            await BlocProvider.of<CreatePostCubit>(context).createNewPost(
-                                              file: draftVideo,
-                                              user: user,
-                                            );
+                                              await BlocProvider.of<CreatePostCubit>(context).createNewPost(
+                                                file: draftVideo,
+                                                user: user,
+                                              );
 
-                                            if (!context.mounted) return;
+                                              if (!context.mounted) return;
 
-                                            Navigator.of(context).pushNamed(
-                                              AppRoutes.videoEditingPage.path,
-                                            );
-                                          },
-                                          splashColor: primaryColor,
-                                          highlightColor: primaryColor,
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Column(
-                                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                Icon(
-                                                  Icons.circle_outlined,
-                                                  color: hasDraft ? Colors.green : theme.iconTheme.color,
-                                                ),
-                                                const Text("Draft"),
-                                              ],
+                                              Navigator.of(context).pushNamed(
+                                                AppRoutes.videoEditingPage.path,
+                                              );
+                                            },
+                                            splashColor: primaryColor,
+                                            highlightColor: primaryColor,
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(8.0),
+                                              child: Column(
+                                                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Icon(
+                                                    Icons.circle_outlined,
+                                                    color: hasDraft ? Colors.green : theme.iconTheme.color,
+                                                  ),
+                                                  const Text("Draft"),
+                                                ],
+                                              ),
                                             ),
                                           ),
                                         ),
-                                      ),
-                                    );
-                                  },
-                                );
-                              },
-                            ),
-                          ),
-                          SizedBox(
-                            height: 150,
-                            width: 180,
-                            child: Card(
-                              color: Colors.black,
-                              shape: const RoundedRectangleBorder(
-                                side: BorderSide(
-                                  color: Colors.white,
-                                ),
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(10),
-                                ),
+                                      );
+                                    },
+                                  );
+                                },
                               ),
-                              child: InkWell(
-                                onTap: () {},
-                                splashColor: primaryColor,
-                                highlightColor: primaryColor,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        crossAxisAlignment: CrossAxisAlignment.center,
-                                        children: [
-                                          Assets.circlesThree.svg(
-                                            height: 30,
-                                            width: 30,
-                                            color: Colors.white,
-                                          ),
-                                          const Icon(
-                                            Icons.lock_outline,
-                                            color: Colors.orange,
-                                          ),
-                                        ],
-                                      ),
-                                      const Text("Use Templates"),
-                                    ],
+                            ),
+                            SizedBox(
+                              height: 150,
+                              width: 180,
+                              child: Card(
+                                color: Colors.black,
+                                shape: const RoundedRectangleBorder(
+                                  side: BorderSide(
+                                    color: Colors.white,
+                                  ),
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(10),
+                                  ),
+                                ),
+                                child: InkWell(
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(10),
+                                  ),
+                                  onTap: () {},
+                                  splashColor: primaryColor,
+                                  highlightColor: primaryColor,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          children: [
+                                            Assets.circlesThree.svg(
+                                              height: 30,
+                                              width: 30,
+                                              color: Colors.white,
+                                            ),
+                                            const Icon(
+                                              Icons.lock_outline,
+                                              color: Colors.orange,
+                                            ),
+                                          ],
+                                        ),
+                                        const Text("Use Templates"),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
-              );
-            },
-          );
-        },
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                );
+              },
+            );
+          },
+        ),
       ),
     );
   }

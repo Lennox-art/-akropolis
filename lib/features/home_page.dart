@@ -1,14 +1,22 @@
+import 'dart:ui';
+
 import 'package:akropolis/components/loader.dart';
+import 'package:akropolis/components/scroll_opacity_controller.dart';
+import 'package:akropolis/components/toast/toast.dart';
 import 'package:akropolis/features/authentication/view_model/authentication_cubit/authentication_cubit.dart';
 import 'package:akropolis/features/create_post/view_model/create_post_cubit.dart';
+import 'package:akropolis/features/news_feed/models/models.dart';
 import 'package:akropolis/features/news_feed/view/for_you.dart';
+import 'package:akropolis/features/news_feed/view_models/news_fetchers/for_you_news_fetcher.dart';
 import 'package:akropolis/features/on_boarding/view_model/user_cubit/user_cubit.dart';
 import 'package:akropolis/gen/assets.gen.dart';
 import 'package:akropolis/features/news_feed/view/local_news.dart';
 import 'package:akropolis/features/news_feed/view/headlines.dart';
 import 'package:akropolis/features/news_feed/view/world_news.dart';
+import 'package:akropolis/main.dart';
 import 'package:akropolis/routes/routes.dart';
 import 'package:akropolis/theme/themes.dart';
+import 'package:akropolis/utils/functions.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -38,18 +46,44 @@ enum BottomNavigationTabs {
   const BottomNavigationTabs(this.title, this.icon);
 }
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  final ValueNotifier<BottomNavigationTabs> bottomValue = ValueNotifier(
+    BottomNavigationTabs.home,
+  );
+  final ValueNotifier<double> bottomNavigationOpacity = ValueNotifier(
+    1.0,
+  );
+
+  final ScrollController mainPageScrollController = ScrollController();
+
+  late final ScrollOpacityController _opacityController;
+
+  final InfiniteScrollController carrouselController = InfiniteScrollController();
+
   final List<HomeTabs> tabs = HomeTabs.values;
+
   final List<BottomNavigationTabs> bottomTabs = BottomNavigationTabs.values;
+
   final List<({String imageurl, String title})> stories = const [
     (
       imageurl: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/CNN_International_logo.svg/2048px-CNN_International_logo.svg.png",
       title: "CNN"
     ),
-    (imageurl: "https://play-lh.googleusercontent.com/-kP0io9_T-LULzdpmtb4E-nFYFwDIKW7cwBhOSRwjn6T2ri0hKhz112s-ksI26NFCKOg", title: "Sky Sports"),
-    (imageurl: "https://mymodernmet.com/wp/wp-content/uploads/2019/09/100k-ai-faces-4.jpg", title: "Jhane k"),
+    (
+      imageurl: "https://play-lh.googleusercontent.com/-kP0io9_T-LULzdpmtb4E-nFYFwDIKW7cwBhOSRwjn6T2ri0hKhz112s-ksI26NFCKOg",
+      title: "Sky Sports",
+    ),
+    (
+      imageurl: "https://mymodernmet.com/wp/wp-content/uploads/2019/09/100k-ai-faces-4.jpg",
+      title: "Jhane k",
+    ),
     (
       imageurl:
           "https://easy-peasy.ai/cdn-cgi/image/quality=80,format=auto,width=700/https://media.easy-peasy.ai/cd6f334c-db74-42d9-882b-b99d9e810dc0/e933bb79-b9b4-40a3-8417-2b15f44d5c45.png",
@@ -58,18 +92,36 @@ class HomePage extends StatelessWidget {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) {
+        _opacityController = ScrollOpacityController(
+          scrollController: mainPageScrollController,
+          onScroll: (newOpacity) {
+            log.info("New Opacity is $newOpacity");
+            bottomNavigationOpacity.value = newOpacity;
+          },
+        );
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    _opacityController.dispose();
+    mainPageScrollController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    final ValueNotifier<BottomNavigationTabs> bottomValue = ValueNotifier(
-      BottomNavigationTabs.home,
-    );
-
-    final InfiniteScrollController carrouselController = InfiniteScrollController();
-
     return DefaultTabController(
       length: tabs.length,
       child: SafeArea(
         child: Scaffold(
+          extendBody: true,
           body: Stack(
             children: [
               Assets.background.image(
@@ -78,6 +130,7 @@ class HomePage extends StatelessWidget {
                 fit: BoxFit.fill,
               ),
               NestedScrollView(
+                controller: mainPageScrollController,
                 headerSliverBuilder: (_, innerBoxIsScrolled) {
                   return [
                     SliverAppBar(
@@ -176,7 +229,7 @@ class HomePage extends StatelessWidget {
                                     children: [
                                       CircleAvatar(
                                         backgroundColor: primaryColor,
-                                        backgroundImage: NetworkImage(i.imageurl),
+                                        backgroundImage: CachedNetworkImageProvider(i.imageurl),
                                         radius: 33,
                                       ),
                                       Text(i.title),
@@ -217,7 +270,7 @@ class HomePage extends StatelessWidget {
                                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                                       crossAxisAlignment: CrossAxisAlignment.stretch,
                                       children: [
-                                         Expanded(
+                                        Expanded(
                                           flex: 3,
                                           child: Column(
                                             mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -285,7 +338,7 @@ class HomePage extends StatelessWidget {
                                     ),
                                   ),
                                 ),
-                              2 =>  Card(
+                              2 => Card(
                                   child: Padding(
                                     padding: const EdgeInsets.only(
                                       left: 8.0,
@@ -319,7 +372,21 @@ class HomePage extends StatelessWidget {
                       ),
                     ),
                     SliverToBoxAdapter(
-                      child: BlocBuilder<CreatePostCubit, CreatePostState>(
+                      child: BlocConsumer<CreatePostCubit, CreatePostState>(
+                        listener: (context, state) {
+                          state.mapOrNull(
+                            loaded: (l) {
+                              NewsPost? newPost = l.newPost;
+                              if (newPost == null) return;
+
+                              if (isTopRoute(context)) {
+                                l.toast?.show();
+                              }
+
+                              ForYouNewsFetcher.cachedNews.add(newPost);
+                            },
+                          );
+                        },
                         builder: (context, state) {
                           return state.map(
                             loading: (l) {
@@ -330,12 +397,14 @@ class HomePage extends StatelessWidget {
                                   Text(
                                     l.message?.message ?? "...",
                                   ),
-                                  Builder(builder: (context) {
-                                    if (l.progress == null) {
-                                      return const SizedBox.shrink();
-                                    }
-                                    return FiniteLoader(progress: l.progress!);
-                                  }),
+                                  Builder(
+                                    builder: (context) {
+                                      if (l.progress == null) {
+                                        return const SizedBox.shrink();
+                                      }
+                                      return FiniteLoader(progress: l.progress!);
+                                    },
+                                  ),
                                 ],
                               );
                             },
@@ -351,14 +420,14 @@ class HomePage extends StatelessWidget {
                     ),
                     SliverPersistentHeader(
                       floating: true,
-                      pinned: false, // Pins the tab bar
+                      pinned: false,
                       delegate: _SliverAppBarDelegate(
                         TabBar(
                           isScrollable: true,
                           tabs: tabs
                               .map(
                                 (t) => Tab(
-                                  text: t.title,
+                                  text: "${t.title} ${t == HomeTabs.local ? "(${deviceCountry ?? ''})" : ""}",
                                 ),
                               )
                               .toList(),
@@ -368,50 +437,65 @@ class HomePage extends StatelessWidget {
                   ];
                 },
                 body: TabBarView(
-                  children: tabs.map((t) => switch (t) {
+                  children: tabs
+                      .map(
+                        (t) => switch (t) {
                           HomeTabs.forYou => const ForYouContent(),
                           HomeTabs.worldNews => const WorldNewsContent(),
                           HomeTabs.headlines => const HeadlinesContent(),
                           HomeTabs.local => const LocalNewsContent(),
-                        },).toList(),
+                        },
+                      )
+                      .toList(),
                 ),
               ),
             ],
           ),
           bottomNavigationBar: ValueListenableBuilder(
             valueListenable: bottomValue,
-            builder: (_, value, __) => BottomNavigationBar(
-              currentIndex: value.index,
-              onTap: (i) {
-                switch (bottomTabs[i]) {
-                  case BottomNavigationTabs.post:
-                    Navigator.of(context).pushNamed(
-                      AppRoutes.createPost.path,
-                    );
-                    break;
-                  default:
-                    bottomValue.value = bottomTabs[i];
-                    break;
-                }
-              },
-              items: bottomTabs
-                  .map(
-                    (e) => BottomNavigationBarItem(
-                      label: e.title,
-                      icon: switch (e) {
-                        BottomNavigationTabs.chat => Assets.chatsCircle.svg(
-                            color: value == BottomNavigationTabs.chat ? primaryColor : null,
-                          ),
-                        BottomNavigationTabs.profile => Assets.userIcon.svg(
-                            color: value == BottomNavigationTabs.profile ? primaryColor : null,
-                          ),
-                        _ => Icon(e.icon),
-                      },
-                      tooltip: e.title,
+            builder: (_, value, __) => ValueListenableBuilder(
+                valueListenable: bottomNavigationOpacity,
+                builder: (_, opacity, __) {
+                  return AnimatedOpacity(
+                    opacity: opacity,
+                    duration: const Duration(
+                      seconds: 1,
                     ),
-                  )
-                  .toList(),
-            ),
+                    child: BottomNavigationBar(
+                      currentIndex: value.index,
+                      onTap: (i) {
+                        switch (bottomTabs[i]) {
+                          case BottomNavigationTabs.post:
+                            Navigator.of(context).pushNamed(
+                              AppRoutes.createPost.path,
+                            );
+                            break;
+                          default:
+                            bottomValue.value = bottomTabs[i];
+                            break;
+                        }
+                      },
+                      items: bottomTabs
+                          .map(
+                            (e) => BottomNavigationBarItem(
+                              backgroundColor: theme.bottomNavigationBarTheme.backgroundColor?.withValues(alpha: opacity),
+                              label: e.title,
+                              icon: switch (e) {
+                                BottomNavigationTabs.chat => Assets.chatsCircle.svg(
+                                    color: value == BottomNavigationTabs.chat ? primaryColor : null,
+                                  ),
+                                BottomNavigationTabs.profile => Assets.userIcon.svg(
+                                    color: value == BottomNavigationTabs.profile ? primaryColor : null,
+                                  ),
+                                _ => Icon(e.icon),
+                              },
+                              tooltip: e.title,
+                            ),
+                          )
+                          .toList(),
+                    ),
+                  );
+                }),
           ),
         ),
       ),

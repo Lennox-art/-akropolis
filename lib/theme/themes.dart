@@ -177,8 +177,11 @@ AppBarTheme get appBarTheme {
   return const AppBarTheme(
     backgroundColor: Colors.transparent,
     elevation: 0,
+    toolbarHeight: 60,
   );
 }
+
+
 
 InputDecorationTheme get inputDecorationTheme {
   return InputDecorationTheme(
@@ -277,6 +280,7 @@ BottomNavigationBarThemeData get bottomNavTheme {
     unselectedItemColor: secondaryColor,
     selectedItemColor: primaryColor,
     type: BottomNavigationBarType.fixed,
+    backgroundColor: backgroundColor,
   );
 }
 

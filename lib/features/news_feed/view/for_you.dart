@@ -14,42 +14,62 @@ class ForYouContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final GlobalKey<PagedListState> pagedListKey = GlobalKey<PagedListState>();
     return SingleChildScrollView(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          FutureBuilder(
-            future: ForYouNewsFetcher.fetchUserPostsNews(
-              pageSize: 10,
-              fromCache: true,
-            ),
-            builder: (_, snap) {
-              if (snap.connectionState != ConnectionState.done) {
-                return const InfiniteLoader();
-              }
+      child: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Colors.black12,
+              Colors.black26,
+              Colors.black87,
+              Colors.black,
+            ], // Gradient
+            stops: [
+              0.0,
+              0.05,
+              0.17,
+              0.29,
+            ], // Evenly spaced stops
+            begin: Alignment.topLeft, // Start position
+            end: Alignment.bottomRight, // End position
+          ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            FutureBuilder(
+              future: ForYouNewsFetcher.fetchUserPostsNews(
+                pageSize: 10,
+                fromCache: true,
+              ),
+              builder: (_, snap) {
+                if (snap.connectionState != ConnectionState.done) {
+                  return const InfiniteLoader();
+                }
 
-              return ForYouHighlightCarrousel(
-                newsPost: snap.requireData ?? [],
-              );
-            },
-          ),
-          PagedList<NewsPost>(
-            shrinkWrap: true,
-            key: pagedListKey,
-            physics: const ClampingScrollPhysics(),
-            firstPageProgressIndicatorBuilder: (_) => const InfiniteLoader(),
-            newPageProgressIndicatorBuilder: (_) => const InfiniteLoader(),
-            itemBuilder: (_, news, i) => NewsCard(
-              post: news,
-              newsChannel: NewsChannel.userPosts,
+                return ForYouHighlightCarrousel(
+                  newsPost: snap.requireData ?? [],
+                );
+              },
             ),
-            fetchPage: (int page, int pageSize, bool initialFetch) async {
-              return ForYouNewsFetcher.fetchUserPostsNews(
-                pageSize: pageSize,
-                fromCache: initialFetch,
-              );
-            },
-          ),
-        ],
+            PagedList<NewsPost>(
+              shrinkWrap: true,
+              key: pagedListKey,
+              physics: const ClampingScrollPhysics(),
+              firstPageProgressIndicatorBuilder: (_) => const InfiniteLoader(),
+              newPageProgressIndicatorBuilder: (_) => const InfiniteLoader(),
+              itemBuilder: (_, news, i) => ForYouCard(
+                post: news,
+                newsChannel: NewsChannel.userPosts,
+              ),
+              fetchPage: (int page, int pageSize, bool initialFetch) async {
+                return ForYouNewsFetcher.fetchUserPostsNews(
+                  pageSize: pageSize,
+                  fromCache: initialFetch,
+                );
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -64,14 +84,13 @@ class ForYouHighlightCarrousel extends StatelessWidget {
   final List<NewsPost> newsPost;
   final ValueNotifier<int> scrollController = ValueNotifier(0);
 
-
   @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         SizedBox(
-          height: 340,
+          height: 320,
           child: InfiniteCarousel.builder(
             itemCount: newsPost.length,
             itemExtent: 350,
@@ -91,22 +110,22 @@ class ForYouHighlightCarrousel extends StatelessWidget {
           ),
         ),
         ValueListenableBuilder(
-            valueListenable: scrollController,
-            builder: (_, index, __) {
-              return DotsIndicator(
-                dotsCount: newsPost.length,
-                position: index.toDouble(),
-                decorator: const DotsDecorator(
-                  color: Colors.black87, // Inactive color
-                  activeColor: Colors.white,
-                ),
-              );
-            }),
+          valueListenable: scrollController,
+          builder: (_, index, __) {
+            return DotsIndicator(
+              dotsCount: newsPost.length,
+              position: index.toDouble(),
+              decorator: const DotsDecorator(
+                color: Colors.grey, // Inactive color
+                activeColor: Colors.white,
+              ),
+            );
+          },
+        ),
         const Divider(
-          color: Colors.white70,
+          color: Colors.white12,
         )
       ],
     );
   }
 }
-

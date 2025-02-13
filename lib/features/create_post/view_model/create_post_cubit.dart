@@ -295,10 +295,11 @@ class CreatePostCubit extends Cubit<CreatePostState> {
     form = null;
 
     emit(
-      const LoadedPostState(
-        toast: ToastSuccess(
+      LoadedPostState(
+        toast: const ToastSuccess(
           message: "Post uploaded successfully",
         ),
+        newPost: newsPost,
       ),
     );
 
