@@ -1,16 +1,10 @@
 import 'dart:io';
 import 'dart:ui';
 
-import 'package:akropolis/features/authentication/view_model/authentication_cubit/authentication_cubit.dart';
-import 'package:akropolis/features/create_post/view_model/create_post_cubit.dart';
-import 'package:akropolis/features/news_feed/view_models/post_news_post_reply_cubit/post_news_post_reply_cubit.dart';
-
-import 'package:akropolis/features/on_boarding/view_model/user_cubit/user_cubit.dart';
-import 'package:akropolis/routes/routes.dart';
-import 'package:akropolis/theme/themes.dart';
+import 'package:akropolis/presentation/routes/routes.dart';
+import 'package:akropolis/presentation/ui/themes.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:logging_service/logging_service.dart';
@@ -61,29 +55,13 @@ class AkropolisApplication extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider(
-          create: (context) => AuthenticationCubit(),
-        ),
-        BlocProvider(
-          create: (context) => UserCubit(),
-        ),
-        BlocProvider(
-          create: (context) => CreatePostCubit(),
-        ),
-        BlocProvider(
-          create: (context) => PostVideoReplyCubit(),
-        ),
-      ],
-      child: MaterialApp(
-        theme: lightTheme,
-        debugShowCheckedModeBanner: false,
-        initialRoute: AppRoutes.splashScreen.path,
-        routes: {
-          for (var r in AppRoutes.values) r.path: (_) => r.page,
-        },
-      ),
+    return MaterialApp(
+      theme: lightTheme,
+      debugShowCheckedModeBanner: false,
+      initialRoute: AppRoutes.splashScreen.path,
+      routes: {
+        for (var r in AppRoutes.values) r.path: (_) => r.page,
+      },
     );
   }
 }

@@ -1,0 +1,62 @@
+
+import 'package:akropolis/presentation/features/authentication/view/forgot_password.dart';
+import 'package:akropolis/presentation/features/authentication/view/login.dart';
+import 'package:akropolis/presentation/features/authentication/view/new_password.dart';
+import 'package:akropolis/presentation/features/authentication/view/sign_in.dart';
+import 'package:akropolis/presentation/features/authentication/view/sign_up.dart';
+import 'package:akropolis/presentation/features/create_post/views/create_post_page.dart';
+import 'package:akropolis/presentation/features/create_post/views/edit_video_post_page.dart';
+import 'package:akropolis/presentation/features/create_post/views/post_meta_data_page.dart';
+import 'package:akropolis/presentation/features/home/view/home_page.dart';
+import 'package:akropolis/presentation/features/news_feed/view/news_detailed_view.dart';
+import 'package:akropolis/presentation/features/news_feed/view/post_reply_screen.dart';
+import 'package:akropolis/presentation/features/on_boarding/presentation/select_default_preferences.dart';
+import 'package:akropolis/presentation/features/on_boarding/presentation/select_topic.dart';
+import 'package:akropolis/presentation/features/on_boarding/presentation/welcome_screen.dart';
+import 'package:akropolis/presentation/features/on_boarding/view/welcome_screen.dart';
+import 'package:akropolis/presentation/features/splash_screen.dart';
+import 'package:flutter/material.dart';
+
+enum AppRoutes {
+  splashScreen("/"),
+  login("/login"),
+  signIn("/signIn"),
+  signInWithEmail("/signInEmail"),
+  signUp("/signUp"),
+  signUpWithEmail("/signUpWithEmail"),
+  forgotPassword("/forgotPassword"),
+  newPassword("/newPassword"),
+  welcome("/welcome"),
+  welcomeTopics("/welcomeTopics"),
+  welcomePreferences("/welcomePreferences"),
+  home("/home"),
+  createPost("/createPostPage"),
+  videoEditingPage("/videoEditingPage"),
+  finalizePost("/finalizePost"),
+  newsDetailsPage("/newsDetailsPage"),
+  postReplyScreen("/postReplyScreen");
+
+  final String path;
+
+  const AppRoutes(this.path);
+
+  Widget get page => switch(this) {
+    AppRoutes.splashScreen => const SplashScreen(),
+    AppRoutes.login => const LoginScreen(),
+    AppRoutes.signIn => const SignInScreen(),
+    AppRoutes.signInWithEmail => const SignInWithEmailScreen(),
+    AppRoutes.signUp => const SignUpPage(),
+    AppRoutes.signUpWithEmail => const SignUpWithEmailScreen(),
+    AppRoutes.forgotPassword => const ForgotPasswordScreen(),
+    AppRoutes.newPassword => const NewPasswordScreen(),
+    AppRoutes.welcome => const WelcomeScreen(),
+    AppRoutes.welcomeTopics => const SelectTopicScreen(),
+    AppRoutes.welcomePreferences => const SelectDefaultPreferencesScreen(),
+    AppRoutes.home => const HomePage(),
+    AppRoutes.createPost => const CreatePostPage(),
+    AppRoutes.videoEditingPage => const EditVideoPostPage(),
+    AppRoutes.finalizePost => const PostMetaDataPage(),
+    AppRoutes.newsDetailsPage => const NewsDetailedViewPage(),
+    AppRoutes.postReplyScreen => const PostReplyScreenPage(),
+  };
+}
