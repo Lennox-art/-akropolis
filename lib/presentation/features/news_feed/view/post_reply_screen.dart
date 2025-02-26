@@ -8,20 +8,14 @@ import 'package:akropolis/presentation/ui/components/loader.dart';
 import 'package:flutter/material.dart';
 
 class PostReplyScreenPage extends StatelessWidget {
-  const PostReplyScreenPage({
-    super.key,
-  });
-
+  const PostReplyScreenPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-
     final NewsDetailPostViewModel newsDetailPostViewModel = ModalRoute.of(context)!.settings.arguments as NewsDetailPostViewModel;
-
     final ValueNotifier<VideoEditingTools> currentToolNotifier = ValueNotifier(
       VideoEditingTools.trimVideo,
     );
-
     return ListenableBuilder(
       listenable: newsDetailPostViewModel,
       builder: (_, __) {
@@ -44,7 +38,7 @@ class PostReplyScreenPage extends StatelessWidget {
                   trailing: TextButton(
                     onPressed: () async {
                       await newsDetailPostViewModel.doPost();
-                      if(!context.mounted) return;
+                      if (!context.mounted) return;
                       Navigator.of(context).pop();
                     },
                     child: const Text("Post"),
