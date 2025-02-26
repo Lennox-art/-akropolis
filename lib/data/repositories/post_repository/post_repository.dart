@@ -2,7 +2,6 @@ import 'package:akropolis/data/models/dto_models/dto_models.dart';
 import 'package:akropolis/data/models/remote_models/remote_models.dart';
 
 abstract class PostRepository {
-
   Future<Result<NewsPost>> setPost({
     required NewsPost newsPost,
   });
@@ -40,6 +39,32 @@ abstract class PostRepository {
     required int pageSize,
   });
 
+  Future<Result<int>> countPostComments({
+    required String postId,
+    required String collection,
+  });
 
+  Future<Result<void>> addUserToPostViewers({
+    required String postId,
+    required String collection,
+    required String userId,
+  });
 
+  Future<Result<void>> addUserToPostEmpathyReaction({required String postId, required String collection, required String userId});
+
+  Future<Result<void>> addUserToPostLogicianReaction({required String postId, required String collection, required String userId});
+
+  Future<Result<void>> addUserToPostCommentEmpathyReaction({
+    required String postId,
+    required String collection,
+    required String commentId,
+    required String userId,
+  });
+
+  Future<Result<void>> addUserToPostCommentLogicianReaction({
+    required String postId,
+    required String collection,
+    required String commentId,
+    required String userId,
+  });
 }

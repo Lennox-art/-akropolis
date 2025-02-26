@@ -1,22 +1,29 @@
 import 'package:akropolis/data/models/dto_models/dto_models.dart';
 import 'package:akropolis/data/models/remote_models/remote_models.dart';
+import 'package:akropolis/domain/use_cases/fetch_post_comments_use_case.dart';
 import 'package:akropolis/presentation/features/news_feed/models/models.dart';
 import 'package:akropolis/presentation/features/news_feed/view/news_card.dart';
 import 'package:akropolis/presentation/features/news_feed/view_models/for_you_view_model.dart';
+import 'package:akropolis/presentation/features/news_feed/view_models/news_card_view_model.dart';
 import 'package:akropolis/presentation/ui/components/loader.dart';
 import 'package:akropolis/presentation/ui/components/toast/toast.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:infinite_carousel/infinite_carousel.dart';
 import 'package:paged_list_view/paged_list_view.dart';
 
 class ForYouContent extends StatelessWidget {
   const ForYouContent({
+    required this.currentUser,
     required this.forYouViewModel,
+    required this.fetchPostCommentsUseCase,
     super.key,
   });
 
+  final AppUser currentUser;
   final ForYouViewModel forYouViewModel;
+  final FetchPostCommentsUseCase fetchPostCommentsUseCase;
 
   /*late final ScrollOpacityController _opacityController;
   final ScrollController mainPageScrollController = ScrollController();
@@ -86,6 +93,8 @@ class ForYouContent extends StatelessWidget {
                   case Success<List<NewsPost>?>():
                     return ForYouHighlightCarrousel(
                       newsPost: forYouHighlightResult.data ?? [],
+                      currentUser: currentUser,
+                      fetchPostCommentsUseCase: fetchPostCommentsUseCase,
                     );
                   case Error<List<NewsPost>?>():
                     return Text(forYouHighlightResult.failure.message);
@@ -100,7 +109,14 @@ class ForYouContent extends StatelessWidget {
               newPageProgressIndicatorBuilder: (_) => const InfiniteLoader(),
               itemBuilder: (_, news, i) => ForYouCard(
                 post: news,
-                newsChannel: NewsChannel.userPosts,
+                newsCardViewModel: NewsCardViewModel(
+                  newsPost: news,
+                  newsChannel: NewsChannel.userPosts,
+                  appUser: currentUser,
+                  postRepository: GetIt.I(),
+                  fetchPostCommentsUseCase: fetchPostCommentsUseCase,
+                ),
+                currentUser: currentUser,
               ),
               fetchPage: (int page, int pageSize, bool initialFetch) async {
                 Result<List<NewsPost>?> forYouHighlightResult = await forYouViewModel.fetchForYouPostsNews(
@@ -127,9 +143,13 @@ class ForYouContent extends StatelessWidget {
 class ForYouHighlightCarrousel extends StatelessWidget {
   ForYouHighlightCarrousel({
     required this.newsPost,
+    required this.currentUser,
+    required this.fetchPostCommentsUseCase,
     super.key,
   });
 
+  final FetchPostCommentsUseCase fetchPostCommentsUseCase;
+  final AppUser currentUser;
   final List<NewsPost> newsPost;
   final ValueNotifier<int> scrollController = ValueNotifier(0);
 
@@ -152,8 +172,13 @@ class ForYouHighlightCarrousel extends StatelessWidget {
             axisDirection: Axis.horizontal,
             itemBuilder: (_, itemIndex, realIndex) {
               return ForYouHighlightCard(
-                post: newsPost[itemIndex],
-                newsChannel: NewsChannel.userPosts,
+                newsCardViewModel: NewsCardViewModel(
+                  newsPost: newsPost[itemIndex],
+                  newsChannel: NewsChannel.userPosts,
+                  appUser: currentUser,
+                  postRepository: GetIt.I(),
+                  fetchPostCommentsUseCase: fetchPostCommentsUseCase,
+                ),
               );
             },
           ),
@@ -173,7 +198,7 @@ class ForYouHighlightCarrousel extends StatelessWidget {
         ),
         const Divider(
           color: Colors.white12,
-        )
+        ),
       ],
     );
   }

@@ -4,7 +4,7 @@ import 'package:akropolis/data/models/dto_models/dto_models.dart';
 import 'package:akropolis/data/models/remote_models/remote_models.dart';
 import 'package:akropolis/domain/use_cases/fetch_for_you_post_use_case.dart';
 import 'package:akropolis/domain/use_cases/fetch_highlights_post_use_case.dart';
-import 'package:akropolis/domain/use_cases/fetch_World_news_post_use_case.dart';
+import 'package:akropolis/domain/use_cases/fetch_world_news_post_use_case.dart';
 import 'package:flutter/material.dart';
 
 class WorldNewsViewModel extends ChangeNotifier {

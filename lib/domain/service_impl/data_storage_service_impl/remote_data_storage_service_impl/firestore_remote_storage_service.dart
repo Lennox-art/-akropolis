@@ -41,6 +41,12 @@ class FirestoreRemoteStorageService extends RemoteDataStorageService {
             toFirestore: (model, _) => model.toJson(),
           );
 
+  DocumentReference postReference({required String collection, required String postId}) =>
+      FirebaseFirestore.instance.collection(collection).doc(postId).withConverter<NewsPost>(
+            fromFirestore: (snapshot, _) => NewsPost.fromJson(snapshot.data()!),
+            toFirestore: (model, _) => model.toJson(),
+          );
+
   final LoggingService _log;
 
   FirestoreRemoteStorageService({
@@ -209,6 +215,132 @@ class FirestoreRemoteStorageService extends RemoteDataStorageService {
       QuerySnapshot commentsSnapshot = await postCommentCollectionRef(collection: collection, postId: postId).limit(pageSize).get();
       List<PostComment> postComments = commentsSnapshot.docs.map((d) => d.data() as PostComment).toList();
       return Result.success(data: postComments);
+    } catch (e, trace) {
+      return Result.error(
+        failure: AppFailure(
+          message: e.toString(),
+          trace: trace,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Result<int>> countPostComments({
+    required String collection,
+    required String postId,
+  }) async {
+    try {
+      AggregateQuerySnapshot commentsCount = await postCommentCollectionRef(collection: collection, postId: postId).count().get();
+      int count = commentsCount.count ?? 0;
+      return Result.success(data: count);
+    } catch (e, trace) {
+      return Result.error(
+        failure: AppFailure(
+          message: e.toString(),
+          trace: trace,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Result<void>> addUserToPostViewers({
+    required String postId,
+    required String collection,
+    required String userId,
+  }) async {
+    try {
+      await postReference(collection: collection, postId: postId).update({
+        'viewers': FieldValue.arrayUnion([userId])
+      });
+      return const Result.success(data: null);
+    } catch (e, trace) {
+      return Result.error(
+        failure: AppFailure(
+          message: e.toString(),
+          trace: trace,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Result<void>> addUserToPostEmpathyReaction({
+    required String postId,
+    required String collection,
+    required String userId,
+  }) async {
+    try {
+      await postReference(collection: collection, postId: postId).update({
+        'reaction.emp': FieldValue.arrayUnion([userId])
+      });
+      return const Result.success(data: null);
+    } catch (e, trace) {
+      return Result.error(
+        failure: AppFailure(
+          message: e.toString(),
+          trace: trace,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Result<void>> addUserToPostLogicianReaction({
+    required String postId,
+    required String collection,
+    required String userId,
+  }) async {
+    try {
+      await postReference(collection: collection, postId: postId).update({
+        'reaction.log': FieldValue.arrayUnion([userId])
+      });
+      return const Result.success(data: null);
+    } catch (e, trace) {
+      return Result.error(
+        failure: AppFailure(
+          message: e.toString(),
+          trace: trace,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Result<void>> addUserToPostCommentEmpathyReaction({
+    required String postId,
+    required String collection,
+    required String commentId,
+    required String userId,
+  }) async {
+    try {
+      await postCommentCollectionRef(collection: collection, postId: postId).doc(commentId).update({
+        'reaction.emp': FieldValue.arrayUnion([userId])
+      });
+      return const Result.success(data: null);
+    } catch (e, trace) {
+      return Result.error(
+        failure: AppFailure(
+          message: e.toString(),
+          trace: trace,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Result<void>> addUserToPostCommentLogicianReaction({
+    required String postId,
+    required String collection,
+    required String commentId,
+    required String userId,
+  }) async {
+    try {
+      await postCommentCollectionRef(collection: collection, postId: postId).doc(commentId).update({
+        'reaction.log': FieldValue.arrayUnion([userId])
+      });
+      return const Result.success(data: null);
     } catch (e, trace) {
       return Result.error(
         failure: AppFailure(

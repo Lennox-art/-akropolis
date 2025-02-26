@@ -1,3 +1,13 @@
+enum PostMenu {
+  share("Share"),
+  bookmark("Bookmark"),
+  notInterested("Not interested"),
+  report("Report");
+
+  final String title;
+
+  const PostMenu(this.title);
+}
 
 enum NewsSourceEnum {
   bbc(

@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:akropolis/domain/gen/assets.gen.dart';
-import 'package:akropolis/data/utils/constants.dart';
 
 import 'package:akropolis/data/utils/validations.dart';
 import 'package:akropolis/presentation/features/authentication/models/authentication_state.dart';
@@ -10,10 +9,8 @@ import 'package:akropolis/presentation/routes/routes.dart';
 import 'package:akropolis/presentation/ui/components/loader.dart';
 import 'package:akropolis/presentation/ui/components/toast/toast.dart';
 import 'package:akropolis/presentation/ui/themes.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({

@@ -77,9 +77,83 @@ class PostRepositoryImpl extends PostRepository {
     required String postId,
     required String collection,
     required int pageSize,
-  }) => _remoteDataStorageService.fetchPostComments(
+  }) =>
+      _remoteDataStorageService.fetchPostComments(
         collection: collection,
         postId: postId,
         pageSize: pageSize,
+      );
+
+  @override
+  Future<Result<int>> countPostComments({
+    required String postId,
+    required String collection,
+  }) =>
+      _remoteDataStorageService.countPostComments(
+        collection: collection,
+        postId: postId,
+      );
+
+  @override
+  Future<Result<void>> addUserToPostViewers({
+    required String postId,
+    required String collection,
+    required String userId,
+  }) =>
+      _remoteDataStorageService.countPostComments(
+        collection: collection,
+        postId: postId,
+      );
+
+  @override
+  Future<Result<void>> addUserToPostCommentEmpathyReaction({
+    required String postId,
+    required String collection,
+    required String commentId,
+    required String userId,
+  }) =>
+      _remoteDataStorageService.addUserToPostCommentEmpathyReaction(
+        collection: collection,
+        postId: postId,
+        commentId: commentId,
+        userId: userId,
+      );
+
+  @override
+  Future<Result<void>> addUserToPostCommentLogicianReaction({
+    required String postId,
+    required String collection,
+    required String commentId,
+    required String userId,
+  }) =>
+      _remoteDataStorageService.addUserToPostCommentLogicianReaction(
+        collection: collection,
+        postId: postId,
+        commentId: commentId,
+        userId: userId,
+      );
+
+  @override
+  Future<Result<void>> addUserToPostEmpathyReaction({
+    required String postId,
+    required String collection,
+    required String userId,
+  }) =>
+      _remoteDataStorageService.addUserToPostEmpathyReaction(
+        collection: collection,
+        postId: postId,
+        userId: userId,
+      );
+
+  @override
+  Future<Result<void>> addUserToPostLogicianReaction({
+    required String postId,
+    required String collection,
+    required String userId,
+  }) =>
+      _remoteDataStorageService.addUserToPostLogicianReaction(
+        collection: collection,
+        postId: postId,
+        userId: userId,
       );
 }

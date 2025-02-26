@@ -1,8 +1,10 @@
+import 'package:akropolis/data/models/remote_models/remote_models.dart';
 import 'package:akropolis/domain/gen/assets.gen.dart';
-import 'package:akropolis/domain/use_cases/fetch_World_news_post_use_case.dart';
 import 'package:akropolis/domain/use_cases/fetch_for_you_post_use_case.dart';
 import 'package:akropolis/domain/use_cases/fetch_highlights_post_use_case.dart';
 import 'package:akropolis/domain/use_cases/fetch_local_news_post_use_case.dart';
+import 'package:akropolis/domain/use_cases/fetch_post_comments_use_case.dart';
+import 'package:akropolis/domain/use_cases/fetch_world_news_post_use_case.dart';
 import 'package:akropolis/main.dart';
 import 'package:akropolis/presentation/features/news_feed/models/enums.dart';
 import 'package:akropolis/presentation/features/news_feed/view/for_you.dart';
@@ -23,10 +25,12 @@ import 'package:infinite_carousel/infinite_carousel.dart';
 class NewsFeedTab extends StatefulWidget {
   const NewsFeedTab({
     required this.newsFeedViewModel,
+    required this.currentUser,
     super.key,
   });
 
   final NewsFeedViewModel newsFeedViewModel;
+  final AppUser currentUser;
 
   @override
   State<NewsFeedTab> createState() => _NewsFeedTabState();
@@ -34,29 +38,45 @@ class NewsFeedTab extends StatefulWidget {
 
 class _NewsFeedTabState extends State<NewsFeedTab> {
   final InfiniteScrollController carrouselController = InfiniteScrollController();
-  final ForYouViewModel forYouViewModel = ForYouViewModel(
-    fetchForYouPostUseCase: FetchForYouPostUseCase(
-      postRepository: GetIt.I(),
-    ),
-  );
 
-  final WorldNewsViewModel worldNewsViewModel = WorldNewsViewModel(
-    fetchWorldNewsPostUseCase: FetchWorldNewsPostUseCase(
-      postRepository: GetIt.I(),
-    ),
-  );
+  late final ForYouViewModel forYouViewModel;
+  late final WorldNewsViewModel worldNewsViewModel;
+  late final HeadlinesViewModel headlinesViewModel;
+  late final LocalNewsViewModel localNewsViewModel;
 
-  final HeadlinesViewModel headlinesViewModel = HeadlinesViewModel(
-    fetchHeadlinesPostUseCase: FetchHeadlinesPostUseCase(
-      postRepository: GetIt.I(),
-    ),
-  );
+  @override
+  void initState() {
+    forYouViewModel = ForYouViewModel(
+      fetchForYouPostUseCase: FetchForYouPostUseCase(
+        postRepository: GetIt.I(),
+      ),
+    );
+    worldNewsViewModel = WorldNewsViewModel(
+      fetchWorldNewsPostUseCase: FetchWorldNewsPostUseCase(
+        postRepository: GetIt.I(),
+      ),
+    );
+    headlinesViewModel = HeadlinesViewModel(
+      fetchHeadlinesPostUseCase: FetchHeadlinesPostUseCase(
+        postRepository: GetIt.I(),
+      ),
+    );
+    localNewsViewModel = LocalNewsViewModel(
+      fetchLocalNewsPostUseCase: FetchLocalNewsPostUseCase(
+        postRepository: GetIt.I(),
+      ),
+    );
+    super.initState();
+  }
 
-  final LocalNewsViewModel localNewsViewModel = LocalNewsViewModel(
-    fetchLocalNewsPostUseCase: FetchLocalNewsPostUseCase(
-      postRepository: GetIt.I(),
-    ),
-  );
+  @override
+  void dispose() {
+    forYouViewModel.dispose();
+    worldNewsViewModel.dispose();
+    headlinesViewModel.dispose();
+    localNewsViewModel.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -335,15 +355,23 @@ class _NewsFeedTabState extends State<NewsFeedTab> {
                   (t) => switch (t) {
                     NewsFeedTabEnum.forYou => ForYouContent(
                         forYouViewModel: forYouViewModel,
+                        currentUser: widget.currentUser,
+                        fetchPostCommentsUseCase: widget.newsFeedViewModel.fetchPostCommentsUseCase,
                       ),
                     NewsFeedTabEnum.worldNews => WorldNewsContent(
                         worldNewsViewModel: worldNewsViewModel,
+                        currentUser: widget.currentUser,
+                        fetchPostCommentsUseCase: widget.newsFeedViewModel.fetchPostCommentsUseCase,
                       ),
                     NewsFeedTabEnum.headlines => HeadlinesContent(
                         headlinesViewModel: headlinesViewModel,
+                        currentUser: widget.currentUser,
+                        fetchPostCommentsUseCase: widget.newsFeedViewModel.fetchPostCommentsUseCase,
                       ),
                     NewsFeedTabEnum.local => LocalNewsContent(
                         localNewsViewModel: localNewsViewModel,
+                        currentUser: widget.currentUser,
+                        fetchPostCommentsUseCase: widget.newsFeedViewModel.fetchPostCommentsUseCase,
                       ),
                   },
                 )

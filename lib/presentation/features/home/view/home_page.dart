@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:akropolis/domain/gen/assets.gen.dart';
+import 'package:akropolis/domain/use_cases/fetch_post_comments_use_case.dart';
 
 import 'package:akropolis/presentation/features/home/models/home_models.dart';
 import 'package:akropolis/presentation/features/home/view_model/home_view_model.dart';
@@ -12,6 +13,7 @@ import 'package:akropolis/presentation/ui/components/toast/toast.dart';
 import 'package:akropolis/presentation/ui/themes.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:infinite_carousel/infinite_carousel.dart';
 
 final ValueNotifier<double> bottomNavigationOpacity = ValueNotifier(1.0);
@@ -107,15 +109,27 @@ class _HomePageState extends State<HomePage> {
           body: ListenableBuilder(
             listenable: widget.homeViewModel,
             builder: (_, __) {
-              return switch (widget.homeViewModel.currentTab) {
-                BottomNavigationTabs.newsFeed => NewsFeedTab(
-                    newsFeedViewModel: NewsFeedViewModel(),
-                  ),
-                BottomNavigationTabs.search => const SizedBox.shrink(),
-                BottomNavigationTabs.post => const SizedBox.shrink(),
-                BottomNavigationTabs.chat => const SizedBox.shrink(),
-                BottomNavigationTabs.profile => const SizedBox.shrink(),
-              };
+              return widget.homeViewModel.homeState.map(
+                initial: (i) => const Text("Initial"),
+                error: (e) => Text(e.failure.message),
+                loading: (l) => const InfiniteLoader(),
+                ready: (r) {
+                  return switch (widget.homeViewModel.currentTab) {
+                    BottomNavigationTabs.newsFeed => NewsFeedTab(
+                        currentUser: r.appUser,
+                        newsFeedViewModel: NewsFeedViewModel(
+                          FetchPostCommentsUseCase(
+                            postRepository: GetIt.I(),
+                          ),
+                        ),
+                      ),
+                    BottomNavigationTabs.search => const SizedBox.shrink(),
+                    BottomNavigationTabs.post => const SizedBox.shrink(),
+                    BottomNavigationTabs.chat => const SizedBox.shrink(),
+                    BottomNavigationTabs.profile => const SizedBox.shrink(),
+                  };
+                },
+              );
             },
           ),
           bottomNavigationBar: ListenableBuilder(
@@ -175,4 +189,3 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-

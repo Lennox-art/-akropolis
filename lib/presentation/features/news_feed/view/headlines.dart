@@ -1,20 +1,28 @@
 import 'package:akropolis/data/models/dto_models/dto_models.dart';
 import 'package:akropolis/data/models/remote_models/remote_models.dart';
+import 'package:akropolis/domain/use_cases/fetch_post_comments_use_case.dart';
 import 'package:akropolis/presentation/features/news_feed/models/models.dart';
 import 'package:akropolis/presentation/features/news_feed/view/news_card.dart';
 import 'package:akropolis/presentation/features/news_feed/view_models/headlines_view_model.dart';
+import 'package:akropolis/presentation/features/news_feed/view_models/news_card_view_model.dart';
 import 'package:akropolis/presentation/ui/components/loader.dart';
 import 'package:akropolis/presentation/ui/components/toast/toast.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:paged_list_view/paged_list_view.dart';
 
 class HeadlinesContent extends StatelessWidget {
   const HeadlinesContent({
     required this.headlinesViewModel,
+    required this.currentUser,
+    required this.fetchPostCommentsUseCase,
     super.key,
   });
 
   final HeadlinesViewModel headlinesViewModel;
+  final AppUser currentUser;
+  final FetchPostCommentsUseCase fetchPostCommentsUseCase;
+
 
   /* late final ScrollOpacityController _opacityController;
   final ScrollController mainPageScrollController = ScrollController();
@@ -51,12 +59,17 @@ class HeadlinesContent extends StatelessWidget {
       shrinkWrap: true,
       key: pagedListKey,
       scrollPhysics: const NeverScrollableScrollPhysics(),
-      // Disables ListView scrolling
       firstPageProgressIndicatorBuilder: (_) => const InfiniteLoader(),
       newPageProgressIndicatorBuilder: (_) => const InfiniteLoader(),
       itemBuilder: (_, news, i) => NewsCard(
         post: news,
-        newsChannel: NewsChannel.newsHeadlines,
+        newsCardViewModel: NewsCardViewModel(
+          newsPost: news,
+          newsChannel: NewsChannel.newsHeadlines,
+          appUser: currentUser,
+          postRepository: GetIt.I(),
+          fetchPostCommentsUseCase: fetchPostCommentsUseCase,
+        ),
       ),
       fetchPage: (int page, int pageSize, bool initialFetch) async {
         Result<List<NewsPost>?> headlinesResult = await headlinesViewModel.fetchHeadlinesPostsNews(

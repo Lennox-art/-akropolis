@@ -1,66 +1,37 @@
-
-
 import 'package:akropolis/data/models/remote_models/remote_models.dart';
 import 'package:akropolis/domain/gen/assets.gen.dart';
 import 'package:akropolis/main.dart';
 import 'package:akropolis/domain/utils/functions.dart';
+import 'package:akropolis/presentation/features/news_feed/models/enums.dart';
 import 'package:akropolis/presentation/features/news_feed/models/models.dart';
+import 'package:akropolis/presentation/features/news_feed/view_models/news_card_view_model.dart';
 import 'package:akropolis/presentation/routes/routes.dart';
 import 'package:akropolis/presentation/ui/components/app_video_player.dart';
 import 'package:akropolis/presentation/ui/components/loader.dart';
 import 'package:akropolis/presentation/ui/components/news_post_components.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-
-import 'news_detailed_view.dart';
 
 class NewsCard extends StatelessWidget {
   final NewsPost post;
-  final NewsChannel newsChannel;
-
-  DocumentReference get postsCollectionRef => FirebaseFirestore.instance.collection(newsChannel.collection).doc(post.id).withConverter<NewsPost>(
-        fromFirestore: (snapshot, _) => NewsPost.fromJson(snapshot.data()!),
-        toFirestore: (model, _) => model.toJson(),
-      );
+  final NewsCardViewModel newsCardViewModel;
 
   const NewsCard({
     super.key,
     required this.post,
-    required this.newsChannel,
+    required this.newsCardViewModel,
   });
-
-  void setViewedPost(String userId) {
-    bool isViewer = post.viewers.contains(userId);
-    if (isViewer) return;
-
-    post.viewers.add(userId);
-
-    postsCollectionRef.update({
-      'viewers': FieldValue.arrayUnion([userId])
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    User? user = BlocProvider.of<AuthenticationCubit>(context).getCurrentUser();
-    late Future<AggregateQuerySnapshot> commentsCountFuture = postsCollectionRef.collection(PostComment.collection).count().get();
-
-    WidgetsBinding.instance.addPostFrameCallback(
-      (_) {
-        if (user == null) return;
-        setViewedPost(user.uid);
-      },
-    );
 
     return GestureDetector(
       onTap: () {
         Navigator.of(context).pushNamed(
           AppRoutes.newsDetailsPage.path,
-          arguments: NewsPostDto(post, newsChannel),
+          arguments: NewsPostDto(post, newsCardViewModel.newsChannel, newsCardViewModel.currentUser),
         );
       },
       child: Card(
@@ -167,29 +138,33 @@ class NewsCard extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 8),
-                      /*FutureBuilder(
-                        future: commentsCountFuture,
-                        builder: (_, commentsCountSnap) {
-                          if (commentsCountSnap.connectionState != ConnectionState.done) {
-                            return const InfiniteLoader();
-                          }
-
-                          int? commentsCount = commentsCountSnap.data?.count;
-
-                          if (commentsCount == null) {
-                            return const Icon(Icons.question_mark);
-                          }
-
+                      ListenableBuilder(
+                        listenable: newsCardViewModel,
+                        builder: (_, __) {
                           return Visibility(
-                            visible: commentsCount > 0,
-                            replacement: const Text("Be the first to comment"),
-                            child: Text(
-                              "+$commentsCount Replies",
-                              style: const TextStyle(fontSize: 14, color: Colors.blue),
+                            visible: !newsCardViewModel.loadingComments,
+                            replacement: const InfiniteLoader(),
+                            child: Visibility(
+                              visible: (newsCardViewModel.commentsCount ?? 0) > 0,
+                              replacement: const Text(
+                                "Be the first to reply",
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  color: Colors.white,
+                                ),
+                                textAlign: TextAlign.start,
+                              ),
+                              child: Text(
+                                "+${newsCardViewModel.commentsCount ?? 0} Replies",
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.white,
+                                ),
+                              ),
                             ),
                           );
                         },
-                      ),*/
+                      ),
                       const Spacer(),
                       IconButton(
                         onPressed: () {},
@@ -213,15 +188,15 @@ class NewsCard extends StatelessWidget {
 
 class PostCommentCard extends StatelessWidget {
   PostCommentCard({
+    required this.currentUser,
     required this.post,
     required this.comment,
-    required this.newsPostRef,
     super.key,
   });
 
+  final AppUser currentUser;
   final NewsPost post;
   final PostComment comment;
-  final DocumentReference newsPostRef;
   final ValueNotifier<bool> clickedPlay = ValueNotifier(false);
 
   @override
@@ -283,24 +258,12 @@ class PostCommentCard extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Expanded(
-              child: StreamBuilder(
-                stream: newsPostRef
-                    .collection(PostComment.collection)
-                    .doc(comment.id)
-                    .withConverter<PostComment>(
-                      fromFirestore: (snapshot, _) => PostComment.fromJson(snapshot.data()!),
-                      toFirestore: (model, _) => model.toJson(),
-                    )
-                    .snapshots(includeMetadataChanges: true),
-                builder: (_, commentSnap) {
-                  final PostComment comment = commentSnap.data?.data() ?? this.comment;
-
-                  return CommentReactionWidget(
-                    newsPost: post,
-                    postComment: comment,
-                    postsCollectionRef: newsPostRef,
-                  );
-                },
+              child: CommentReactionWidget(
+                newsPost: post,
+                postComment: comment,
+                currentUser: currentUser,
+                onLogician: () {},
+                onEmpathy: () {},
               ),
             ),
             Padding(
@@ -338,8 +301,7 @@ class PostCommentCard extends StatelessWidget {
                               style: TextStyle(color: menu == PostMenu.report ? Colors.red : Colors.white),
                             ),
                           ),
-                        )
-                        .toList(),
+                        ).toList(),
                   ),
                 ],
               ),
@@ -352,49 +314,28 @@ class PostCommentCard extends StatelessWidget {
 }
 
 class ForYouHighlightCard extends StatelessWidget {
-  final NewsPost post;
-  final NewsChannel newsChannel;
-
-  DocumentReference get postsCollectionRef => FirebaseFirestore.instance.collection(newsChannel.collection).doc(post.id).withConverter<NewsPost>(
-        fromFirestore: (snapshot, _) => NewsPost.fromJson(snapshot.data()!),
-        toFirestore: (model, _) => model.toJson(),
-      );
+  final NewsCardViewModel newsCardViewModel;
 
   const ForYouHighlightCard({
     super.key,
-    required this.post,
-    required this.newsChannel,
+    required this.newsCardViewModel,
   });
 
-  void setViewedPost(String userId) {
-    bool isViewer = post.viewers.contains(userId);
-    if (isViewer) return;
-
-    post.viewers.add(userId);
-
-    postsCollectionRef.update({
-      'viewers': FieldValue.arrayUnion([userId])
-    });
-  }
+  NewsPost get post => newsCardViewModel.newsPost;
 
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    User? user = BlocProvider.of<AuthenticationCubit>(context).getCurrentUser();
-    late Future<AggregateQuerySnapshot> commentsCountFuture = postsCollectionRef.collection(PostComment.collection).count().get();
-
-    WidgetsBinding.instance.addPostFrameCallback(
-      (_) {
-        if (user == null) return;
-        setViewedPost(user.uid);
-      },
-    );
 
     return GestureDetector(
       onTap: () {
         Navigator.of(context).pushNamed(
           AppRoutes.newsDetailsPage.path,
-          arguments: NewsPostDto(post, newsChannel),
+          arguments: NewsPostDto(
+            post,
+            newsCardViewModel.newsChannel,
+            newsCardViewModel.currentUser,
+          ),
         );
       },
       child: Card(
@@ -526,41 +467,35 @@ class ForYouHighlightCard extends StatelessWidget {
                               ),
                             ),
                             Flexible(
-                              child: FutureBuilder(
-                                future: commentsCountFuture,
-                                builder: (_, commentsCountSnap) {
-                                  if (commentsCountSnap.connectionState != ConnectionState.done) {
-                                    return const InfiniteLoader();
-                                  }
-
-                                  int? commentsCount = commentsCountSnap.data?.count;
-
-                                  if (commentsCount == null) {
-                                    return const Icon(Icons.question_mark);
-                                  }
-
-                                  return Padding(
-                                    padding: const EdgeInsets.only(left: 8.0),
-                                    child: Visibility(
-                                      visible: commentsCount > 0,
-                                      replacement: Text(
-                                        "Be the first to reply",
-                                        style: const TextStyle(
-                                          fontSize: 10,
-                                          color: Colors.white,
+                              child: Padding(
+                                padding: const EdgeInsets.only(left: 8.0),
+                                child: ListenableBuilder(
+                                  listenable: newsCardViewModel,
+                                  builder: (_, __) {
+                                    return Visibility(
+                                      visible: !newsCardViewModel.loadingComments,
+                                      replacement: const InfiniteLoader(),
+                                      child: Visibility(
+                                        visible: (newsCardViewModel.commentsCount ?? 0) > 0,
+                                        replacement: const Text(
+                                          "Be the first to reply",
+                                          style: TextStyle(
+                                            fontSize: 10,
+                                            color: Colors.white,
+                                          ),
+                                          textAlign: TextAlign.start,
                                         ),
-                                        textAlign: TextAlign.start,
-                                      ),
-                                      child: Text(
-                                        "+$commentsCount Replies",
-                                        style: const TextStyle(
-                                          fontSize: 12,
-                                          color: Colors.white,
+                                        child: Text(
+                                          "+${newsCardViewModel.commentsCount ?? 0} Replies",
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.white,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  );
-                                },
+                                    );
+                                  },
+                                ),
                               ),
                             ),
                             const Padding(
@@ -602,55 +537,32 @@ class ForYouHighlightCard extends StatelessWidget {
 }
 
 class ForYouCard extends StatelessWidget {
+  final AppUser currentUser;
   final NewsPost post;
-  final NewsChannel newsChannel;
-
-  DocumentReference get postsCollectionRef => FirebaseFirestore.instance.collection(newsChannel.collection).doc(post.id).withConverter<NewsPost>(
-        fromFirestore: (snapshot, _) => NewsPost.fromJson(snapshot.data()!),
-        toFirestore: (model, _) => model.toJson(),
-      );
+  final NewsCardViewModel newsCardViewModel;
 
   const ForYouCard({
     super.key,
+    required this.currentUser,
     required this.post,
-    required this.newsChannel,
+    required this.newsCardViewModel,
   });
-
-  void setViewedPost(String userId) {
-    bool isViewer = post.viewers.contains(userId);
-    if (isViewer) return;
-
-    post.viewers.add(userId);
-
-    postsCollectionRef.update({
-      'viewers': FieldValue.arrayUnion([userId])
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    User? user = BlocProvider.of<AuthenticationCubit>(context).getCurrentUser();
-    late Future<AggregateQuerySnapshot> commentsCountFuture = postsCollectionRef.collection(PostComment.collection).count().get();
-
-    WidgetsBinding.instance.addPostFrameCallback(
-      (_) {
-        if (user == null) return;
-        setViewedPost(user.uid);
-      },
-    );
 
     return GestureDetector(
       onTap: () {
         Navigator.of(context).pushNamed(
           AppRoutes.newsDetailsPage.path,
-          arguments: NewsPostDto(post, newsChannel),
+          arguments: NewsPostDto(post, newsCardViewModel.newsChannel, currentUser),
         );
       },
       child: Container(
         height: 210,
         padding: const EdgeInsets.all(10.0),
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           border: Border(
             bottom: BorderSide(
               width: 1,
@@ -787,15 +699,21 @@ class ForYouCard extends StatelessWidget {
                         ),
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 8.0),
-                      child: Text(
-                        "Replies",
-                        style: theme.textTheme.labelLarge?.copyWith(
-                          fontSize: 12,
-                          color: Colors.white,
-                        ),
-                      ),
+                    ListenableBuilder(
+                      listenable: newsCardViewModel,
+                      builder: (_, __) {
+                        return Visibility(
+                          visible: !newsCardViewModel.loadingComments,
+                          replacement: const InfiniteLoader(),
+                          child: Text(
+                            "+${newsCardViewModel.commentsCount ?? 0} Replies",
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.white,
+                            ),
+                          ),
+                        );
+                      },
                     ),
                     const Padding(
                       padding: EdgeInsets.only(left: 8.0),

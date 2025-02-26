@@ -1,6 +1,7 @@
+import 'dart:async';
 import 'dart:io';
 
-
+import 'package:akropolis/data/models/dto_models/dto_models.dart';
 import 'package:akropolis/data/models/local_models/local_models.dart';
 import 'package:akropolis/data/models/remote_models/remote_models.dart';
 import 'package:akropolis/domain/gen/assets.gen.dart';
@@ -9,70 +10,57 @@ import 'package:akropolis/main.dart';
 import 'package:akropolis/data/utils/constants.dart';
 import 'package:akropolis/data/utils/date_format.dart';
 import 'package:akropolis/data/utils/validations.dart';
+import 'package:akropolis/presentation/features/news_feed/models/enums.dart';
 import 'package:akropolis/presentation/features/news_feed/models/models.dart';
-import 'package:akropolis/presentation/features/news_feed/view_models/news_fetchers/post_comment_fetcher.dart';
-import 'package:akropolis/presentation/features/news_feed/view_models/post_news_post_reply_cubit/post_news_post_reply_cubit.dart';
+import 'package:akropolis/presentation/features/news_feed/view_models/news_detail_post_view_model.dart';
 import 'package:akropolis/presentation/routes/routes.dart';
 import 'package:akropolis/presentation/ui/components/app_video_player.dart';
 import 'package:akropolis/presentation/ui/components/duration_picker.dart';
 import 'package:akropolis/presentation/ui/components/loader.dart';
 import 'package:akropolis/presentation/ui/components/news_post_components.dart';
 import 'package:akropolis/presentation/ui/components/toast/toast.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:paged_list_view/paged_list_view.dart';
 
 import 'news_card.dart';
 
-enum PostMenu {
-  share("Share"),
-  bookmark("Bookmark"),
-  notInterested("Not interested"),
-  report("Report");
-
-  final String title;
-
-  const PostMenu(this.title);
-}
-
 class NewsDetailedViewPage extends StatefulWidget {
-  const NewsDetailedViewPage({super.key});
+  const NewsDetailedViewPage({
+    super.key,
+  });
+
 
   @override
   State<NewsDetailedViewPage> createState() => _NewsDetailedViewPageState();
 }
 
 class _NewsDetailedViewPageState extends State<NewsDetailedViewPage> {
-  late final NewsPostDto? newsPostDto = ModalRoute.of(context)?.settings.arguments as NewsPostDto?;
+  late final StreamSubscription<PostComment> commentPostedStreamSubscription;
+  late final NewsDetailPostViewModel newsDetailPostViewModel = ModalRoute.of(context)!.settings.arguments as NewsDetailPostViewModel;
+
+  @override
+  void initState() {
+    commentPostedStreamSubscription = newsDetailPostViewModel.postCommentStream.listen(_onCommentPosted);
+    super.initState();
+  }
+
+  void _onCommentPosted(PostComment comment) {}
 
   @override
   void dispose() {
+    newsDetailPostViewModel.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (newsPostDto == null) {
-      return TextButton(
-        onPressed: Navigator.of(context).pop,
-        child: const Text("Back"),
-      );
-    }
+  
+    
 
-    NewsPost newsPost = newsPostDto!.newsPost;
-    NewsChannel channel = newsPostDto!.channel;
+   
     final GlobalKey<PagedListState> commentPagedListKey = GlobalKey<PagedListState>();
-
-    final DocumentReference newsPostRef = FirebaseFirestore.instance.collection(channel.collection).doc(newsPost.id).withConverter<NewsPost>(
-          fromFirestore: (snapshot, _) => NewsPost.fromJson(snapshot.data()!),
-          toFirestore: (model, _) => model.toJson(),
-        );
-
-    late Future<AggregateQuerySnapshot> commentCount = newsPostRef.collection(PostComment.collection).count().get();
 
     final ThemeData theme = Theme.of(context);
 
@@ -99,9 +87,6 @@ class _NewsDetailedViewPageState extends State<NewsDetailedViewPage> {
                 );
                 if (videoData == null || !context.mounted) return;
 
-                AppUser? user = await BlocProvider.of<UserCubit>(context).getCurrentUser();
-                if (user == null || !context.mounted) return;
-
                 String? videoError = await validateVideo(videoData.path);
                 if (!context.mounted) return;
 
@@ -110,10 +95,11 @@ class _NewsDetailedViewPageState extends State<NewsDetailedViewPage> {
                   return;
                 }
 
-                await BlocProvider.of<PostVideoReplyCubit>(context).createVideoReply(
-                  post: newsPost,
-                  file: File(videoData.path)..writeAsBytesSync(await videoData.readAsBytes()),
-                  user: user,
+                await newsDetailPostViewModel.setVideo(
+                  File(videoData.path)
+                    ..writeAsBytesSync(
+                      await videoData.readAsBytes(),
+                    ),
                 );
 
                 if (!context.mounted) return;
@@ -155,17 +141,18 @@ class _NewsDetailedViewPageState extends State<NewsDetailedViewPage> {
                               padding: const EdgeInsets.all(8.0),
                               child: Builder(
                                 builder: (context) {
-                                  if (newsPost.author.imageUrl == null) {
+
+                                  if (newsDetailPostViewModel.newsPost.author.imageUrl == null) {
                                     return const Icon(Icons.person);
                                   }
 
                                   return CircleAvatar(
-                                    backgroundImage: NetworkImage(newsPost.author.imageUrl!),
+                                    backgroundImage: NetworkImage(newsDetailPostViewModel.newsPost.author.imageUrl!),
                                   );
                                 },
                               ),
                             ),
-                            Text(newsPost.author.name),
+                            Text(newsDetailPostViewModel.newsPost.author.name),
                           ],
                         ),
                       ),
@@ -197,43 +184,32 @@ class _NewsDetailedViewPageState extends State<NewsDetailedViewPage> {
                       )
                     ],
                   ),
-                  BlocConsumer<PostVideoReplyCubit, PostVideoReplyState>(
-                    listener: (context, state) {
-                      state.mapOrNull(
-                        loaded: (l) {
-                          setState(() {
-                            commentCount = newsPostRef.collection(PostComment.collection).count().get();
-                          });
-                          l.message?.show();
+                  ListenableBuilder(
+                    listenable: newsDetailPostViewModel,
+                    builder: (_, __) {
+                      return newsDetailPostViewModel.createPostState.map(
+                        loading: (l) {
+                          return Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              const Text(
+                                "Posting comment",
+                              ),
+                              Builder(builder: (context) {
+                                if (l.progress == null) {
+                                  return const SizedBox.shrink();
+                                }
+                                return FiniteLoader(progress: l.progress!);
+                              }),
+                            ],
+                          );
                         },
+                        loaded: (_) => const SizedBox.shrink(),
                       );
                     },
-                    builder: (context, state) {
-                      return state.mapOrNull(
-                            loading: (l) {
-                              if (newsPost.id != l.postId) return null;
-
-                              return Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    l.message?.message ?? "...",
-                                  ),
-                                  Builder(builder: (context) {
-                                    if (l.progress == null) {
-                                      return const SizedBox.shrink();
-                                    }
-                                    return FiniteLoader(progress: l.progress!);
-                                  }),
-                                ],
-                              );
-                            },
-                          ) ??
-                          const SizedBox.shrink();
-                    },
                   ),
-                  Container(
+                  /* Container(
                     height: 400,
                     color: Colors.black12,
                     child: FutureBuilder<MediaType>(
@@ -280,11 +256,11 @@ class _NewsDetailedViewPageState extends State<NewsDetailedViewPage> {
                         }
                       },
                     ),
-                  ),
+                  ),*/
                   Padding(
                     padding: const EdgeInsets.only(left: 8.0, top: 4.0),
                     child: Text(
-                      newsPost.description,
+                      newsDetailPostViewModel.newsPost.description,
                       style: theme.textTheme.labelLarge,
                       textAlign: TextAlign.start,
                     ),
@@ -292,7 +268,7 @@ class _NewsDetailedViewPageState extends State<NewsDetailedViewPage> {
                   Padding(
                     padding: const EdgeInsets.only(left: 8.0, top: 4.0),
                     child: Text(
-                      newsPost.publishedAt.commentDateTime,
+                      newsDetailPostViewModel.newsPost.publishedAt.commentDateTime,
                       style: theme.textTheme.labelMedium?.copyWith(
                         fontSize: 14,
                         color: Colors.grey,
@@ -310,15 +286,11 @@ class _NewsDetailedViewPageState extends State<NewsDetailedViewPage> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Expanded(
-                              child: StreamBuilder(
-                                stream: newsPostRef.snapshots(includeMetadataChanges: true),
-                                builder: (_, snap) {
-                                  NewsPost updatedPost = snap.data?.data() as NewsPost? ?? newsPost;
-                                  return NewsPostReactionWidget(
-                                    newsPost: updatedPost,
-                                    postsCollectionRef: newsPostRef,
-                                  );
-                                },
+                              child: NewsPostReactionWidget(
+                                newsPost: newsDetailPostViewModel.newsPost,
+                                currentUser: newsDetailPostViewModel.currentUser,
+                                onEmpathy: () {},
+                                onLogician: () {},
                               ),
                             ),
                             Card(
@@ -329,22 +301,16 @@ class _NewsDetailedViewPageState extends State<NewsDetailedViewPage> {
                                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                   children: [
                                     Assets.chatTearDot.svg(),
-                                    FutureBuilder(
-                                      future: commentCount,
-                                      builder: (_, commentsCountSnap) {
-                                        if (commentsCountSnap.connectionState != ConnectionState.done) {
-                                          return const InfiniteLoader();
-                                        }
-
-                                        int? commentsCount = commentsCountSnap.data?.count;
-
-                                        if (commentsCount == null) {
-                                          return const Icon(Icons.question_mark);
-                                        }
-
-                                        return Padding(
-                                          padding: const EdgeInsets.only(left: 4.0, right: 4.0),
-                                          child: Text(commentsCount.toString()),
+                                    ListenableBuilder(
+                                      listenable: newsDetailPostViewModel,
+                                      builder: (_, __) {
+                                        return Visibility(
+                                          visible: newsDetailPostViewModel.commentCount != null,
+                                          replacement: const Icon(Icons.question_mark),
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(left: 4.0, right: 4.0),
+                                            child: Text((newsDetailPostViewModel.commentCount ?? 0).toString()),
+                                          ),
                                         );
                                       },
                                     ),
@@ -378,16 +344,14 @@ class _NewsDetailedViewPageState extends State<NewsDetailedViewPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Text(
-                          "Replies",
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: Colors.grey,
-                          )
-                        ),
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text("Replies",
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: Colors.grey,
+                            )),
                       ),
                       Padding(
-                        padding: EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.all(8.0),
                         child: Text(
                           "View Activity",
                           style: theme.textTheme.bodySmall?.copyWith(
@@ -407,22 +371,29 @@ class _NewsDetailedViewPageState extends State<NewsDetailedViewPage> {
         },
         body: PagedList<PostComment>(
           key: commentPagedListKey,
-          noMoreItemsIndicatorBuilder: (_) => Text("No more comments"),
-          noItemsFoundIndicatorBuilder: (_) => Text("Post the first comment"),
+          noMoreItemsIndicatorBuilder: (_) => const Text("No more comments"),
+          noItemsFoundIndicatorBuilder: (_) => const Text("Post the first comment"),
           firstPageProgressIndicatorBuilder: (_) => const InfiniteLoader(),
           newPageProgressIndicatorBuilder: (_) => const InfiniteLoader(),
           itemBuilder: (_, comment, i) => PostCommentCard(
-            post: newsPost,
+            post: newsDetailPostViewModel.newsPost,
             comment: comment,
-            newsPostRef: newsPostRef,
+            currentUser: newsDetailPostViewModel.currentUser,
           ),
           fetchPage: (_, int pageSize, bool initialFetch) async {
-            return PostCommentFetcher.fetchPostsCommentsNews(
-              postCollection: channel.collection,
-              postId: newsPost.id,
+            Result<List<PostComment>?> fetchCommentResult = await newsDetailPostViewModel.fetchPostComments(
               pageSize: pageSize,
               fromCache: initialFetch,
             );
+
+            switch (fetchCommentResult) {
+              case Success<List<PostComment>?>():
+                return fetchCommentResult.data;
+
+              case Error<List<PostComment>?>():
+                ToastError(title: "Post comments", message: fetchCommentResult.failure.message).show();
+                return [];
+            }
           },
         ),
       ),

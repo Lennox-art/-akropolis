@@ -1,6 +1,6 @@
 import 'dart:io';
 
-
+import 'package:akropolis/data/models/remote_models/remote_models.dart';
 
 enum NewsChannel {
   worldNews("world_news"),
@@ -11,12 +11,8 @@ enum NewsChannel {
 
   final String collection;
 
-  static Map<String, NewsChannel> newsChannelEnumMap = {
-    for (var e in values) e.collection: e
-  };
+  static Map<String, NewsChannel> newsChannelEnumMap = {for (var e in values) e.collection: e};
 }
-
-
 
 /*
   TODO nested replies
@@ -59,8 +55,9 @@ class PostReply {
 class NewsPostDto {
   final NewsPost newsPost;
   final NewsChannel channel;
+  final AppUser currentUser;
 
-  NewsPostDto(this.newsPost, this.channel);
+  NewsPostDto(this.newsPost, this.channel, this.currentUser);
 }
 
 class CommentReplyDto {

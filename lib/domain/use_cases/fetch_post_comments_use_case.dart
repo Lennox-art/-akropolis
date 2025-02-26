@@ -7,7 +7,8 @@ import 'package:common_fn/common_fn.dart';
 
 class FetchPostCommentsUseCase {
   final PostRepository _postRepository;
-  static final LinkedHashMap<String, List<PostComment>> _cachedNews = LinkedHashMap();
+  static final LinkedHashMap<String, List<PostComment>> _cachedPostComments = LinkedHashMap();
+  static final LinkedHashMap<String, int> _postCommentsCount = LinkedHashMap();
   static final Map<String, PostComment?> lastFetchedCommentMap = {};
 
   FetchPostCommentsUseCase({
@@ -20,10 +21,10 @@ class FetchPostCommentsUseCase {
     required int pageSize,
     required bool fromCache,
   }) async {
-    if (fromCache && _cachedNews.isNotEmpty) {
+    if (fromCache && _cachedPostComments.containsKey(postId)) {
       return Result.success(
         data: pageList<PostComment>(
-          (_cachedNews[postId] ?? []).take(pageSize).toList(),
+          _cachedPostComments[postId]!.take(pageSize).toList(),
           page: 0,
           pageSize: pageSize,
         ),
@@ -37,10 +38,36 @@ class FetchPostCommentsUseCase {
     );
 
     if (fetchPostResult is Success<List<PostComment>> && fetchPostResult.data.isNotEmpty) {
-      _cachedNews.update(postId, (l) => l + fetchPostResult.data, ifAbsent: () => fetchPostResult.data);
+      _cachedPostComments.update(postId, (l) => l + fetchPostResult.data, ifAbsent: () => fetchPostResult.data);
       lastFetchedCommentMap.update(postId, (_) => fetchPostResult.data.last, ifAbsent: ()=> fetchPostResult.data.last);
     }
 
     return fetchPostResult;
   }
+
+  Future<Result<int>> countPostComments({
+    required String postCollection,
+    required String postId,
+    required bool fromCache,
+  }) async {
+
+    if (fromCache && _postCommentsCount.containsKey(postId)) {
+      return Result.success(
+        data: _postCommentsCount[postId]!,
+      );
+    }
+
+    Result<int> countPostCommentResult = await _postRepository.countPostComments(
+      postId: postId,
+      collection: postCollection,
+    );
+
+    if (countPostCommentResult is Success<int>) {
+      _postCommentsCount.update(postId, (l) => l + countPostCommentResult.data, ifAbsent: () => countPostCommentResult.data);
+    }
+
+    return countPostCommentResult;
+  }
+  
+
 }

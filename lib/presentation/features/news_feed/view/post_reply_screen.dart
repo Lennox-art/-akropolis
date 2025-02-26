@@ -1,73 +1,74 @@
 import 'dart:io';
 
-
 import 'package:akropolis/main.dart';
 import 'package:akropolis/presentation/features/create_post/models/create_post_models.dart';
-import 'package:akropolis/presentation/features/news_feed/view_models/post_news_post_reply_cubit/post_news_post_reply_cubit.dart';
+import 'package:akropolis/presentation/features/news_feed/view_models/news_detail_post_view_model.dart';
 import 'package:akropolis/presentation/features/video_editing/view/video_editing.dart';
 import 'package:akropolis/presentation/ui/components/loader.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 class PostReplyScreenPage extends StatelessWidget {
-  const PostReplyScreenPage({super.key});
+  const PostReplyScreenPage({
+    super.key,
+  });
+
 
   @override
   Widget build(BuildContext context) {
+
+    final NewsDetailPostViewModel newsDetailPostViewModel = ModalRoute.of(context)!.settings.arguments as NewsDetailPostViewModel;
 
     final ValueNotifier<VideoEditingTools> currentToolNotifier = ValueNotifier(
       VideoEditingTools.trimVideo,
     );
 
-    return Scaffold(
-      body: BlocBuilder<PostVideoReplyCubit, PostVideoReplyState>(
-        builder: (_, state) {
-          return state.map(
-            loading: (_) => const Center(
-              child: InfiniteLoader(),
-            ),
-            loaded: (l) {
-              return Flex(
-                direction: Axis.vertical,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Visibility(
-                      visible: l.replyForm != null,
-                      child: VideoEditingWidget(
-                        data: l.replyForm!._videoData!,
-                        currentToolNotifier: currentToolNotifier,
-                      ),
-                    ),
+    return ListenableBuilder(
+      listenable: newsDetailPostViewModel,
+      builder: (_, __) {
+        return newsDetailPostViewModel.createPostState.map(
+          loading: (_) => const InfiniteLoader(),
+          loaded: (l) {
+            return Flex(
+              direction: Axis.vertical,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: VideoEditingWidget(
+                    newsDetailPostViewModel: newsDetailPostViewModel,
+                    data: newsDetailPostViewModel.videoData!,
+                    currentToolNotifier: currentToolNotifier,
                   ),
-                  ListTile(
-                    trailing: TextButton(
-                      onPressed: () {
-                        BlocProvider.of<PostVideoReplyCubit>(context).doPost();
-                        Navigator.of(context).pop();
-                      },
-                      child: const Text("Post"),
-                    ),
+                ),
+                ListTile(
+                  trailing: TextButton(
+                    onPressed: () async {
+                      await newsDetailPostViewModel.doPost();
+                      if(!context.mounted) return;
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text("Post"),
                   ),
-                ],
-              );
-            },
-          );
-        },
-      ),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 }
 
 class VideoEditingWidget extends StatelessWidget {
   const VideoEditingWidget({
+    required this.newsDetailPostViewModel,
     required this.currentToolNotifier,
     required this.data,
     super.key,
   });
 
   final File data;
+  final NewsDetailPostViewModel newsDetailPostViewModel;
   final ValueNotifier<VideoEditingTools> currentToolNotifier;
 
   @override
@@ -75,7 +76,6 @@ class VideoEditingWidget extends StatelessWidget {
     return Flex(
       direction: Axis.vertical,
       children: [
-
         Expanded(
           child: ValueListenableBuilder(
             valueListenable: currentToolNotifier,
@@ -89,7 +89,7 @@ class VideoEditingWidget extends StatelessWidget {
                     }) {
                       log.debug("Modifying trim video");
 
-                      BlocProvider.of<PostVideoReplyCubit>(context).trimVideo(
+                      newsDetailPostViewModel.trimVideo(
                         startTime: start,
                         endTime: end,
                       );
@@ -98,7 +98,7 @@ class VideoEditingWidget extends StatelessWidget {
                 VideoEditingTools.thumbnailPicker => ThumbnailVideoWidget(
                     data: data,
                     onConfirm: (p) {
-                      BlocProvider.of<PostVideoReplyCubit>(context).modifyThumbnail(
+                      newsDetailPostViewModel.modifyThumbnail(
                         timeInSeconds: p.inSeconds,
                       );
                       log.debug("Modifying thumbnail");
@@ -108,7 +108,6 @@ class VideoEditingWidget extends StatelessWidget {
             },
           ),
         ),
-
         SizedBox(
           height: 80,
           child: Row(
@@ -125,7 +124,6 @@ class VideoEditingWidget extends StatelessWidget {
                 .toList(),
           ),
         ),
-
       ],
     );
   }

@@ -1,71 +1,34 @@
 
 import 'package:akropolis/data/models/remote_models/remote_models.dart';
 import 'package:akropolis/domain/gen/assets.gen.dart';
-import 'package:akropolis/main.dart';
-import 'package:akropolis/presentation/features/news_feed/models/models.dart';
 import 'package:akropolis/presentation/ui/themes.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 class NewsPostReactionWidget extends StatelessWidget {
   const NewsPostReactionWidget({
     required this.newsPost,
-    required this.postsCollectionRef,
+    required this.currentUser,
+    required this.onEmpathy,
+    required this.onLogician,
     super.key,
   });
 
   final NewsPost newsPost;
-  final DocumentReference postsCollectionRef;
+  final AppUser currentUser;
+  final Function() onEmpathy;
+  final Function() onLogician;
 
-  Future<void> setLogicReaction(AppUser user) async {
-    log.info("User clicked logic reaction for post ${newsPost.id}");
 
-
-    newsPost.reaction.log.add(user.id);
-
-    await postsCollectionRef.update({
-      'reaction.log': FieldValue.arrayUnion([user.id])
-    });
-    /*   await postsCollectionRef.update({
-      'reaction.emp': FieldValue.arrayRemove([user.id])
-    });*/
-  }
-
-  Future<void> setEmpathyReaction(AppUser user) async {
-    log.info("User clicked emp reaction for post ${newsPost.id}");
-
-    newsPost.reaction.emp.add(user.id);
-
-    await postsCollectionRef.update({
-      'reaction.emp': FieldValue.arrayUnion([user.id])
-    });
-
-    /*await postsCollectionRef.update({
-      'reaction.log': FieldValue.arrayRemove([user.id])
-    });*/
-  }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-        future: BlocProvider.of<UserCubit>(context).getCurrentUser(),
-        builder: (_, snap) {
-
-          if (!snap.hasData) return const SizedBox.shrink();
-
-          AppUser currentUser = snap.data!;
-
-          bool alreadyVoted = newsPost.reaction.log.contains(currentUser.id) || newsPost.reaction.emp.contains(currentUser.id);
-
-          return PostReactionWidget(
-          alreadyVoted: alreadyVoted,
-          empathyCount: newsPost.reaction.emp.length,
-          onEmpathy: () => setEmpathyReaction(currentUser),
-          logicCount: newsPost.reaction.log.length,
-          onLogic: () => setLogicReaction(currentUser),
-        );
-      }
+    bool alreadyVoted = newsPost.reaction.log.contains(currentUser.id) || newsPost.reaction.emp.contains(currentUser.id);
+    return PostReactionWidget(
+      alreadyVoted: alreadyVoted,
+      empathyCount: newsPost.reaction.emp.length,
+      onEmpathy: onEmpathy,
+      logicCount: newsPost.reaction.log.length,
+      onLogic: onLogician,
     );
   }
 }
@@ -74,62 +37,29 @@ class CommentReactionWidget extends StatelessWidget {
   const CommentReactionWidget({
     required this.newsPost,
     required this.postComment,
-    required this.postsCollectionRef,
+    required this.currentUser,
+    required this.onEmpathy,
+    required this.onLogician,
     super.key,
   });
 
   final NewsPost newsPost;
+  final AppUser currentUser;
   final PostComment postComment;
-  final DocumentReference postsCollectionRef;
+  final Function() onEmpathy;
+  final Function() onLogician;
 
-  Future<void> setLogicReaction(AppUser user) async {
-    log.info("User clicked logic reaction for comment ${postComment.id}");
-
-    bool hasReacted = postComment.reaction.log.contains(user.id) || postComment.reaction.emp.contains(user.id);
-    if (hasReacted) return;
-
-    postComment.reaction.log.add(user.id);
-
-    await postsCollectionRef.collection(PostComment.collection).doc(postComment.id).update({
-      'reaction.log': FieldValue.arrayUnion([user.id])
-    });
-
-  }
-
-  Future<void> setEmpathyReaction(AppUser user) async {
-    log.info("User clicked emp reaction for comment ${postComment.id}");
-
-    bool hasReacted = postComment.reaction.emp.contains(user.id) || postComment.reaction.log.contains(user.id);
-    if (hasReacted) return;
-
-    postComment.reaction.emp.add(user.id);
-
-
-    await postsCollectionRef.collection(PostComment.collection).doc(postComment.id).update({
-      'reaction.emp': FieldValue.arrayUnion([user.id])
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: BlocProvider.of<UserCubit>(context).getCurrentUser(),
-      builder: (_, snap) {
+    bool alreadyVoted = postComment.reaction.log.contains(currentUser.id) || postComment.reaction.emp.contains(currentUser.id);
 
-        if (!snap.hasData) return const SizedBox.shrink();
-
-        AppUser currentUser = snap.data!;
-
-        bool alreadyVoted = postComment.reaction.log.contains(currentUser.id) || postComment.reaction.emp.contains(currentUser.id);
-
-        return PostReactionWidget(
-          alreadyVoted: alreadyVoted,
-          empathyCount: postComment.reaction.emp.length,
-          onEmpathy: () => setEmpathyReaction(currentUser),
-          logicCount: postComment.reaction.log.length,
-          onLogic: () => setLogicReaction(currentUser),
-        );
-      }
+    return PostReactionWidget(
+      alreadyVoted: alreadyVoted,
+      empathyCount: postComment.reaction.emp.length,
+      onEmpathy: onEmpathy,
+      logicCount: postComment.reaction.log.length,
+      onLogic: onLogician,
     );
   }
 }

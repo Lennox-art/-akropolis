@@ -46,4 +46,44 @@ abstract class RemoteDataStorageService {
   /// Returns:
   /// Possible Failures:
   Future<Result<List<PostComment>>> fetchPostComments({required int pageSize, required String collection, required String postId});
+
+  /// Function:
+  /// Returns:
+  /// Possible Failures:
+  Future<Result<int>> countPostComments({required String collection, required String postId});
+
+  /// Function:
+  /// Returns:
+  /// Possible Failures:
+  Future<Result<void>> addUserToPostViewers({required String postId, required String collection, required String userId});
+
+  /// Function:
+  /// Returns:
+  /// Possible Failures:
+  Future<Result<void>> addUserToPostEmpathyReaction({required String postId, required String collection, required String userId});
+
+  /// Function:
+  /// Returns:
+  /// Possible Failures:
+  Future<Result<void>> addUserToPostLogicianReaction({required String postId, required String collection, required String userId});
+
+  /// Function:
+  /// Returns:
+  /// Possible Failures:
+  Future<Result<void>> addUserToPostCommentEmpathyReaction({
+    required String postId,
+    required String collection,
+    required String commentId,
+    required String userId,
+  });
+
+  /// Function:
+  /// Returns:
+  /// Possible Failures:
+  Future<Result<void>> addUserToPostCommentLogicianReaction({
+    required String postId,
+    required String collection,
+    required String commentId,
+    required String userId,
+  });
 }
