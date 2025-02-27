@@ -1,4 +1,5 @@
 import 'package:akropolis/data/models/dto_models/dto_models.dart';
+import 'package:akropolis/data/models/remote_models/remote_models.dart';
 import 'package:akropolis/data/repositories/authentication_repository/authentication_repository.dart';
 import 'package:exception_base/exception_base.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -57,28 +58,12 @@ class AuthenticationRepositoryImpl extends AuthenticationRepository {
 
       return Result.success(data: user);
     } on FirebaseAuthException catch (e, trace) {
-      if (e.code == 'user-not-found') {
-        return Result.error(
-          failure: AppFailure(
-            message: 'No account found with this email.',
-            trace: trace,
-            failureType: FailureType.networkServerFailure,
-          ),
-        );
-      }
-      if (e.code == 'wrong-password') {
-        return Result.error(
-          failure: AppFailure(
-            message: 'Incorrect password',
-            trace: trace,
-            failureType: FailureType.networkServerFailure,
-          ),
-        );
-      }
+      FirebaseAuthError firebaseAuthError = FirebaseAuthError.fromCode(e.code);
       return Result.error(
         failure: AppFailure(
-          message: e.toString(),
+          message: firebaseAuthError.description,
           trace: trace,
+          failureType: FailureType.networkServerFailure,
         ),
       );
     } catch (e, trace) {
@@ -118,7 +103,16 @@ class AuthenticationRepositoryImpl extends AuthenticationRepository {
       }
 
       return Result.success(data: user);
-    } catch (e, trace) {
+    } on FirebaseAuthException catch (e, trace) {
+      FirebaseAuthError firebaseAuthError = FirebaseAuthError.fromCode(e.code);
+      return Result.error(
+        failure: AppFailure(
+          message: firebaseAuthError.description,
+          trace: trace,
+          failureType: FailureType.networkServerFailure,
+        ),
+      );
+    }catch (e, trace) {
       return Result.error(
         failure: AppFailure(
           message: e.toString(),
@@ -151,16 +145,14 @@ class AuthenticationRepositoryImpl extends AuthenticationRepository {
 
       return Result.success(data: user);
     } on FirebaseAuthException catch (e, trace) {
-      if (e.code == 'email-already-in-use') {
-        return Result.error(
-          failure: AppFailure(
-            message: 'An account with this email already exists',
-            trace: trace,
-            failureType: FailureType.networkServerFailure,
-          ),
-        );
-      }
-      rethrow;
+      FirebaseAuthError firebaseAuthError = FirebaseAuthError.fromCode(e.code);
+      return Result.error(
+        failure: AppFailure(
+          message: firebaseAuthError.description,
+          trace: trace,
+          failureType: FailureType.networkServerFailure,
+        ),
+      );
     } catch (e, trace) {
       return Result.error(
         failure: AppFailure(

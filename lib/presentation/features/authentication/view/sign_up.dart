@@ -39,7 +39,15 @@ class _SignUpPageState extends State<SignUpPage> {
     toast.show();
   }
 
-  void _onStateChange(AuthenticationState state) {}
+  void _onStateChange(AuthenticationState state) {
+    // Navigate to home page
+    state.mapOrNull(authenticated: (a) {
+      AppRoutes nextRoute = a.requiresOnboarding ? AppRoutes.welcome : AppRoutes.home;
+      Navigator.of(context).pushNamed(nextRoute.path);
+    }, partialSignUp: (p) {
+      Navigator.of(context).pushNamed(AppRoutes.partialSignUp.path);
+    });
+  }
 
   @override
   void dispose() {
@@ -140,7 +148,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                 (_) => false,
                           );*/
                         },
-                        label: const Text("Sign in with Google"),
+                        label: const Text("Sign up with Google"),
                         style: theme.elevatedButtonTheme.style?.copyWith(
                           backgroundColor: const WidgetStatePropertyAll(Colors.transparent),
                           side: const WidgetStatePropertyAll(
@@ -244,7 +252,15 @@ class _SignUpWithEmailScreenState extends State<SignUpWithEmailScreen> {
     toast.show();
   }
 
-  void _onStateChange(AuthenticationState state) {}
+  void _onStateChange(AuthenticationState state) {
+    // Navigate to home page
+    state.mapOrNull(authenticated: (a) {
+      AppRoutes nextRoute = a.requiresOnboarding ? AppRoutes.welcome : AppRoutes.home;
+      Navigator.of(context).pushNamed(nextRoute.path);
+    }, partialSignUp: (p) {
+      Navigator.of(context).pushNamed(AppRoutes.partialSignUp.path);
+    });
+  }
 
   @override
   void dispose() {
@@ -347,7 +363,7 @@ class _SignUpWithEmailScreenState extends State<SignUpWithEmailScreen> {
                                       hidePasswordNotifier.value = !hidePasswordNotifier.value;
                                     },
                                     icon: const Icon(
-                                      Icons.password_outlined,
+                                      Icons.visibility_off,
                                     ),
                                   ),
                                   child: IconButton(
@@ -355,7 +371,7 @@ class _SignUpWithEmailScreenState extends State<SignUpWithEmailScreen> {
                                       hidePasswordNotifier.value = !hidePasswordNotifier.value;
                                     },
                                     icon: const Icon(
-                                      Icons.remove_red_eye_outlined,
+                                      Icons.visibility,
                                     ),
                                   ),
                                 ),
@@ -391,32 +407,8 @@ class _SignUpWithEmailScreenState extends State<SignUpWithEmailScreen> {
                         displayName: displayName,
                         password: password,
                       );
-
-                      /*if (signedInUser == null) return;
-                      if (!context.mounted) return;
-
-                      UserCubit userCubit = BlocProvider.of<UserCubit>(context);
-                      AppUser? appUser = await userCubit.findUserById(
-                        signedInUser.uid,
-                      );
-
-                      if (appUser == null) return;
-                      if (!context.mounted) return;
-
-                      if (appUser.topics == null || (appUser.topics?.isEmpty ?? true)) {
-                        Navigator.of(context).pushNamedAndRemoveUntil(
-                          AppRoutes.welcomeTopics.path,
-                              (_) => false,
-                        );
-                        return;
-                      }
-
-                      Navigator.of(context).pushNamedAndRemoveUntil(
-                        AppRoutes.home.path,
-                            (_) => false,
-                      );*/
                     },
-                    child: const Text("Sign in"),
+                    child: const Text("Sign up"),
                   );
                 },
                 authenticated: (_) => const Text("Welcome"),

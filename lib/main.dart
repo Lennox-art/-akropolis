@@ -17,6 +17,7 @@ import 'package:akropolis/presentation/routes/routes.dart';
 import 'package:akropolis/presentation/ui/themes.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get_it/get_it.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:logging_service/logging_service.dart';
@@ -36,7 +37,8 @@ late final Directory temporaryDirectory;
 final String? deviceCountry = PlatformDispatcher.instance.locale.countryCode;
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   Directory docDir = await getApplicationDocumentsDirectory();
   temporaryDirectory = await getTemporaryDirectory();
@@ -98,6 +100,7 @@ Future<void> main() async {
   getIt.registerSingleton(postRepository);
 
   runApp(const AkropolisApplication());
+  FlutterNativeSplash.remove();
 }
 
 class AkropolisApplication extends StatelessWidget {

@@ -41,15 +41,12 @@ class _SignInScreenState extends State<SignInScreen> {
 
   void _onStateChange(AuthenticationState state) {
     // Navigate to home page
-    state.mapOrNull(
-      authenticated: (a) {
-        AppRoutes nextRoute = a.requiresOnboarding ? AppRoutes.welcome : AppRoutes.home;
-        Navigator.of(context).pushNamed(nextRoute.path);
-      },
-      partialSignUp: (p) {
-        Navigator.of(context).pushNamed(AppRoutes.partialSignUp.path);
-      }
-    );
+    state.mapOrNull(authenticated: (a) {
+      AppRoutes nextRoute = a.requiresOnboarding ? AppRoutes.welcome : AppRoutes.home;
+      Navigator.of(context).pushNamed(nextRoute.path);
+    }, partialSignUp: (p) {
+      Navigator.of(context).pushNamed(AppRoutes.partialSignUp.path);
+    });
   }
 
   @override
@@ -212,7 +209,15 @@ class _SignInWithEmailScreenState extends State<SignInWithEmailScreen> {
     toast.show();
   }
 
-  void _onStateChange(AuthenticationState state) {}
+  void _onStateChange(AuthenticationState state) {
+    // Navigate to home page
+    state.mapOrNull(authenticated: (a) {
+      AppRoutes nextRoute = a.requiresOnboarding ? AppRoutes.welcome : AppRoutes.home;
+      Navigator.of(context).pushNamed(nextRoute.path);
+    }, partialSignUp: (p) {
+      Navigator.of(context).pushNamed(AppRoutes.partialSignUp.path);
+    });
+  }
 
   @override
   void dispose() {
@@ -292,7 +297,7 @@ class _SignInWithEmailScreenState extends State<SignInWithEmailScreen> {
                                     hidePasswordNotifier.value = !hidePasswordNotifier.value;
                                   },
                                   icon: const Icon(
-                                    Icons.password_outlined,
+                                    Icons.visibility_off,
                                   ),
                                 ),
                                 child: IconButton(
@@ -300,7 +305,7 @@ class _SignInWithEmailScreenState extends State<SignInWithEmailScreen> {
                                     hidePasswordNotifier.value = !hidePasswordNotifier.value;
                                   },
                                   icon: const Icon(
-                                    Icons.remove_red_eye_outlined,
+                                    Icons.visibility,
                                   ),
                                 ),
                               ),

@@ -2,6 +2,51 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'remote_models.g.dart';
 
+enum FirebaseAuthError {
+  invalidCredential("Invalid email or password."),
+  userNotFound("No account found with this email."),
+  wrongPassword("Incorrect password."),
+  emailAlreadyInUse("This email is already in use."),
+  invalidEmail("Please enter a valid email."),
+  weakPassword("Your password is too weak."),
+  userDisabled("This account has been disabled."),
+  tooManyRequests("Too many failed attempts. Try again later."),
+  operationNotAllowed("This operation is not allowed."),
+  networkError("Network error. Check your connection."),
+  unknown("An unknown error occurred. Please try again.");
+
+  final String description;
+  const FirebaseAuthError(this.description);
+
+  /// Convert FirebaseAuthException code to our enum
+  static FirebaseAuthError fromCode(String code) {
+    switch (code) {
+      case 'invalid-credential':
+        return FirebaseAuthError.invalidCredential;
+      case 'user-not-found':
+        return FirebaseAuthError.userNotFound;
+      case 'wrong-password':
+        return FirebaseAuthError.wrongPassword;
+      case 'email-already-in-use':
+        return FirebaseAuthError.emailAlreadyInUse;
+      case 'invalid-email':
+        return FirebaseAuthError.invalidEmail;
+      case 'weak-password':
+        return FirebaseAuthError.weakPassword;
+      case 'user-disabled':
+        return FirebaseAuthError.userDisabled;
+      case 'too-many-requests':
+        return FirebaseAuthError.tooManyRequests;
+      case 'operation-not-allowed':
+        return FirebaseAuthError.operationNotAllowed;
+      case 'network-request-failed':
+        return FirebaseAuthError.networkError;
+      default:
+        return FirebaseAuthError.unknown;
+    }
+  }
+}
+
 @JsonSerializable()
 class AppUser {
   final String id;

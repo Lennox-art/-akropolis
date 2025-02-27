@@ -25,6 +25,7 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       authenticationResultStreamSubscription = widget.splashScreenViewModel.splashScreenStateResult.listen(_onAuthenticationResult);
+      widget.splashScreenViewModel.checkAuthenticationResult();
     });
     super.initState();
   }

@@ -19,14 +19,12 @@ class SplashScreenViewModel extends ChangeNotifier {
     required AuthenticationRepository authenticationRepository,
     required UserRepository userRepository,
   }) : _authenticationRepository = authenticationRepository,
-        _userRepository = userRepository {
-    _checkAuthenticationResult();
-  }
+        _userRepository = userRepository;
 
   Stream<SplashScreenState> get splashScreenStateResult => _splashScreenStateController.stream;
   SplashScreenState get splashScreenState => _splashScreenState;
 
-  Future<void> _checkAuthenticationResult() async {
+  Future<void> checkAuthenticationResult() async {
     try {
       Result<User> currentUserResult = await _authenticationRepository.getCurrentUser();
       switch (currentUserResult) {
