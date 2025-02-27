@@ -2,7 +2,6 @@ import 'package:akropolis/data/models/dto_models/dto_models.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 abstract class AuthenticationRepository {
-
   Future<Result<User>> getCurrentUser();
 
   Future<Result<User>> signInWithEmailAndPassword({
@@ -22,5 +21,4 @@ abstract class AuthenticationRepository {
   });
 
   Future<Result<void>> logout();
-
 }

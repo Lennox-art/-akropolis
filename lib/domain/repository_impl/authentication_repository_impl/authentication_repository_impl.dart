@@ -5,7 +5,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthenticationRepositoryImpl extends AuthenticationRepository {
-
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
   @override
@@ -57,6 +56,31 @@ class AuthenticationRepositoryImpl extends AuthenticationRepository {
       }
 
       return Result.success(data: user);
+    } on FirebaseAuthException catch (e, trace) {
+      if (e.code == 'user-not-found') {
+        return Result.error(
+          failure: AppFailure(
+            message: 'No account found with this email.',
+            trace: trace,
+            failureType: FailureType.networkServerFailure,
+          ),
+        );
+      }
+      if (e.code == 'wrong-password') {
+        return Result.error(
+          failure: AppFailure(
+            message: 'Incorrect password',
+            trace: trace,
+            failureType: FailureType.networkServerFailure,
+          ),
+        );
+      }
+      return Result.error(
+        failure: AppFailure(
+          message: e.toString(),
+          trace: trace,
+        ),
+      );
     } catch (e, trace) {
       return Result.error(
         failure: AppFailure(
@@ -126,6 +150,17 @@ class AuthenticationRepositoryImpl extends AuthenticationRepository {
       }
 
       return Result.success(data: user);
+    } on FirebaseAuthException catch (e, trace) {
+      if (e.code == 'email-already-in-use') {
+        return Result.error(
+          failure: AppFailure(
+            message: 'An account with this email already exists',
+            trace: trace,
+            failureType: FailureType.networkServerFailure,
+          ),
+        );
+      }
+      rethrow;
     } catch (e, trace) {
       return Result.error(
         failure: AppFailure(
@@ -139,7 +174,6 @@ class AuthenticationRepositoryImpl extends AuthenticationRepository {
   @override
   Future<Result<User>> getCurrentUser() async {
     try {
-
       User? user = _firebaseAuth.currentUser;
       if (user == null) {
         return Result.error(

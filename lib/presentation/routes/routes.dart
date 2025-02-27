@@ -2,6 +2,7 @@ import 'package:akropolis/domain/use_cases/create_user_post_use_case.dart';
 import 'package:akropolis/presentation/features/authentication/view/forgot_password.dart';
 import 'package:akropolis/presentation/features/authentication/view/login.dart';
 import 'package:akropolis/presentation/features/authentication/view/new_password.dart';
+import 'package:akropolis/presentation/features/authentication/view/partial_sign_up.dart';
 import 'package:akropolis/presentation/features/authentication/view/sign_in.dart';
 import 'package:akropolis/presentation/features/authentication/view/sign_up.dart';
 import 'package:akropolis/presentation/features/authentication/view_model/authentication_view_model.dart';
@@ -30,6 +31,7 @@ enum AppRoutes {
   signInWithEmail("/signInEmail"),
   signUp("/signUp"),
   signUpWithEmail("/signUpWithEmail"),
+  partialSignUp("/partialSignUp"),
   forgotPassword("/forgotPassword"),
   newPassword("/newPassword"),
   welcome("/welcome"),
@@ -49,6 +51,7 @@ enum AppRoutes {
   Widget get page => switch (this) {
         AppRoutes.splashScreen => SplashScreen(
             splashScreenViewModel: SplashScreenViewModel(
+              userRepository: GetIt.I(),
               authenticationRepository: GetIt.I(),
             ),
           ),
@@ -56,26 +59,37 @@ enum AppRoutes {
         AppRoutes.signIn => SignInScreen(
             authenticationViewModel: AuthenticationViewModel(
               authenticationRepository: GetIt.I(),
+              userRepository: GetIt.I(),
             ),
           ),
         AppRoutes.signInWithEmail => SignInWithEmailScreen(
             authenticationViewModel: AuthenticationViewModel(
               authenticationRepository: GetIt.I(),
+              userRepository: GetIt.I(),
             ),
           ),
         AppRoutes.signUp => SignUpPage(
             authenticationViewModel: AuthenticationViewModel(
               authenticationRepository: GetIt.I(),
+              userRepository: GetIt.I(),
             ),
           ),
         AppRoutes.signUpWithEmail => SignUpWithEmailScreen(
             authenticationViewModel: AuthenticationViewModel(
               authenticationRepository: GetIt.I(),
+              userRepository: GetIt.I(),
+            ),
+          ),
+        AppRoutes.partialSignUp => PartialSignUpScreen(
+            authenticationViewModel: AuthenticationViewModel(
+              authenticationRepository: GetIt.I(),
+              userRepository: GetIt.I(),
             ),
           ),
         AppRoutes.forgotPassword => ForgotPasswordScreen(
             authenticationViewModel: AuthenticationViewModel(
               authenticationRepository: GetIt.I(),
+              userRepository: GetIt.I(),
             ),
           ),
         AppRoutes.newPassword => const NewPasswordScreen(),
@@ -124,18 +138,18 @@ enum AppRoutes {
             ),
           ),
         AppRoutes.finalizePost => PostMetaDataPage(
-          createPostViewModel: CreatePostViewModel(
-            createPostUseCase: CreatePostUseCase(
-              userRepository: GetIt.I(),
-              authenticationRepository: GetIt.I(),
-              postRepository: GetIt.I(),
-              localDataStorageService: GetIt.I(),
-              remoteFileStorageService: GetIt.I(),
-              localFileStorageService: GetIt.I(),
+            createPostViewModel: CreatePostViewModel(
+              createPostUseCase: CreatePostUseCase(
+                userRepository: GetIt.I(),
+                authenticationRepository: GetIt.I(),
+                postRepository: GetIt.I(),
+                localDataStorageService: GetIt.I(),
+                remoteFileStorageService: GetIt.I(),
+                localFileStorageService: GetIt.I(),
+              ),
             ),
           ),
-        ),
         AppRoutes.newsDetailsPage => const NewsDetailedViewPage(),
-        AppRoutes.postReplyScreen => PostReplyScreenPage(),
+        AppRoutes.postReplyScreen => const PostReplyScreenPage(),
       };
 }

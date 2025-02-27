@@ -14,3 +14,13 @@ keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -sto
 ```bash
 (cd functions && npm run serve)
 ```
+
+Splash screen
+```bash
+  dart run flutter_native_splash:create
+```
+
+Icons
+```bash
+  dart run flutter_launcher_icons
+```

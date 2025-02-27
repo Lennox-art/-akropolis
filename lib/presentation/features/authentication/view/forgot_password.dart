@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:akropolis/presentation/features/authentication/models/authentication_state.dart';
 import 'package:akropolis/presentation/features/authentication/view_model/authentication_view_model.dart';
+import 'package:akropolis/presentation/routes/routes.dart';
 import 'package:akropolis/presentation/ui/components/loader.dart';
 import 'package:akropolis/presentation/ui/components/toast/toast.dart';
 import 'package:flutter/material.dart';
@@ -33,7 +34,14 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     toast.show();
   }
 
-  void _onStateChange(AuthenticationState state) {}
+  void _onStateChange(AuthenticationState state) {
+    // Navigate to home page
+    state.mapOrNull(
+      notAuthenticated: (_) {
+        Navigator.of(context).pushReplacementNamed(AppRoutes.signIn.path);
+      }
+    );
+  }
 
   @override
   void dispose() {
@@ -113,6 +121,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   );
                 },
                 authenticated: (_) => const Text("Password has been reset"),
+                partialSignUp: (_) => const Text("Incomplete sign up"),
               );
             },
           ),

@@ -20,21 +20,24 @@ mixin _$AuthenticationState {
   TResult when<TResult extends Object?>({
     required TResult Function() loading,
     required TResult Function() notAuthenticated,
-    required TResult Function() authenticated,
+    required TResult Function(User user) partialSignUp,
+    required TResult Function(bool requiresOnboarding) authenticated,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? loading,
     TResult? Function()? notAuthenticated,
-    TResult? Function()? authenticated,
+    TResult? Function(User user)? partialSignUp,
+    TResult? Function(bool requiresOnboarding)? authenticated,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? loading,
     TResult Function()? notAuthenticated,
-    TResult Function()? authenticated,
+    TResult Function(User user)? partialSignUp,
+    TResult Function(bool requiresOnboarding)? authenticated,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -42,6 +45,7 @@ mixin _$AuthenticationState {
   TResult map<TResult extends Object?>({
     required TResult Function(LoadingAuthenticationState value) loading,
     required TResult Function(NotAuthenticatedState value) notAuthenticated,
+    required TResult Function(PartialSigningUpState value) partialSignUp,
     required TResult Function(AuthenticatedState value) authenticated,
   }) =>
       throw _privateConstructorUsedError;
@@ -49,6 +53,7 @@ mixin _$AuthenticationState {
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(LoadingAuthenticationState value)? loading,
     TResult? Function(NotAuthenticatedState value)? notAuthenticated,
+    TResult? Function(PartialSigningUpState value)? partialSignUp,
     TResult? Function(AuthenticatedState value)? authenticated,
   }) =>
       throw _privateConstructorUsedError;
@@ -56,6 +61,7 @@ mixin _$AuthenticationState {
   TResult maybeMap<TResult extends Object?>({
     TResult Function(LoadingAuthenticationState value)? loading,
     TResult Function(NotAuthenticatedState value)? notAuthenticated,
+    TResult Function(PartialSigningUpState value)? partialSignUp,
     TResult Function(AuthenticatedState value)? authenticated,
     required TResult orElse(),
   }) =>
@@ -130,7 +136,8 @@ class _$LoadingAuthenticationStateImpl implements LoadingAuthenticationState {
   TResult when<TResult extends Object?>({
     required TResult Function() loading,
     required TResult Function() notAuthenticated,
-    required TResult Function() authenticated,
+    required TResult Function(User user) partialSignUp,
+    required TResult Function(bool requiresOnboarding) authenticated,
   }) {
     return loading();
   }
@@ -140,7 +147,8 @@ class _$LoadingAuthenticationStateImpl implements LoadingAuthenticationState {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? loading,
     TResult? Function()? notAuthenticated,
-    TResult? Function()? authenticated,
+    TResult? Function(User user)? partialSignUp,
+    TResult? Function(bool requiresOnboarding)? authenticated,
   }) {
     return loading?.call();
   }
@@ -150,7 +158,8 @@ class _$LoadingAuthenticationStateImpl implements LoadingAuthenticationState {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? loading,
     TResult Function()? notAuthenticated,
-    TResult Function()? authenticated,
+    TResult Function(User user)? partialSignUp,
+    TResult Function(bool requiresOnboarding)? authenticated,
     required TResult orElse(),
   }) {
     if (loading != null) {
@@ -164,6 +173,7 @@ class _$LoadingAuthenticationStateImpl implements LoadingAuthenticationState {
   TResult map<TResult extends Object?>({
     required TResult Function(LoadingAuthenticationState value) loading,
     required TResult Function(NotAuthenticatedState value) notAuthenticated,
+    required TResult Function(PartialSigningUpState value) partialSignUp,
     required TResult Function(AuthenticatedState value) authenticated,
   }) {
     return loading(this);
@@ -174,6 +184,7 @@ class _$LoadingAuthenticationStateImpl implements LoadingAuthenticationState {
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(LoadingAuthenticationState value)? loading,
     TResult? Function(NotAuthenticatedState value)? notAuthenticated,
+    TResult? Function(PartialSigningUpState value)? partialSignUp,
     TResult? Function(AuthenticatedState value)? authenticated,
   }) {
     return loading?.call(this);
@@ -184,6 +195,7 @@ class _$LoadingAuthenticationStateImpl implements LoadingAuthenticationState {
   TResult maybeMap<TResult extends Object?>({
     TResult Function(LoadingAuthenticationState value)? loading,
     TResult Function(NotAuthenticatedState value)? notAuthenticated,
+    TResult Function(PartialSigningUpState value)? partialSignUp,
     TResult Function(AuthenticatedState value)? authenticated,
     required TResult orElse(),
   }) {
@@ -243,7 +255,8 @@ class _$NotAuthenticatedStateImpl implements NotAuthenticatedState {
   TResult when<TResult extends Object?>({
     required TResult Function() loading,
     required TResult Function() notAuthenticated,
-    required TResult Function() authenticated,
+    required TResult Function(User user) partialSignUp,
+    required TResult Function(bool requiresOnboarding) authenticated,
   }) {
     return notAuthenticated();
   }
@@ -253,7 +266,8 @@ class _$NotAuthenticatedStateImpl implements NotAuthenticatedState {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? loading,
     TResult? Function()? notAuthenticated,
-    TResult? Function()? authenticated,
+    TResult? Function(User user)? partialSignUp,
+    TResult? Function(bool requiresOnboarding)? authenticated,
   }) {
     return notAuthenticated?.call();
   }
@@ -263,7 +277,8 @@ class _$NotAuthenticatedStateImpl implements NotAuthenticatedState {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? loading,
     TResult Function()? notAuthenticated,
-    TResult Function()? authenticated,
+    TResult Function(User user)? partialSignUp,
+    TResult Function(bool requiresOnboarding)? authenticated,
     required TResult orElse(),
   }) {
     if (notAuthenticated != null) {
@@ -277,6 +292,7 @@ class _$NotAuthenticatedStateImpl implements NotAuthenticatedState {
   TResult map<TResult extends Object?>({
     required TResult Function(LoadingAuthenticationState value) loading,
     required TResult Function(NotAuthenticatedState value) notAuthenticated,
+    required TResult Function(PartialSigningUpState value) partialSignUp,
     required TResult Function(AuthenticatedState value) authenticated,
   }) {
     return notAuthenticated(this);
@@ -287,6 +303,7 @@ class _$NotAuthenticatedStateImpl implements NotAuthenticatedState {
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(LoadingAuthenticationState value)? loading,
     TResult? Function(NotAuthenticatedState value)? notAuthenticated,
+    TResult? Function(PartialSigningUpState value)? partialSignUp,
     TResult? Function(AuthenticatedState value)? authenticated,
   }) {
     return notAuthenticated?.call(this);
@@ -297,6 +314,7 @@ class _$NotAuthenticatedStateImpl implements NotAuthenticatedState {
   TResult maybeMap<TResult extends Object?>({
     TResult Function(LoadingAuthenticationState value)? loading,
     TResult Function(NotAuthenticatedState value)? notAuthenticated,
+    TResult Function(PartialSigningUpState value)? partialSignUp,
     TResult Function(AuthenticatedState value)? authenticated,
     required TResult orElse(),
   }) {
@@ -312,10 +330,167 @@ abstract class NotAuthenticatedState implements AuthenticationState {
 }
 
 /// @nodoc
+abstract class _$$PartialSigningUpStateImplCopyWith<$Res> {
+  factory _$$PartialSigningUpStateImplCopyWith(
+          _$PartialSigningUpStateImpl value,
+          $Res Function(_$PartialSigningUpStateImpl) then) =
+      __$$PartialSigningUpStateImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({User user});
+}
+
+/// @nodoc
+class __$$PartialSigningUpStateImplCopyWithImpl<$Res>
+    extends _$AuthenticationStateCopyWithImpl<$Res, _$PartialSigningUpStateImpl>
+    implements _$$PartialSigningUpStateImplCopyWith<$Res> {
+  __$$PartialSigningUpStateImplCopyWithImpl(_$PartialSigningUpStateImpl _value,
+      $Res Function(_$PartialSigningUpStateImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of AuthenticationState
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? user = null,
+  }) {
+    return _then(_$PartialSigningUpStateImpl(
+      user: null == user
+          ? _value.user
+          : user // ignore: cast_nullable_to_non_nullable
+              as User,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$PartialSigningUpStateImpl implements PartialSigningUpState {
+  const _$PartialSigningUpStateImpl({required this.user});
+
+  @override
+  final User user;
+
+  @override
+  String toString() {
+    return 'AuthenticationState.partialSignUp(user: $user)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$PartialSigningUpStateImpl &&
+            (identical(other.user, user) || other.user == user));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, user);
+
+  /// Create a copy of AuthenticationState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$PartialSigningUpStateImplCopyWith<_$PartialSigningUpStateImpl>
+      get copyWith => __$$PartialSigningUpStateImplCopyWithImpl<
+          _$PartialSigningUpStateImpl>(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() loading,
+    required TResult Function() notAuthenticated,
+    required TResult Function(User user) partialSignUp,
+    required TResult Function(bool requiresOnboarding) authenticated,
+  }) {
+    return partialSignUp(user);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? loading,
+    TResult? Function()? notAuthenticated,
+    TResult? Function(User user)? partialSignUp,
+    TResult? Function(bool requiresOnboarding)? authenticated,
+  }) {
+    return partialSignUp?.call(user);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? loading,
+    TResult Function()? notAuthenticated,
+    TResult Function(User user)? partialSignUp,
+    TResult Function(bool requiresOnboarding)? authenticated,
+    required TResult orElse(),
+  }) {
+    if (partialSignUp != null) {
+      return partialSignUp(user);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(LoadingAuthenticationState value) loading,
+    required TResult Function(NotAuthenticatedState value) notAuthenticated,
+    required TResult Function(PartialSigningUpState value) partialSignUp,
+    required TResult Function(AuthenticatedState value) authenticated,
+  }) {
+    return partialSignUp(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(LoadingAuthenticationState value)? loading,
+    TResult? Function(NotAuthenticatedState value)? notAuthenticated,
+    TResult? Function(PartialSigningUpState value)? partialSignUp,
+    TResult? Function(AuthenticatedState value)? authenticated,
+  }) {
+    return partialSignUp?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(LoadingAuthenticationState value)? loading,
+    TResult Function(NotAuthenticatedState value)? notAuthenticated,
+    TResult Function(PartialSigningUpState value)? partialSignUp,
+    TResult Function(AuthenticatedState value)? authenticated,
+    required TResult orElse(),
+  }) {
+    if (partialSignUp != null) {
+      return partialSignUp(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class PartialSigningUpState implements AuthenticationState {
+  const factory PartialSigningUpState({required final User user}) =
+      _$PartialSigningUpStateImpl;
+
+  User get user;
+
+  /// Create a copy of AuthenticationState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$PartialSigningUpStateImplCopyWith<_$PartialSigningUpStateImpl>
+      get copyWith => throw _privateConstructorUsedError;
+}
+
+/// @nodoc
 abstract class _$$AuthenticatedStateImplCopyWith<$Res> {
   factory _$$AuthenticatedStateImplCopyWith(_$AuthenticatedStateImpl value,
           $Res Function(_$AuthenticatedStateImpl) then) =
       __$$AuthenticatedStateImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({bool requiresOnboarding});
 }
 
 /// @nodoc
@@ -328,35 +503,63 @@ class __$$AuthenticatedStateImplCopyWithImpl<$Res>
 
   /// Create a copy of AuthenticationState
   /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? requiresOnboarding = null,
+  }) {
+    return _then(_$AuthenticatedStateImpl(
+      requiresOnboarding: null == requiresOnboarding
+          ? _value.requiresOnboarding
+          : requiresOnboarding // ignore: cast_nullable_to_non_nullable
+              as bool,
+    ));
+  }
 }
 
 /// @nodoc
 
 class _$AuthenticatedStateImpl implements AuthenticatedState {
-  const _$AuthenticatedStateImpl();
+  const _$AuthenticatedStateImpl({required this.requiresOnboarding});
+
+  @override
+  final bool requiresOnboarding;
 
   @override
   String toString() {
-    return 'AuthenticationState.authenticated()';
+    return 'AuthenticationState.authenticated(requiresOnboarding: $requiresOnboarding)';
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is _$AuthenticatedStateImpl);
+        (other.runtimeType == runtimeType &&
+            other is _$AuthenticatedStateImpl &&
+            (identical(other.requiresOnboarding, requiresOnboarding) ||
+                other.requiresOnboarding == requiresOnboarding));
   }
 
   @override
-  int get hashCode => runtimeType.hashCode;
+  int get hashCode => Object.hash(runtimeType, requiresOnboarding);
+
+  /// Create a copy of AuthenticationState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$AuthenticatedStateImplCopyWith<_$AuthenticatedStateImpl> get copyWith =>
+      __$$AuthenticatedStateImplCopyWithImpl<_$AuthenticatedStateImpl>(
+          this, _$identity);
 
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() loading,
     required TResult Function() notAuthenticated,
-    required TResult Function() authenticated,
+    required TResult Function(User user) partialSignUp,
+    required TResult Function(bool requiresOnboarding) authenticated,
   }) {
-    return authenticated();
+    return authenticated(requiresOnboarding);
   }
 
   @override
@@ -364,9 +567,10 @@ class _$AuthenticatedStateImpl implements AuthenticatedState {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? loading,
     TResult? Function()? notAuthenticated,
-    TResult? Function()? authenticated,
+    TResult? Function(User user)? partialSignUp,
+    TResult? Function(bool requiresOnboarding)? authenticated,
   }) {
-    return authenticated?.call();
+    return authenticated?.call(requiresOnboarding);
   }
 
   @override
@@ -374,11 +578,12 @@ class _$AuthenticatedStateImpl implements AuthenticatedState {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? loading,
     TResult Function()? notAuthenticated,
-    TResult Function()? authenticated,
+    TResult Function(User user)? partialSignUp,
+    TResult Function(bool requiresOnboarding)? authenticated,
     required TResult orElse(),
   }) {
     if (authenticated != null) {
-      return authenticated();
+      return authenticated(requiresOnboarding);
     }
     return orElse();
   }
@@ -388,6 +593,7 @@ class _$AuthenticatedStateImpl implements AuthenticatedState {
   TResult map<TResult extends Object?>({
     required TResult Function(LoadingAuthenticationState value) loading,
     required TResult Function(NotAuthenticatedState value) notAuthenticated,
+    required TResult Function(PartialSigningUpState value) partialSignUp,
     required TResult Function(AuthenticatedState value) authenticated,
   }) {
     return authenticated(this);
@@ -398,6 +604,7 @@ class _$AuthenticatedStateImpl implements AuthenticatedState {
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(LoadingAuthenticationState value)? loading,
     TResult? Function(NotAuthenticatedState value)? notAuthenticated,
+    TResult? Function(PartialSigningUpState value)? partialSignUp,
     TResult? Function(AuthenticatedState value)? authenticated,
   }) {
     return authenticated?.call(this);
@@ -408,6 +615,7 @@ class _$AuthenticatedStateImpl implements AuthenticatedState {
   TResult maybeMap<TResult extends Object?>({
     TResult Function(LoadingAuthenticationState value)? loading,
     TResult Function(NotAuthenticatedState value)? notAuthenticated,
+    TResult Function(PartialSigningUpState value)? partialSignUp,
     TResult Function(AuthenticatedState value)? authenticated,
     required TResult orElse(),
   }) {
@@ -419,5 +627,14 @@ class _$AuthenticatedStateImpl implements AuthenticatedState {
 }
 
 abstract class AuthenticatedState implements AuthenticationState {
-  const factory AuthenticatedState() = _$AuthenticatedStateImpl;
+  const factory AuthenticatedState({required final bool requiresOnboarding}) =
+      _$AuthenticatedStateImpl;
+
+  bool get requiresOnboarding;
+
+  /// Create a copy of AuthenticationState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$AuthenticatedStateImplCopyWith<_$AuthenticatedStateImpl> get copyWith =>
+      throw _privateConstructorUsedError;
 }

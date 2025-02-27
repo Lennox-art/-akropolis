@@ -41,6 +41,15 @@ class _SignInScreenState extends State<SignInScreen> {
 
   void _onStateChange(AuthenticationState state) {
     // Navigate to home page
+    state.mapOrNull(
+      authenticated: (a) {
+        AppRoutes nextRoute = a.requiresOnboarding ? AppRoutes.welcome : AppRoutes.home;
+        Navigator.of(context).pushNamed(nextRoute.path);
+      },
+      partialSignUp: (p) {
+        Navigator.of(context).pushNamed(AppRoutes.partialSignUp.path);
+      }
+    );
   }
 
   @override
@@ -99,48 +108,6 @@ class _SignInScreenState extends State<SignInScreen> {
                         icon: Assets.google.svg(),
                         onPressed: () async {
                           widget.authenticationViewModel.signInWithGoogle();
-                          /*User? signedInUser = await BlocProvider.of<AuthenticationCubit>(context).signInWithGoogle();
-                          if (signedInUser == null) return;
-                          if (!context.mounted) return;
-
-                          UserCubit userCubit = BlocProvider.of<UserCubit>(context);
-                          AppUser? appUser = await userCubit.findUserById(
-                            signedInUser.uid,
-                          );
-
-                          if (appUser == null) {
-                            await userCubit.saveAppUser(
-                              AppUser(
-                                id: signedInUser.uid,
-                                displayName: signedInUser.displayName ?? '',
-                                username: signedInUser.displayName ?? '',
-                                email: signedInUser.email!,
-                                profilePicture: signedInUser.photoURL,
-                                topics: {},
-                              ),
-                            );
-
-                            if (!context.mounted) return;
-                            Navigator.of(context).pushNamedAndRemoveUntil(
-                              AppRoutes.welcome.path,
-                                  (_) => false,
-                            );
-                            return;
-                          }
-
-                          if (!context.mounted) return;
-                          if (appUser.topics == null || (appUser.topics?.isEmpty ?? true)) {
-                            Navigator.of(context).pushNamedAndRemoveUntil(
-                              AppRoutes.welcomeTopics.path,
-                                  (_) => false,
-                            );
-                            return;
-                          }
-
-                          Navigator.of(context).pushNamedAndRemoveUntil(
-                            AppRoutes.home.path,
-                                (_) => false,
-                          );*/
                         },
                         label: const Text("Sign in with Google"),
                         style: theme.elevatedButtonTheme.style?.copyWith(
@@ -157,6 +124,7 @@ class _SignInScreenState extends State<SignInScreen> {
                         ),
                       ),
                       authenticated: (_) => const Text("Welcome"),
+                      partialSignUp: (_) => const Text("Incomplete sign up"),
                     );
                   },
                 ),
@@ -400,6 +368,7 @@ class _SignInWithEmailScreenState extends State<SignInWithEmailScreen> {
                   );
                 },
                 authenticated: (_) => const Text("Welcome"),
+                partialSignUp: (_) => const Text("Incomplete sign up"),
               );
             },
           ),

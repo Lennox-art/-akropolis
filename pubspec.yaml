@@ -57,6 +57,7 @@ dependencies:
   dots_indicator: ^4.0.0
   hive: ^2.2.3
   flutter_secure_storage: ^9.2.4
+  flutter_native_splash: ^2.4.4
   #ffmpeg_helper: ^1.0.1
 
 dev_dependencies:
@@ -67,6 +68,7 @@ dev_dependencies:
   build_runner:
   json_serializable:
   hive_generator:
+  flutter_launcher_icons:
 
 
 flutter_gen:
@@ -103,3 +105,21 @@ flutter:
    - family: Inter
      fonts:
        - asset: fonts/Inter_18pt-Medium.ttf
+
+
+flutter_native_splash:
+  color: "#42a5f5"
+  image: assets/akropolis_logo_mark.png
+  android: true
+  android_12:
+    image: assets/akropolis_logo_mark.png
+  ios: true
+  android_gravity: center
+  ios_content_mode: center
+  fullscreen: true
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/akropolis_logo_mark.png"
+  min_sdk_android: 21

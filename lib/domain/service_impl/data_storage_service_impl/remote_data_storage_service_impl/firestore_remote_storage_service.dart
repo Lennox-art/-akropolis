@@ -56,8 +56,8 @@ class FirestoreRemoteStorageService extends RemoteDataStorageService {
   @override
   Future<Result<AppUser?>> findUserById({required String id}) async {
     try {
-      AppUser? user = await userCollectionRef.doc(id).get() as AppUser?;
-      return Result.success(data: user);
+      DocumentSnapshot user = await userCollectionRef.doc(id).get();
+      return Result.success(data: user.data() as AppUser?);
     } catch (e, trace) {
       return Result.error(
         failure: AppFailure(

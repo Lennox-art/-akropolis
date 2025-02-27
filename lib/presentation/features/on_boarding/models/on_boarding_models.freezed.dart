@@ -18,7 +18,6 @@ final _privateConstructorUsedError = UnsupportedError(
 mixin _$OnBoardingState {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function() initial,
     required TResult Function() notOnBoarded,
     required TResult Function() loading,
     required TResult Function() topics,
@@ -28,7 +27,6 @@ mixin _$OnBoardingState {
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? initial,
     TResult? Function()? notOnBoarded,
     TResult? Function()? loading,
     TResult? Function()? topics,
@@ -38,7 +36,6 @@ mixin _$OnBoardingState {
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? initial,
     TResult Function()? notOnBoarded,
     TResult Function()? loading,
     TResult Function()? topics,
@@ -49,7 +46,6 @@ mixin _$OnBoardingState {
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(InitialOnBoardingState value) initial,
     required TResult Function(NotOnBoardedBoardingState value) notOnBoarded,
     required TResult Function(LoadingOnBoardingState value) loading,
     required TResult Function(TopicsOnBoardingState value) topics,
@@ -59,7 +55,6 @@ mixin _$OnBoardingState {
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(InitialOnBoardingState value)? initial,
     TResult? Function(NotOnBoardedBoardingState value)? notOnBoarded,
     TResult? Function(LoadingOnBoardingState value)? loading,
     TResult? Function(TopicsOnBoardingState value)? topics,
@@ -69,7 +64,6 @@ mixin _$OnBoardingState {
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(InitialOnBoardingState value)? initial,
     TResult Function(NotOnBoardedBoardingState value)? notOnBoarded,
     TResult Function(LoadingOnBoardingState value)? loading,
     TResult Function(TopicsOnBoardingState value)? topics,
@@ -99,138 +93,6 @@ class _$OnBoardingStateCopyWithImpl<$Res, $Val extends OnBoardingState>
 
   /// Create a copy of OnBoardingState
   /// with the given fields replaced by the non-null parameter values.
-}
-
-/// @nodoc
-abstract class _$$InitialOnBoardingStateImplCopyWith<$Res> {
-  factory _$$InitialOnBoardingStateImplCopyWith(
-          _$InitialOnBoardingStateImpl value,
-          $Res Function(_$InitialOnBoardingStateImpl) then) =
-      __$$InitialOnBoardingStateImplCopyWithImpl<$Res>;
-}
-
-/// @nodoc
-class __$$InitialOnBoardingStateImplCopyWithImpl<$Res>
-    extends _$OnBoardingStateCopyWithImpl<$Res, _$InitialOnBoardingStateImpl>
-    implements _$$InitialOnBoardingStateImplCopyWith<$Res> {
-  __$$InitialOnBoardingStateImplCopyWithImpl(
-      _$InitialOnBoardingStateImpl _value,
-      $Res Function(_$InitialOnBoardingStateImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of OnBoardingState
-  /// with the given fields replaced by the non-null parameter values.
-}
-
-/// @nodoc
-
-class _$InitialOnBoardingStateImpl implements InitialOnBoardingState {
-  const _$InitialOnBoardingStateImpl();
-
-  @override
-  String toString() {
-    return 'OnBoardingState.initial()';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$InitialOnBoardingStateImpl);
-  }
-
-  @override
-  int get hashCode => runtimeType.hashCode;
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() initial,
-    required TResult Function() notOnBoarded,
-    required TResult Function() loading,
-    required TResult Function() topics,
-    required TResult Function() notifications,
-    required TResult Function() cleared,
-  }) {
-    return initial();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? initial,
-    TResult? Function()? notOnBoarded,
-    TResult? Function()? loading,
-    TResult? Function()? topics,
-    TResult? Function()? notifications,
-    TResult? Function()? cleared,
-  }) {
-    return initial?.call();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? initial,
-    TResult Function()? notOnBoarded,
-    TResult Function()? loading,
-    TResult Function()? topics,
-    TResult Function()? notifications,
-    TResult Function()? cleared,
-    required TResult orElse(),
-  }) {
-    if (initial != null) {
-      return initial();
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(InitialOnBoardingState value) initial,
-    required TResult Function(NotOnBoardedBoardingState value) notOnBoarded,
-    required TResult Function(LoadingOnBoardingState value) loading,
-    required TResult Function(TopicsOnBoardingState value) topics,
-    required TResult Function(NotificationsOnBoardingState value) notifications,
-    required TResult Function(ClearedOnBoardingState value) cleared,
-  }) {
-    return initial(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(InitialOnBoardingState value)? initial,
-    TResult? Function(NotOnBoardedBoardingState value)? notOnBoarded,
-    TResult? Function(LoadingOnBoardingState value)? loading,
-    TResult? Function(TopicsOnBoardingState value)? topics,
-    TResult? Function(NotificationsOnBoardingState value)? notifications,
-    TResult? Function(ClearedOnBoardingState value)? cleared,
-  }) {
-    return initial?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(InitialOnBoardingState value)? initial,
-    TResult Function(NotOnBoardedBoardingState value)? notOnBoarded,
-    TResult Function(LoadingOnBoardingState value)? loading,
-    TResult Function(TopicsOnBoardingState value)? topics,
-    TResult Function(NotificationsOnBoardingState value)? notifications,
-    TResult Function(ClearedOnBoardingState value)? cleared,
-    required TResult orElse(),
-  }) {
-    if (initial != null) {
-      return initial(this);
-    }
-    return orElse();
-  }
-}
-
-abstract class InitialOnBoardingState implements OnBoardingState {
-  const factory InitialOnBoardingState() = _$InitialOnBoardingStateImpl;
 }
 
 /// @nodoc
@@ -277,7 +139,6 @@ class _$NotOnBoardedBoardingStateImpl implements NotOnBoardedBoardingState {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function() initial,
     required TResult Function() notOnBoarded,
     required TResult Function() loading,
     required TResult Function() topics,
@@ -290,7 +151,6 @@ class _$NotOnBoardedBoardingStateImpl implements NotOnBoardedBoardingState {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? initial,
     TResult? Function()? notOnBoarded,
     TResult? Function()? loading,
     TResult? Function()? topics,
@@ -303,7 +163,6 @@ class _$NotOnBoardedBoardingStateImpl implements NotOnBoardedBoardingState {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? initial,
     TResult Function()? notOnBoarded,
     TResult Function()? loading,
     TResult Function()? topics,
@@ -320,7 +179,6 @@ class _$NotOnBoardedBoardingStateImpl implements NotOnBoardedBoardingState {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(InitialOnBoardingState value) initial,
     required TResult Function(NotOnBoardedBoardingState value) notOnBoarded,
     required TResult Function(LoadingOnBoardingState value) loading,
     required TResult Function(TopicsOnBoardingState value) topics,
@@ -333,7 +191,6 @@ class _$NotOnBoardedBoardingStateImpl implements NotOnBoardedBoardingState {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(InitialOnBoardingState value)? initial,
     TResult? Function(NotOnBoardedBoardingState value)? notOnBoarded,
     TResult? Function(LoadingOnBoardingState value)? loading,
     TResult? Function(TopicsOnBoardingState value)? topics,
@@ -346,7 +203,6 @@ class _$NotOnBoardedBoardingStateImpl implements NotOnBoardedBoardingState {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(InitialOnBoardingState value)? initial,
     TResult Function(NotOnBoardedBoardingState value)? notOnBoarded,
     TResult Function(LoadingOnBoardingState value)? loading,
     TResult Function(TopicsOnBoardingState value)? topics,
@@ -409,7 +265,6 @@ class _$LoadingOnBoardingStateImpl implements LoadingOnBoardingState {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function() initial,
     required TResult Function() notOnBoarded,
     required TResult Function() loading,
     required TResult Function() topics,
@@ -422,7 +277,6 @@ class _$LoadingOnBoardingStateImpl implements LoadingOnBoardingState {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? initial,
     TResult? Function()? notOnBoarded,
     TResult? Function()? loading,
     TResult? Function()? topics,
@@ -435,7 +289,6 @@ class _$LoadingOnBoardingStateImpl implements LoadingOnBoardingState {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? initial,
     TResult Function()? notOnBoarded,
     TResult Function()? loading,
     TResult Function()? topics,
@@ -452,7 +305,6 @@ class _$LoadingOnBoardingStateImpl implements LoadingOnBoardingState {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(InitialOnBoardingState value) initial,
     required TResult Function(NotOnBoardedBoardingState value) notOnBoarded,
     required TResult Function(LoadingOnBoardingState value) loading,
     required TResult Function(TopicsOnBoardingState value) topics,
@@ -465,7 +317,6 @@ class _$LoadingOnBoardingStateImpl implements LoadingOnBoardingState {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(InitialOnBoardingState value)? initial,
     TResult? Function(NotOnBoardedBoardingState value)? notOnBoarded,
     TResult? Function(LoadingOnBoardingState value)? loading,
     TResult? Function(TopicsOnBoardingState value)? topics,
@@ -478,7 +329,6 @@ class _$LoadingOnBoardingStateImpl implements LoadingOnBoardingState {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(InitialOnBoardingState value)? initial,
     TResult Function(NotOnBoardedBoardingState value)? notOnBoarded,
     TResult Function(LoadingOnBoardingState value)? loading,
     TResult Function(TopicsOnBoardingState value)? topics,
@@ -540,7 +390,6 @@ class _$TopicsOnBoardingStateImpl implements TopicsOnBoardingState {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function() initial,
     required TResult Function() notOnBoarded,
     required TResult Function() loading,
     required TResult Function() topics,
@@ -553,7 +402,6 @@ class _$TopicsOnBoardingStateImpl implements TopicsOnBoardingState {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? initial,
     TResult? Function()? notOnBoarded,
     TResult? Function()? loading,
     TResult? Function()? topics,
@@ -566,7 +414,6 @@ class _$TopicsOnBoardingStateImpl implements TopicsOnBoardingState {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? initial,
     TResult Function()? notOnBoarded,
     TResult Function()? loading,
     TResult Function()? topics,
@@ -583,7 +430,6 @@ class _$TopicsOnBoardingStateImpl implements TopicsOnBoardingState {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(InitialOnBoardingState value) initial,
     required TResult Function(NotOnBoardedBoardingState value) notOnBoarded,
     required TResult Function(LoadingOnBoardingState value) loading,
     required TResult Function(TopicsOnBoardingState value) topics,
@@ -596,7 +442,6 @@ class _$TopicsOnBoardingStateImpl implements TopicsOnBoardingState {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(InitialOnBoardingState value)? initial,
     TResult? Function(NotOnBoardedBoardingState value)? notOnBoarded,
     TResult? Function(LoadingOnBoardingState value)? loading,
     TResult? Function(TopicsOnBoardingState value)? topics,
@@ -609,7 +454,6 @@ class _$TopicsOnBoardingStateImpl implements TopicsOnBoardingState {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(InitialOnBoardingState value)? initial,
     TResult Function(NotOnBoardedBoardingState value)? notOnBoarded,
     TResult Function(LoadingOnBoardingState value)? loading,
     TResult Function(TopicsOnBoardingState value)? topics,
@@ -674,7 +518,6 @@ class _$NotificationsOnBoardingStateImpl
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function() initial,
     required TResult Function() notOnBoarded,
     required TResult Function() loading,
     required TResult Function() topics,
@@ -687,7 +530,6 @@ class _$NotificationsOnBoardingStateImpl
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? initial,
     TResult? Function()? notOnBoarded,
     TResult? Function()? loading,
     TResult? Function()? topics,
@@ -700,7 +542,6 @@ class _$NotificationsOnBoardingStateImpl
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? initial,
     TResult Function()? notOnBoarded,
     TResult Function()? loading,
     TResult Function()? topics,
@@ -717,7 +558,6 @@ class _$NotificationsOnBoardingStateImpl
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(InitialOnBoardingState value) initial,
     required TResult Function(NotOnBoardedBoardingState value) notOnBoarded,
     required TResult Function(LoadingOnBoardingState value) loading,
     required TResult Function(TopicsOnBoardingState value) topics,
@@ -730,7 +570,6 @@ class _$NotificationsOnBoardingStateImpl
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(InitialOnBoardingState value)? initial,
     TResult? Function(NotOnBoardedBoardingState value)? notOnBoarded,
     TResult? Function(LoadingOnBoardingState value)? loading,
     TResult? Function(TopicsOnBoardingState value)? topics,
@@ -743,7 +582,6 @@ class _$NotificationsOnBoardingStateImpl
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(InitialOnBoardingState value)? initial,
     TResult Function(NotOnBoardedBoardingState value)? notOnBoarded,
     TResult Function(LoadingOnBoardingState value)? loading,
     TResult Function(TopicsOnBoardingState value)? topics,
@@ -807,7 +645,6 @@ class _$ClearedOnBoardingStateImpl implements ClearedOnBoardingState {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function() initial,
     required TResult Function() notOnBoarded,
     required TResult Function() loading,
     required TResult Function() topics,
@@ -820,7 +657,6 @@ class _$ClearedOnBoardingStateImpl implements ClearedOnBoardingState {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? initial,
     TResult? Function()? notOnBoarded,
     TResult? Function()? loading,
     TResult? Function()? topics,
@@ -833,7 +669,6 @@ class _$ClearedOnBoardingStateImpl implements ClearedOnBoardingState {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? initial,
     TResult Function()? notOnBoarded,
     TResult Function()? loading,
     TResult Function()? topics,
@@ -850,7 +685,6 @@ class _$ClearedOnBoardingStateImpl implements ClearedOnBoardingState {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(InitialOnBoardingState value) initial,
     required TResult Function(NotOnBoardedBoardingState value) notOnBoarded,
     required TResult Function(LoadingOnBoardingState value) loading,
     required TResult Function(TopicsOnBoardingState value) topics,
@@ -863,7 +697,6 @@ class _$ClearedOnBoardingStateImpl implements ClearedOnBoardingState {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(InitialOnBoardingState value)? initial,
     TResult? Function(NotOnBoardedBoardingState value)? notOnBoarded,
     TResult? Function(LoadingOnBoardingState value)? loading,
     TResult? Function(TopicsOnBoardingState value)? topics,
@@ -876,7 +709,6 @@ class _$ClearedOnBoardingStateImpl implements ClearedOnBoardingState {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(InitialOnBoardingState value)? initial,
     TResult Function(NotOnBoardedBoardingState value)? notOnBoarded,
     TResult Function(LoadingOnBoardingState value)? loading,
     TResult Function(TopicsOnBoardingState value)? topics,

@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'authentication_state.freezed.dart';
@@ -9,6 +10,8 @@ class AuthenticationState with _$AuthenticationState {
 
   const factory AuthenticationState.notAuthenticated() = NotAuthenticatedState;
 
-  const factory AuthenticationState.authenticated() = AuthenticatedState;
+  const factory AuthenticationState.partialSignUp({required User user}) = PartialSigningUpState;
+
+  const factory AuthenticationState.authenticated({required bool requiresOnboarding}) = AuthenticatedState;
 
 }

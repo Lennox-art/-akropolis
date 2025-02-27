@@ -155,6 +155,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         ),
                       ),
                       authenticated: (_) => const Text("Welcome"),
+                      partialSignUp: (_) => const Text("Incomplete sign up"),
                     );
                   },
                 ),
@@ -384,8 +385,10 @@ class _SignUpWithEmailScreenState extends State<SignUpWithEmailScreen> {
                       String displayName = displayNameController.text;
                       String email = emailController.text;
 
-                      widget.authenticationViewModel.signUpWithEmailAndPassword(
+                      widget.authenticationViewModel.signUp(
+                        username: username,
                         email: email,
+                        displayName: displayName,
                         password: password,
                       );
 
@@ -417,6 +420,7 @@ class _SignUpWithEmailScreenState extends State<SignUpWithEmailScreen> {
                   );
                 },
                 authenticated: (_) => const Text("Welcome"),
+                partialSignUp: (_) => const Text("Incomplete Sign up"),
               );
             },
           ),

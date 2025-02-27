@@ -98,18 +98,16 @@ class _SelectTopicScreenState extends State<SelectTopicScreen> {
             ListenableBuilder(
               listenable: widget.onBoardingViewModel,
               builder: (_, __) {
-                return widget.onBoardingViewModel.onBoardingState.mapOrNull(
-                  loading: (_) => const InfiniteLoader(),
-                  topics: (_) {
-                    return ElevatedButton(
-                      onPressed: () async {
-                        widget.onBoardingViewModel.setTopics(topics: selectedTopics);
-                      },
-                      child: const Text("Next"),
-                    );
+                if(widget.onBoardingViewModel.onBoardingState is LoadingOnBoardingState) {
+                  return const InfiniteLoader();
+                }
+
+                return ElevatedButton(
+                  onPressed: () async {
+                    widget.onBoardingViewModel.setTopics(topics: selectedTopics);
                   },
-                  cleared: (_) => const Text("Topics set"),
-                ) ?? const Text("Wrong state");
+                  child: const Text("Next"),
+                );
               },
             ),
           ],

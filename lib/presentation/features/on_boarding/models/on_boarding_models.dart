@@ -5,8 +5,6 @@ part 'on_boarding_models.freezed.dart';
 @freezed
 class OnBoardingState with _$OnBoardingState {
 
-  const factory OnBoardingState.initial() = InitialOnBoardingState;
-
   const factory OnBoardingState.notOnBoarded() = NotOnBoardedBoardingState;
 
   const factory OnBoardingState.loading() = LoadingOnBoardingState;

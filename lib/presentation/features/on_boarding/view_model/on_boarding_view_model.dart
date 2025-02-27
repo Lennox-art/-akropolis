@@ -15,7 +15,8 @@ class OnBoardingViewModel extends ChangeNotifier {
   final AuthenticationRepository _authenticationRepository;
   final StreamController<ToastMessage> _toastStreamController = StreamController.broadcast();
   final StreamController<OnBoardingState> _onBoardingStateStreamController = StreamController.broadcast();
-  OnBoardingState _state = const InitialOnBoardingState();
+  OnBoardingState _state = const NotOnBoardedBoardingState();
+  AppUser? _user;
   final UnmodifiableListView<String> _topics = UnmodifiableListView(const [
     'Akropolis',
     'Programming',
@@ -49,7 +50,6 @@ class OnBoardingViewModel extends ChangeNotifier {
     'Love',
     'Science',
   ]);
-  AppUser? _user;
 
   OnBoardingViewModel({
     required UserRepository userRepository,
@@ -68,7 +68,7 @@ class OnBoardingViewModel extends ChangeNotifier {
   OnBoardingState get onBoardingState => _state;
 
   Future<void> _initializeViewModel() async {
-    if (_state is! InitialOnBoardingState) return;
+    if (_state is! NotOnBoardedBoardingState) return;
 
     _state = const LoadingOnBoardingState();
     notifyListeners();
@@ -90,7 +90,6 @@ class OnBoardingViewModel extends ChangeNotifier {
               }
 
               _user = currentUser;
-
               if ((currentUser.topics ?? {}).isEmpty) {
                 _state = const TopicsOnBoardingState();
                 return;
@@ -101,7 +100,11 @@ class OnBoardingViewModel extends ChangeNotifier {
 
               break;
             case Error<AppUser?>():
-              _state = const InitialOnBoardingState();
+
+              //Not to be here without an account
+              //Fatalt error
+              _state = const NotOnBoardedBoardingState();
+
               _toastStreamController.add(
                 ToastError(message: currentAppUserState.failure.message),
               );
@@ -109,27 +112,32 @@ class OnBoardingViewModel extends ChangeNotifier {
           }
 
         case Error<User>():
-          _state = const InitialOnBoardingState();
+          _state = const NotOnBoardedBoardingState();
           _toastStreamController.add(
             ToastError(message: currentUserState.failure.message),
           );
           break;
       }
     } finally {
+      _onBoardingStateStreamController.add(_state);
       notifyListeners();
     }
   }
 
+
+
   Future<void> setTopics({
     required Set<String> topics,
   }) async {
-    if (_state is! LoadingOnBoardingState || _user == null) return;
+    if (_state is LoadingOnBoardingState || _user == null) return;
 
     _state = const LoadingOnBoardingState();
     notifyListeners();
 
     try {
-      _user!.topics = topics;
+
+      _user?.topics = topics;
+
       Result<void> setTopicsResult = await _userRepository.saveAppUser(
         appUser: _user!,
       );
@@ -153,6 +161,7 @@ class OnBoardingViewModel extends ChangeNotifier {
       }
 
     } finally {
+      _onBoardingStateStreamController.add(_state);
       notifyListeners();
     }
   }

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:akropolis/domain/gen/assets.gen.dart';
+import 'package:akropolis/presentation/features/splash_screen/models/splash_models.dart';
 import 'package:akropolis/presentation/features/splash_screen/view_model/splash_screen_view_model.dart';
 import 'package:akropolis/presentation/routes/routes.dart';
 import 'package:flutter/material.dart';
@@ -18,13 +19,12 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  late final StreamSubscription<bool> authenticationResultStreamSubscription;
+  late final StreamSubscription<SplashScreenState> authenticationResultStreamSubscription;
 
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      authenticationResultStreamSubscription = widget.splashScreenViewModel.authenticatedResultStream.listen(_onAuthenticationResult);
-      widget.splashScreenViewModel.checkAuthenticationResult();
+      authenticationResultStreamSubscription = widget.splashScreenViewModel.splashScreenStateResult.listen(_onAuthenticationResult);
     });
     super.initState();
   }
@@ -35,11 +35,29 @@ class _SplashScreenState extends State<SplashScreen> {
     super.dispose();
   }
 
-  void _onAuthenticationResult(bool authenticated) {
-    AppRoutes nextRoute = authenticated ? AppRoutes.welcome : AppRoutes.login;
-    Navigator.of(context).pushNamedAndRemoveUntil(
-      nextRoute.path,
-      (_) => false,
+  void _onAuthenticationResult(SplashScreenState state) {
+    state.map(
+      loading: (_) {
+        //
+      },
+      notAuthenticated: (_) {
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          AppRoutes.login.path,
+          (_) => false,
+        );
+      },
+      onBoarding: (_) {
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          AppRoutes.welcomeTopics.path,
+          (_) => false,
+        );
+      },
+      home: (_) {
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          AppRoutes.home.path,
+          (_) => false,
+        );
+      },
     );
   }
 
@@ -75,5 +93,4 @@ class _SplashScreenState extends State<SplashScreen> {
       ),
     );
   }
-
 }
