@@ -18,9 +18,9 @@ class LocalFileSystemLocalStorageServiceImpl extends LocalFileStorageService {
         _log = loggingService;
 
   /// Function: [getCachedFileData] will retrieve a file from the [Sha1] of the file
-  /// Returns: [Result.success], with the [data] as a [Uint8List] of the file and null if file not found
+  /// Returns: [Result.success], with the [selectedThumbnail] as a [Uint8List] of the file and null if file not found
   @override
-  Future<Result<Uint8List?>> getCachedFileData(Sha1 sha1) async {
+  Future<Result<File?>> getCachedFileData(Sha1 sha1) async {
     try {
       _log.debug("LocalFileSystemLocalStorageServiceImpl : getCachedFileData(sha1=$sha1)");
       String filePath = path.join(_fileDirectory, sha1.short, sha1.hash);
@@ -29,8 +29,7 @@ class LocalFileSystemLocalStorageServiceImpl extends LocalFileStorageService {
       if (!await file.exists()) return const Result.success(data: null);
 
       //to avoid blocking the event loop use async
-      Uint8List bytes = await file.readAsBytes();
-      return Result.success(data: bytes);
+      return Result.success(data: file);
     } on FileSystemException catch (e, trace) {
       return Result.error(
         failure: AppFailure(
@@ -52,15 +51,22 @@ class LocalFileSystemLocalStorageServiceImpl extends LocalFileStorageService {
   /// Function: [cacheLocalFile] an idempotent function that will save a [file] to the local file system
   /// Returns: [Result.success], with a [Sha1] of the file unless otherwise
   @override
-  Future<Result<Sha1>> cacheLocalFileData(Uint8List data) async {
+  Future<Result<CacheFileResult>> cacheLocalFileData(Uint8List data) async {
     try {
       _log.debug("LocalFileSystemLocalStorageServiceImpl : cacheLocalFile(data=${data.length})");
       Sha1 sha1 = await compute<Uint8List, Sha1>(computeSha1Hash, data);
       String filePath = path.join(_fileDirectory, sha1.short, sha1.hash);
       File f = File(filePath);
-      if (await f.exists()) return Result.success(data: sha1);
+
+      // Ensure directory exists
+      Directory parentDir = f.parent;
+      if (!await parentDir.exists()) {
+        await parentDir.create(recursive: true);
+      }
+
+      if (await f.exists()) return Result.success(data: CacheFileResult(file: f, sha1: sha1));
       await f.writeAsBytes(data);
-      return Result.success(data: sha1);
+      return Result.success(data: CacheFileResult(file: f, sha1: sha1));
     } on FileSystemException catch (e, trace) {
       return Result.error(
         failure: AppFailure(

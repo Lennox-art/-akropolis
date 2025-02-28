@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:akropolis/data/models/local_models/local_models.dart';
 import 'package:akropolis/data/repositories/authentication_repository/authentication_repository.dart';
 import 'package:akropolis/data/repositories/post_repository/post_repository.dart';
 import 'package:akropolis/data/repositories/user_repository/user_repository.dart';
@@ -13,12 +14,14 @@ import 'package:akropolis/domain/repository_impl/post_respository_impl/post_repo
 import 'package:akropolis/domain/repository_impl/user_repository_impl/user_repository_impl.dart';
 import 'package:akropolis/domain/service_impl/data_storage_service_impl/remote_data_storage_service_impl/firestore_remote_storage_service.dart';
 import 'package:akropolis/domain/service_impl/file_storage_service_impl/local_file_storage_service_impl/local_file_system_local_storage_service_impl.dart';
+import 'package:akropolis/domain/use_cases/fetch_post_comments_use_case.dart';
 import 'package:akropolis/presentation/routes/routes.dart';
 import 'package:akropolis/presentation/ui/themes.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get_it/get_it.dart';
+import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:logging_service/logging_service.dart';
 import 'package:network_service/network_service.dart';
@@ -98,6 +101,14 @@ Future<void> main() async {
     remoteDataStorageService: remoteDataStorageService,
   );
   getIt.registerSingleton(postRepository);
+
+  ///Use cases
+  FetchPostCommentsUseCase fetchPostCommentsUseCase = FetchPostCommentsUseCase(postRepository: postRepository);
+  getIt.registerSingleton(fetchPostCommentsUseCase);
+
+  ///Adapters
+  Hive.registerAdapter(LocalFileCacheAdapter());
+  Hive.registerAdapter(MediaTypeAdapter());
 
   runApp(const AkropolisApplication());
   FlutterNativeSplash.remove();

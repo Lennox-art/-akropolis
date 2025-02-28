@@ -78,6 +78,7 @@ class NewsCardViewModel extends ChangeNotifier {
       }
     } finally {
       _loadingComments = false;
+      notifyListeners();
     }
   }
 }

@@ -1,17 +1,18 @@
+import 'dart:io';
+
 import 'package:akropolis/data/utils/duration_style.dart';
 import 'package:flutter/material.dart';
 
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:video_player/video_player.dart';
 import 'package:chewie/chewie.dart';
 
 class CachedVideoPlayer extends StatefulWidget {
-  final String videoUrl;
+  final File file;
   final bool autoPlay;
 
   const CachedVideoPlayer({
     super.key,
-    required this.videoUrl,
+    required this.file,
     required this.autoPlay,
   });
 
@@ -33,10 +34,9 @@ class _CachedVideoPlayerState extends State<CachedVideoPlayer> {
   Future<void> _initializeVideo() async {
     try {
       // Check cache and get the video file
-      final file = await DefaultCacheManager().getSingleFile(widget.videoUrl);
 
       // Initialize the video player
-      _videoController = VideoPlayerController.file(file);
+      _videoController = VideoPlayerController.file(widget.file);
       await _videoController!.initialize();
 
       _chewieController = ChewieController(

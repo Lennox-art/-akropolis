@@ -275,39 +275,57 @@ abstract class _DurationTrim implements DurationTrim {
 mixin _$CreatePostState {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(UploadProgress? progress) loading,
-    required TResult Function() loaded,
+    required TResult Function(ProgressModel? progress) loading,
+    required TResult Function() pickingVideo,
+    required TResult Function(File video, Uint8List selectedThumbnail,
+            List<Uint8List> videoThumbnails, VideoEditingTools currentTool)
+        editingVideo,
+    required TResult Function(File video, Uint8List thumbnail) captionPost,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(UploadProgress? progress)? loading,
-    TResult? Function()? loaded,
+    TResult? Function(ProgressModel? progress)? loading,
+    TResult? Function()? pickingVideo,
+    TResult? Function(File video, Uint8List selectedThumbnail,
+            List<Uint8List> videoThumbnails, VideoEditingTools currentTool)?
+        editingVideo,
+    TResult? Function(File video, Uint8List thumbnail)? captionPost,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(UploadProgress? progress)? loading,
-    TResult Function()? loaded,
+    TResult Function(ProgressModel? progress)? loading,
+    TResult Function()? pickingVideo,
+    TResult Function(File video, Uint8List selectedThumbnail,
+            List<Uint8List> videoThumbnails, VideoEditingTools currentTool)?
+        editingVideo,
+    TResult Function(File video, Uint8List thumbnail)? captionPost,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(LoadingCreatePostState value) loading,
-    required TResult Function(LoadedCreatePostState value) loaded,
+    required TResult Function(PickingVideoCreatePostState value) pickingVideo,
+    required TResult Function(EdittingVideoCreatePostState value) editingVideo,
+    required TResult Function(CaptionPostCreatePostState value) captionPost,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(LoadingCreatePostState value)? loading,
-    TResult? Function(LoadedCreatePostState value)? loaded,
+    TResult? Function(PickingVideoCreatePostState value)? pickingVideo,
+    TResult? Function(EdittingVideoCreatePostState value)? editingVideo,
+    TResult? Function(CaptionPostCreatePostState value)? captionPost,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(LoadingCreatePostState value)? loading,
-    TResult Function(LoadedCreatePostState value)? loaded,
+    TResult Function(PickingVideoCreatePostState value)? pickingVideo,
+    TResult Function(EdittingVideoCreatePostState value)? editingVideo,
+    TResult Function(CaptionPostCreatePostState value)? captionPost,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -341,7 +359,7 @@ abstract class _$$LoadingCreatePostStateImplCopyWith<$Res> {
           $Res Function(_$LoadingCreatePostStateImpl) then) =
       __$$LoadingCreatePostStateImplCopyWithImpl<$Res>;
   @useResult
-  $Res call({UploadProgress? progress});
+  $Res call({ProgressModel? progress});
 }
 
 /// @nodoc
@@ -364,7 +382,7 @@ class __$$LoadingCreatePostStateImplCopyWithImpl<$Res>
       progress: freezed == progress
           ? _value.progress
           : progress // ignore: cast_nullable_to_non_nullable
-              as UploadProgress?,
+              as ProgressModel?,
     ));
   }
 }
@@ -375,7 +393,7 @@ class _$LoadingCreatePostStateImpl implements LoadingCreatePostState {
   const _$LoadingCreatePostStateImpl({this.progress});
 
   @override
-  final UploadProgress? progress;
+  final ProgressModel? progress;
 
   @override
   String toString() {
@@ -406,8 +424,12 @@ class _$LoadingCreatePostStateImpl implements LoadingCreatePostState {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(UploadProgress? progress) loading,
-    required TResult Function() loaded,
+    required TResult Function(ProgressModel? progress) loading,
+    required TResult Function() pickingVideo,
+    required TResult Function(File video, Uint8List selectedThumbnail,
+            List<Uint8List> videoThumbnails, VideoEditingTools currentTool)
+        editingVideo,
+    required TResult Function(File video, Uint8List thumbnail) captionPost,
   }) {
     return loading(progress);
   }
@@ -415,8 +437,12 @@ class _$LoadingCreatePostStateImpl implements LoadingCreatePostState {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(UploadProgress? progress)? loading,
-    TResult? Function()? loaded,
+    TResult? Function(ProgressModel? progress)? loading,
+    TResult? Function()? pickingVideo,
+    TResult? Function(File video, Uint8List selectedThumbnail,
+            List<Uint8List> videoThumbnails, VideoEditingTools currentTool)?
+        editingVideo,
+    TResult? Function(File video, Uint8List thumbnail)? captionPost,
   }) {
     return loading?.call(progress);
   }
@@ -424,8 +450,12 @@ class _$LoadingCreatePostStateImpl implements LoadingCreatePostState {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(UploadProgress? progress)? loading,
-    TResult Function()? loaded,
+    TResult Function(ProgressModel? progress)? loading,
+    TResult Function()? pickingVideo,
+    TResult Function(File video, Uint8List selectedThumbnail,
+            List<Uint8List> videoThumbnails, VideoEditingTools currentTool)?
+        editingVideo,
+    TResult Function(File video, Uint8List thumbnail)? captionPost,
     required TResult orElse(),
   }) {
     if (loading != null) {
@@ -438,7 +468,9 @@ class _$LoadingCreatePostStateImpl implements LoadingCreatePostState {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(LoadingCreatePostState value) loading,
-    required TResult Function(LoadedCreatePostState value) loaded,
+    required TResult Function(PickingVideoCreatePostState value) pickingVideo,
+    required TResult Function(EdittingVideoCreatePostState value) editingVideo,
+    required TResult Function(CaptionPostCreatePostState value) captionPost,
   }) {
     return loading(this);
   }
@@ -447,7 +479,9 @@ class _$LoadingCreatePostStateImpl implements LoadingCreatePostState {
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(LoadingCreatePostState value)? loading,
-    TResult? Function(LoadedCreatePostState value)? loaded,
+    TResult? Function(PickingVideoCreatePostState value)? pickingVideo,
+    TResult? Function(EdittingVideoCreatePostState value)? editingVideo,
+    TResult? Function(CaptionPostCreatePostState value)? captionPost,
   }) {
     return loading?.call(this);
   }
@@ -456,7 +490,9 @@ class _$LoadingCreatePostStateImpl implements LoadingCreatePostState {
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(LoadingCreatePostState value)? loading,
-    TResult Function(LoadedCreatePostState value)? loaded,
+    TResult Function(PickingVideoCreatePostState value)? pickingVideo,
+    TResult Function(EdittingVideoCreatePostState value)? editingVideo,
+    TResult Function(CaptionPostCreatePostState value)? captionPost,
     required TResult orElse(),
   }) {
     if (loading != null) {
@@ -467,10 +503,10 @@ class _$LoadingCreatePostStateImpl implements LoadingCreatePostState {
 }
 
 abstract class LoadingCreatePostState implements CreatePostState {
-  const factory LoadingCreatePostState({final UploadProgress? progress}) =
+  const factory LoadingCreatePostState({final ProgressModel? progress}) =
       _$LoadingCreatePostStateImpl;
 
-  UploadProgress? get progress;
+  ProgressModel? get progress;
 
   /// Create a copy of CreatePostState
   /// with the given fields replaced by the non-null parameter values.
@@ -480,19 +516,21 @@ abstract class LoadingCreatePostState implements CreatePostState {
 }
 
 /// @nodoc
-abstract class _$$LoadedCreatePostStateImplCopyWith<$Res> {
-  factory _$$LoadedCreatePostStateImplCopyWith(
-          _$LoadedCreatePostStateImpl value,
-          $Res Function(_$LoadedCreatePostStateImpl) then) =
-      __$$LoadedCreatePostStateImplCopyWithImpl<$Res>;
+abstract class _$$PickingVideoCreatePostStateImplCopyWith<$Res> {
+  factory _$$PickingVideoCreatePostStateImplCopyWith(
+          _$PickingVideoCreatePostStateImpl value,
+          $Res Function(_$PickingVideoCreatePostStateImpl) then) =
+      __$$PickingVideoCreatePostStateImplCopyWithImpl<$Res>;
 }
 
 /// @nodoc
-class __$$LoadedCreatePostStateImplCopyWithImpl<$Res>
-    extends _$CreatePostStateCopyWithImpl<$Res, _$LoadedCreatePostStateImpl>
-    implements _$$LoadedCreatePostStateImplCopyWith<$Res> {
-  __$$LoadedCreatePostStateImplCopyWithImpl(_$LoadedCreatePostStateImpl _value,
-      $Res Function(_$LoadedCreatePostStateImpl) _then)
+class __$$PickingVideoCreatePostStateImplCopyWithImpl<$Res>
+    extends _$CreatePostStateCopyWithImpl<$Res,
+        _$PickingVideoCreatePostStateImpl>
+    implements _$$PickingVideoCreatePostStateImplCopyWith<$Res> {
+  __$$PickingVideoCreatePostStateImplCopyWithImpl(
+      _$PickingVideoCreatePostStateImpl _value,
+      $Res Function(_$PickingVideoCreatePostStateImpl) _then)
       : super(_value, _then);
 
   /// Create a copy of CreatePostState
@@ -501,19 +539,19 @@ class __$$LoadedCreatePostStateImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$LoadedCreatePostStateImpl implements LoadedCreatePostState {
-  const _$LoadedCreatePostStateImpl();
+class _$PickingVideoCreatePostStateImpl implements PickingVideoCreatePostState {
+  const _$PickingVideoCreatePostStateImpl();
 
   @override
   String toString() {
-    return 'CreatePostState.loaded()';
+    return 'CreatePostState.pickingVideo()';
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$LoadedCreatePostStateImpl);
+            other is _$PickingVideoCreatePostStateImpl);
   }
 
   @override
@@ -522,30 +560,42 @@ class _$LoadedCreatePostStateImpl implements LoadedCreatePostState {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(UploadProgress? progress) loading,
-    required TResult Function() loaded,
+    required TResult Function(ProgressModel? progress) loading,
+    required TResult Function() pickingVideo,
+    required TResult Function(File video, Uint8List selectedThumbnail,
+            List<Uint8List> videoThumbnails, VideoEditingTools currentTool)
+        editingVideo,
+    required TResult Function(File video, Uint8List thumbnail) captionPost,
   }) {
-    return loaded();
+    return pickingVideo();
   }
 
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(UploadProgress? progress)? loading,
-    TResult? Function()? loaded,
+    TResult? Function(ProgressModel? progress)? loading,
+    TResult? Function()? pickingVideo,
+    TResult? Function(File video, Uint8List selectedThumbnail,
+            List<Uint8List> videoThumbnails, VideoEditingTools currentTool)?
+        editingVideo,
+    TResult? Function(File video, Uint8List thumbnail)? captionPost,
   }) {
-    return loaded?.call();
+    return pickingVideo?.call();
   }
 
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(UploadProgress? progress)? loading,
-    TResult Function()? loaded,
+    TResult Function(ProgressModel? progress)? loading,
+    TResult Function()? pickingVideo,
+    TResult Function(File video, Uint8List selectedThumbnail,
+            List<Uint8List> videoThumbnails, VideoEditingTools currentTool)?
+        editingVideo,
+    TResult Function(File video, Uint8List thumbnail)? captionPost,
     required TResult orElse(),
   }) {
-    if (loaded != null) {
-      return loaded();
+    if (pickingVideo != null) {
+      return pickingVideo();
     }
     return orElse();
   }
@@ -554,34 +604,438 @@ class _$LoadedCreatePostStateImpl implements LoadedCreatePostState {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(LoadingCreatePostState value) loading,
-    required TResult Function(LoadedCreatePostState value) loaded,
+    required TResult Function(PickingVideoCreatePostState value) pickingVideo,
+    required TResult Function(EdittingVideoCreatePostState value) editingVideo,
+    required TResult Function(CaptionPostCreatePostState value) captionPost,
   }) {
-    return loaded(this);
+    return pickingVideo(this);
   }
 
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(LoadingCreatePostState value)? loading,
-    TResult? Function(LoadedCreatePostState value)? loaded,
+    TResult? Function(PickingVideoCreatePostState value)? pickingVideo,
+    TResult? Function(EdittingVideoCreatePostState value)? editingVideo,
+    TResult? Function(CaptionPostCreatePostState value)? captionPost,
   }) {
-    return loaded?.call(this);
+    return pickingVideo?.call(this);
   }
 
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(LoadingCreatePostState value)? loading,
-    TResult Function(LoadedCreatePostState value)? loaded,
+    TResult Function(PickingVideoCreatePostState value)? pickingVideo,
+    TResult Function(EdittingVideoCreatePostState value)? editingVideo,
+    TResult Function(CaptionPostCreatePostState value)? captionPost,
     required TResult orElse(),
   }) {
-    if (loaded != null) {
-      return loaded(this);
+    if (pickingVideo != null) {
+      return pickingVideo(this);
     }
     return orElse();
   }
 }
 
-abstract class LoadedCreatePostState implements CreatePostState {
-  const factory LoadedCreatePostState() = _$LoadedCreatePostStateImpl;
+abstract class PickingVideoCreatePostState implements CreatePostState {
+  const factory PickingVideoCreatePostState() =
+      _$PickingVideoCreatePostStateImpl;
+}
+
+/// @nodoc
+abstract class _$$EdittingVideoCreatePostStateImplCopyWith<$Res> {
+  factory _$$EdittingVideoCreatePostStateImplCopyWith(
+          _$EdittingVideoCreatePostStateImpl value,
+          $Res Function(_$EdittingVideoCreatePostStateImpl) then) =
+      __$$EdittingVideoCreatePostStateImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call(
+      {File video,
+      Uint8List selectedThumbnail,
+      List<Uint8List> videoThumbnails,
+      VideoEditingTools currentTool});
+}
+
+/// @nodoc
+class __$$EdittingVideoCreatePostStateImplCopyWithImpl<$Res>
+    extends _$CreatePostStateCopyWithImpl<$Res,
+        _$EdittingVideoCreatePostStateImpl>
+    implements _$$EdittingVideoCreatePostStateImplCopyWith<$Res> {
+  __$$EdittingVideoCreatePostStateImplCopyWithImpl(
+      _$EdittingVideoCreatePostStateImpl _value,
+      $Res Function(_$EdittingVideoCreatePostStateImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of CreatePostState
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? video = null,
+    Object? selectedThumbnail = null,
+    Object? videoThumbnails = null,
+    Object? currentTool = null,
+  }) {
+    return _then(_$EdittingVideoCreatePostStateImpl(
+      video: null == video
+          ? _value.video
+          : video // ignore: cast_nullable_to_non_nullable
+              as File,
+      selectedThumbnail: null == selectedThumbnail
+          ? _value.selectedThumbnail
+          : selectedThumbnail // ignore: cast_nullable_to_non_nullable
+              as Uint8List,
+      videoThumbnails: null == videoThumbnails
+          ? _value._videoThumbnails
+          : videoThumbnails // ignore: cast_nullable_to_non_nullable
+              as List<Uint8List>,
+      currentTool: null == currentTool
+          ? _value.currentTool
+          : currentTool // ignore: cast_nullable_to_non_nullable
+              as VideoEditingTools,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$EdittingVideoCreatePostStateImpl
+    implements EdittingVideoCreatePostState {
+  const _$EdittingVideoCreatePostStateImpl(
+      {required this.video,
+      required this.selectedThumbnail,
+      required final List<Uint8List> videoThumbnails,
+      required this.currentTool})
+      : _videoThumbnails = videoThumbnails;
+
+  @override
+  final File video;
+  @override
+  final Uint8List selectedThumbnail;
+  final List<Uint8List> _videoThumbnails;
+  @override
+  List<Uint8List> get videoThumbnails {
+    if (_videoThumbnails is EqualUnmodifiableListView) return _videoThumbnails;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_videoThumbnails);
+  }
+
+  @override
+  final VideoEditingTools currentTool;
+
+  @override
+  String toString() {
+    return 'CreatePostState.editingVideo(video: $video, selectedThumbnail: $selectedThumbnail, videoThumbnails: $videoThumbnails, currentTool: $currentTool)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$EdittingVideoCreatePostStateImpl &&
+            (identical(other.video, video) || other.video == video) &&
+            const DeepCollectionEquality()
+                .equals(other.selectedThumbnail, selectedThumbnail) &&
+            const DeepCollectionEquality()
+                .equals(other._videoThumbnails, _videoThumbnails) &&
+            (identical(other.currentTool, currentTool) ||
+                other.currentTool == currentTool));
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      video,
+      const DeepCollectionEquality().hash(selectedThumbnail),
+      const DeepCollectionEquality().hash(_videoThumbnails),
+      currentTool);
+
+  /// Create a copy of CreatePostState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$EdittingVideoCreatePostStateImplCopyWith<
+          _$EdittingVideoCreatePostStateImpl>
+      get copyWith => __$$EdittingVideoCreatePostStateImplCopyWithImpl<
+          _$EdittingVideoCreatePostStateImpl>(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(ProgressModel? progress) loading,
+    required TResult Function() pickingVideo,
+    required TResult Function(File video, Uint8List selectedThumbnail,
+            List<Uint8List> videoThumbnails, VideoEditingTools currentTool)
+        editingVideo,
+    required TResult Function(File video, Uint8List thumbnail) captionPost,
+  }) {
+    return editingVideo(video, selectedThumbnail, videoThumbnails, currentTool);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(ProgressModel? progress)? loading,
+    TResult? Function()? pickingVideo,
+    TResult? Function(File video, Uint8List selectedThumbnail,
+            List<Uint8List> videoThumbnails, VideoEditingTools currentTool)?
+        editingVideo,
+    TResult? Function(File video, Uint8List thumbnail)? captionPost,
+  }) {
+    return editingVideo?.call(
+        video, selectedThumbnail, videoThumbnails, currentTool);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(ProgressModel? progress)? loading,
+    TResult Function()? pickingVideo,
+    TResult Function(File video, Uint8List selectedThumbnail,
+            List<Uint8List> videoThumbnails, VideoEditingTools currentTool)?
+        editingVideo,
+    TResult Function(File video, Uint8List thumbnail)? captionPost,
+    required TResult orElse(),
+  }) {
+    if (editingVideo != null) {
+      return editingVideo(
+          video, selectedThumbnail, videoThumbnails, currentTool);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(LoadingCreatePostState value) loading,
+    required TResult Function(PickingVideoCreatePostState value) pickingVideo,
+    required TResult Function(EdittingVideoCreatePostState value) editingVideo,
+    required TResult Function(CaptionPostCreatePostState value) captionPost,
+  }) {
+    return editingVideo(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(LoadingCreatePostState value)? loading,
+    TResult? Function(PickingVideoCreatePostState value)? pickingVideo,
+    TResult? Function(EdittingVideoCreatePostState value)? editingVideo,
+    TResult? Function(CaptionPostCreatePostState value)? captionPost,
+  }) {
+    return editingVideo?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(LoadingCreatePostState value)? loading,
+    TResult Function(PickingVideoCreatePostState value)? pickingVideo,
+    TResult Function(EdittingVideoCreatePostState value)? editingVideo,
+    TResult Function(CaptionPostCreatePostState value)? captionPost,
+    required TResult orElse(),
+  }) {
+    if (editingVideo != null) {
+      return editingVideo(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class EdittingVideoCreatePostState implements CreatePostState {
+  const factory EdittingVideoCreatePostState(
+          {required final File video,
+          required final Uint8List selectedThumbnail,
+          required final List<Uint8List> videoThumbnails,
+          required final VideoEditingTools currentTool}) =
+      _$EdittingVideoCreatePostStateImpl;
+
+  File get video;
+  Uint8List get selectedThumbnail;
+  List<Uint8List> get videoThumbnails;
+  VideoEditingTools get currentTool;
+
+  /// Create a copy of CreatePostState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$EdittingVideoCreatePostStateImplCopyWith<
+          _$EdittingVideoCreatePostStateImpl>
+      get copyWith => throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$CaptionPostCreatePostStateImplCopyWith<$Res> {
+  factory _$$CaptionPostCreatePostStateImplCopyWith(
+          _$CaptionPostCreatePostStateImpl value,
+          $Res Function(_$CaptionPostCreatePostStateImpl) then) =
+      __$$CaptionPostCreatePostStateImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({File video, Uint8List thumbnail});
+}
+
+/// @nodoc
+class __$$CaptionPostCreatePostStateImplCopyWithImpl<$Res>
+    extends _$CreatePostStateCopyWithImpl<$Res,
+        _$CaptionPostCreatePostStateImpl>
+    implements _$$CaptionPostCreatePostStateImplCopyWith<$Res> {
+  __$$CaptionPostCreatePostStateImplCopyWithImpl(
+      _$CaptionPostCreatePostStateImpl _value,
+      $Res Function(_$CaptionPostCreatePostStateImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of CreatePostState
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? video = null,
+    Object? thumbnail = null,
+  }) {
+    return _then(_$CaptionPostCreatePostStateImpl(
+      video: null == video
+          ? _value.video
+          : video // ignore: cast_nullable_to_non_nullable
+              as File,
+      thumbnail: null == thumbnail
+          ? _value.thumbnail
+          : thumbnail // ignore: cast_nullable_to_non_nullable
+              as Uint8List,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$CaptionPostCreatePostStateImpl implements CaptionPostCreatePostState {
+  const _$CaptionPostCreatePostStateImpl(
+      {required this.video, required this.thumbnail});
+
+  @override
+  final File video;
+  @override
+  final Uint8List thumbnail;
+
+  @override
+  String toString() {
+    return 'CreatePostState.captionPost(video: $video, thumbnail: $thumbnail)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$CaptionPostCreatePostStateImpl &&
+            (identical(other.video, video) || other.video == video) &&
+            const DeepCollectionEquality().equals(other.thumbnail, thumbnail));
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      runtimeType, video, const DeepCollectionEquality().hash(thumbnail));
+
+  /// Create a copy of CreatePostState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$CaptionPostCreatePostStateImplCopyWith<_$CaptionPostCreatePostStateImpl>
+      get copyWith => __$$CaptionPostCreatePostStateImplCopyWithImpl<
+          _$CaptionPostCreatePostStateImpl>(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(ProgressModel? progress) loading,
+    required TResult Function() pickingVideo,
+    required TResult Function(File video, Uint8List selectedThumbnail,
+            List<Uint8List> videoThumbnails, VideoEditingTools currentTool)
+        editingVideo,
+    required TResult Function(File video, Uint8List thumbnail) captionPost,
+  }) {
+    return captionPost(video, thumbnail);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(ProgressModel? progress)? loading,
+    TResult? Function()? pickingVideo,
+    TResult? Function(File video, Uint8List selectedThumbnail,
+            List<Uint8List> videoThumbnails, VideoEditingTools currentTool)?
+        editingVideo,
+    TResult? Function(File video, Uint8List thumbnail)? captionPost,
+  }) {
+    return captionPost?.call(video, thumbnail);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(ProgressModel? progress)? loading,
+    TResult Function()? pickingVideo,
+    TResult Function(File video, Uint8List selectedThumbnail,
+            List<Uint8List> videoThumbnails, VideoEditingTools currentTool)?
+        editingVideo,
+    TResult Function(File video, Uint8List thumbnail)? captionPost,
+    required TResult orElse(),
+  }) {
+    if (captionPost != null) {
+      return captionPost(video, thumbnail);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(LoadingCreatePostState value) loading,
+    required TResult Function(PickingVideoCreatePostState value) pickingVideo,
+    required TResult Function(EdittingVideoCreatePostState value) editingVideo,
+    required TResult Function(CaptionPostCreatePostState value) captionPost,
+  }) {
+    return captionPost(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(LoadingCreatePostState value)? loading,
+    TResult? Function(PickingVideoCreatePostState value)? pickingVideo,
+    TResult? Function(EdittingVideoCreatePostState value)? editingVideo,
+    TResult? Function(CaptionPostCreatePostState value)? captionPost,
+  }) {
+    return captionPost?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(LoadingCreatePostState value)? loading,
+    TResult Function(PickingVideoCreatePostState value)? pickingVideo,
+    TResult Function(EdittingVideoCreatePostState value)? editingVideo,
+    TResult Function(CaptionPostCreatePostState value)? captionPost,
+    required TResult orElse(),
+  }) {
+    if (captionPost != null) {
+      return captionPost(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class CaptionPostCreatePostState implements CreatePostState {
+  const factory CaptionPostCreatePostState(
+      {required final File video,
+      required final Uint8List thumbnail}) = _$CaptionPostCreatePostStateImpl;
+
+  File get video;
+  Uint8List get thumbnail;
+
+  /// Create a copy of CreatePostState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$CaptionPostCreatePostStateImplCopyWith<_$CaptionPostCreatePostStateImpl>
+      get copyWith => throw _privateConstructorUsedError;
 }

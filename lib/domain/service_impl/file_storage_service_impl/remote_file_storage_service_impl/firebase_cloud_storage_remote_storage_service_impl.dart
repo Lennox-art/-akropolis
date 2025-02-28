@@ -21,16 +21,16 @@ class FirebaseCloudStorageRemoteStorageServiceImpl extends RemoteFileStorageServ
   /// Possible Failures: [FailureType.networkClientFailure], [FailureType.networkServerFailure]
   @override
   Future<Result<LocalFileCache>> uploadBlob(
-    Uint8List blob, {
+      MediaBlobData blob, {
     Function(ProgressModel progress)? onProgress,
   }) async {
     try {
-      _log.debug("FirebaseCloudStorageRemoteStorageServiceImpl : uploadBlob(blob=${blob.length})");
+      _log.debug("FirebaseCloudStorageRemoteStorageServiceImpl : uploadBlob(blob=${blob.blob.length}, mediaType=${blob.mediaType})");
 
-      Sha1 sha1 = await compute<Uint8List, Sha1>(computeSha1Hash, blob);
+      Sha1 sha1 = await compute<Uint8List, Sha1>(computeSha1Hash, blob.blob);
 
       Reference blobRef = blobDumpReference.child(sha1.short).child(sha1.hash);
-      var existingFileResult = await _doesFileExist(blobRef);
+      Result<String?> existingFileResult = await _doesFileExist(blobRef);
 
       switch (existingFileResult) {
         case Success<String?>():
@@ -38,7 +38,7 @@ class FirebaseCloudStorageRemoteStorageServiceImpl extends RemoteFileStorageServ
           bool exists = downloadUrl != null;
           if (exists) {
             return Result.success(
-              data: LocalFileCache(sha1: sha1.hash, url: downloadUrl),
+              data: LocalFileCache(sha1: sha1.hash, url: downloadUrl, mediaType: blob.mediaType),
             );
           }
           break;
@@ -46,7 +46,7 @@ class FirebaseCloudStorageRemoteStorageServiceImpl extends RemoteFileStorageServ
           break;
       }
 
-      UploadTask uploadBlobTask = blobRef.putData(blob);
+      UploadTask uploadBlobTask = blobRef.putBlob(blob.blob);
 
       await for (TaskSnapshot snapshot in uploadBlobTask.snapshotEvents) {
         if (snapshot.totalBytes == 0) continue;
@@ -82,6 +82,7 @@ class FirebaseCloudStorageRemoteStorageServiceImpl extends RemoteFileStorageServ
               data: LocalFileCache(
                 sha1: sha1.hash,
                 url: downloadUrl,
+                mediaType: blob.mediaType,
               ),
             );
         }
@@ -115,24 +116,33 @@ class FirebaseCloudStorageRemoteStorageServiceImpl extends RemoteFileStorageServ
   /// Returns: [Result.success],if the blob is found, if not found returns [Result.error] with [FailureType.networkServerFailure]
   /// Possible Failures: [FailureType.networkClientFailure], [FailureType.networkServerFailure]
   @override
-  Future<Result<Uint8List>> downloadBlob(String url, {Function(ProgressModel progress)? onProgress}) async {
+  Future<Result<MediaBlobData>> downloadBlob(String url, {Function(ProgressModel progress)? onProgress}) async {
     try {
       _log.debug("FirebaseCloudStorageRemoteStorageServiceImpl : downloadBlob(url=$url)");
 
-      Dio dio = Dio();
-      Response<List<int>> response = await dio.get<List<int>>(
-        url,
-        options: Options(responseType: ResponseType.bytes),
-        onReceiveProgress: (count, total) => onProgress?.call(
-          ProgressModel(sent: count, total: total),
-        ),
-      );
+      Result<MediaType> mediaTypeUrlResult = await getMediaTypeFromUrl(url);
+      switch (mediaTypeUrlResult) {
+        case Success<MediaType>():
+          Dio dio = Dio();
+          Response<List<int>> response = await dio.get<List<int>>(
+            url,
+            options: Options(responseType: ResponseType.bytes),
+            onReceiveProgress: (count, total) => onProgress?.call(
+              ProgressModel(sent: count, total: total),
+            ),
+          );
 
-      Uint8List bytes = Uint8List.fromList(response.data!);
-      return Result.success(
-        data: bytes,
-      );
-    } on DioException catch(e, trace) {
+          Uint8List bytes = Uint8List.fromList(response.data!);
+          return Result.success(
+            data: MediaBlobData(
+              blob: bytes,
+              mediaType: mediaTypeUrlResult.data,
+            ),
+          );
+        case Error<MediaType>():
+          return Result.error(failure: mediaTypeUrlResult.failure);
+      }
+    } on DioException catch (e, trace) {
       return Result.error(
         failure: AppFailure(
           message: e.message ?? e.type.name,
@@ -186,6 +196,48 @@ class FirebaseCloudStorageRemoteStorageServiceImpl extends RemoteFileStorageServ
           );
         }
       }
+      return Result.error(
+        failure: AppFailure(
+          message: e.toString(),
+          trace: trace,
+        ),
+      );
+    }
+  }
+
+  Future<Result<MediaType>> getMediaTypeFromUrl(String url) async {
+    // 1. Make a HEAD request if extension is missing
+    try {
+      Response response = await Dio().head(url);
+      String? contentType = response.headers.value('content-type');
+
+      if (contentType == null) {
+        return Result.error(
+          failure: AppFailure(
+            message: "Content type not found",
+            failureType: FailureType.networkClientFailure,
+            trace: response,
+          ),
+        );
+      }
+
+      if (contentType.startsWith('image/')) {
+        return const Result.success(
+          data: MediaType.image,
+        );
+      }
+      if (contentType.startsWith('video/')) {
+        return const Result.success(data: MediaType.video);
+      }
+
+      return Result.error(
+        failure: AppFailure(
+          message: "Unsupported content type",
+          failureType: FailureType.networkClientFailure,
+          trace: response,
+        ),
+      );
+    } catch (e, trace) {
       return Result.error(
         failure: AppFailure(
           message: e.toString(),

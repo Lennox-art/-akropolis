@@ -1,3 +1,7 @@
+import 'dart:io';
+import 'dart:typed_data';
+
+import 'package:akropolis/data/models/local_models/local_models.dart';
 import 'package:exception_base/exception_base.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
@@ -53,4 +57,37 @@ class ProgressModel {
 
   @override
   String toString() => "$sent / $total = $percent %";
+}
+
+class MediaData {
+  final File file;
+  final MediaType mediaType;
+
+  MediaData({
+    required this.file,
+    required this.mediaType,
+  });
+
+}
+
+class MediaBlobData {
+  final Uint8List blob;
+  final MediaType mediaType;
+
+  MediaBlobData({
+    required this.blob,
+    required this.mediaType,
+  });
+
+}
+
+class CacheFileResult {
+  final File file;
+  final Sha1 sha1;
+
+  CacheFileResult({
+    required this.file,
+    required this.sha1,
+  });
+
 }

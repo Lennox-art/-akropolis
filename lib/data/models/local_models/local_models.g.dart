@@ -19,17 +19,20 @@ class LocalFileCacheAdapter extends TypeAdapter<LocalFileCache> {
     return LocalFileCache(
       sha1: fields[0] as String,
       url: fields[1] as String,
+      mediaType: fields[2] as MediaType,
     );
   }
 
   @override
   void write(BinaryWriter writer, LocalFileCache obj) {
     writer
-      ..writeByte(2)
+      ..writeByte(3)
       ..writeByte(0)
       ..write(obj.sha1)
       ..writeByte(1)
-      ..write(obj.url);
+      ..write(obj.url)
+      ..writeByte(2)
+      ..write(obj.mediaType);
   }
 
   @override

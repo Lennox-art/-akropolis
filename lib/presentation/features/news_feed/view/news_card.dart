@@ -187,7 +187,7 @@ class NewsCard extends StatelessWidget {
 }
 
 class PostCommentCard extends StatelessWidget {
-  PostCommentCard({
+  const PostCommentCard({
     required this.currentUser,
     required this.post,
     required this.comment,
@@ -197,7 +197,6 @@ class PostCommentCard extends StatelessWidget {
   final AppUser currentUser;
   final NewsPost post;
   final PostComment comment;
-  final ValueNotifier<bool> clickedPlay = ValueNotifier(false);
 
   @override
   Widget build(BuildContext context) {
@@ -225,32 +224,9 @@ class PostCommentCard extends StatelessWidget {
         ),
         SizedBox(
           height: 400,
-          child: ValueListenableBuilder(
-            valueListenable: clickedPlay,
-            builder: (_, showVideo, __) {
-              if (!showVideo) {
-                return Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    CachedNetworkImage(
-                      imageUrl: comment.thumbnailUrl,
-                      fit: BoxFit.fill,
-                    ),
-                    IconButton(
-                      onPressed: () {
-                        clickedPlay.value = true;
-                      },
-                      icon: const Icon(Icons.play_arrow),
-                    ),
-                  ],
-                );
-              }
-
-              return CachedVideoPlayer(
-                videoUrl: comment.postUrl,
-                autoPlay: true,
-              );
-            },
+          child: CachedNetworkImage(
+            imageUrl: comment.thumbnailUrl,
+            fit: BoxFit.fill,
           ),
         ),
         Flex(

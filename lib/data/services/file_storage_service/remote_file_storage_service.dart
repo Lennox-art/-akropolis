@@ -9,12 +9,12 @@ abstract class RemoteFileStorageService {
   /// Returns: [Result.success], with a [Sha1] of the [blob] unless otherwise
   /// Possible Failures: [FailureType.networkClientFailure], [FailureType.networkServerFailure],
   Future<Result<LocalFileCache>> uploadBlob(
-    Uint8List blob, {
+      MediaBlobData blob, {
     Function(ProgressModel progress)? onProgress,
   });
 
   /// Function: [downloadBlob] a function that will download the [Uint8List] from the remote server
   /// Returns: [Result.success],if the blob is found, if not found returns [Result.error] with [FailureType.networkServerFailure]
   /// Possible Failures: [FailureType.networkClientFailure], [FailureType.networkServerFailure]
-  Future<Result<Uint8List>> downloadBlob(String url, {Function(ProgressModel progress)? onProgress,});
+  Future<Result<MediaBlobData>> downloadBlob(String url, {Function(ProgressModel progress)? onProgress,});
 }

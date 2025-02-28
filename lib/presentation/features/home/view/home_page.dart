@@ -61,76 +61,42 @@ class _HomePageState extends State<HomePage> {
       length: widget.homeViewModel.allTabs.length,
       child: SafeArea(
         child: Scaffold(
-          extendBody: true,
-          appBar: AppBar(
-            leading: Padding(
-              padding: const EdgeInsets.only(
-                left: 12.0,
-                top: 12.0,
+          backgroundColor: Colors.transparent,
+          body: Stack(
+            children: [
+              Assets.background.image(
+                width: double.infinity,
+                height: double.infinity,
+                fit: BoxFit.fill,
               ),
-              child: ListenableBuilder(
+              ListenableBuilder(
                 listenable: widget.homeViewModel,
                 builder: (_, __) {
                   return widget.homeViewModel.homeState.map(
-                        initial: (_) => Assets.profilePic.svg(),
-                        error: (e) => Text(e.failure.message),
-                        loading: (_) => const InfiniteLoader(),
-                        ready: (r) {
-                          String? profilePicture = r.appUser.profilePicture;
-                          if (profilePicture == null) {
-                            return Assets.profilePic.svg();
-                          }
-
-                          return CircleAvatar(
-                            backgroundImage: CachedNetworkImageProvider(profilePicture),
-                          );
-                        },
-                      ) ??
-                      const SizedBox.shrink();
-                },
-              ),
-            ),
-            actions: [
-              IconButton(
-                onPressed: () {
-                  widget.homeViewModel.logout();
-                  Navigator.of(context).pushNamedAndRemoveUntil(
-                    AppRoutes.login.path,
-                    (_) => false,
+                    initial: (i) => const Text("Initial"),
+                    error: (e) => Text(e.failure.message),
+                    loading: (l) => const InfiniteLoader(),
+                    ready: (r) {
+                      return switch (widget.homeViewModel.currentTab) {
+                        BottomNavigationTabs.newsFeed => NewsFeedTab(
+                            currentUser: r.appUser,
+                            homeViewModel: widget.homeViewModel,
+                            newsFeedViewModel: NewsFeedViewModel(
+                              FetchPostCommentsUseCase(
+                                postRepository: GetIt.I(),
+                              ),
+                            ),
+                          ),
+                        BottomNavigationTabs.search => const SizedBox.shrink(),
+                        BottomNavigationTabs.post => const SizedBox.shrink(),
+                        BottomNavigationTabs.chat => const SizedBox.shrink(),
+                        BottomNavigationTabs.profile => const SizedBox.shrink(),
+                      };
+                    },
                   );
                 },
-                icon: const Icon(
-                  Icons.logout_outlined,
-                  color: Colors.red,
-                ),
               ),
             ],
-          ),
-          body: ListenableBuilder(
-            listenable: widget.homeViewModel,
-            builder: (_, __) {
-              return widget.homeViewModel.homeState.map(
-                initial: (i) => const Text("Initial"),
-                error: (e) => Text(e.failure.message),
-                loading: (l) => const InfiniteLoader(),
-                ready: (r) {
-                  return switch (widget.homeViewModel.currentTab) {
-                    BottomNavigationTabs.newsFeed => NewsFeedTab(
-                        currentUser: r.appUser,
-                        newsFeedViewModel: NewsFeedViewModel(
-                          FetchPostCommentsUseCase(
-                            postRepository: GetIt.I(),
-                          ),
-                        ),
-                      ),
-                    BottomNavigationTabs.search => const SizedBox.shrink(),
-                    BottomNavigationTabs.post => const SizedBox.shrink(),
-                    BottomNavigationTabs.chat => const SizedBox.shrink(),
-                    BottomNavigationTabs.profile => const SizedBox.shrink(),
-                  };
-                },
-              );
-            },
           ),
           bottomNavigationBar: ListenableBuilder(
             listenable: widget.homeViewModel,

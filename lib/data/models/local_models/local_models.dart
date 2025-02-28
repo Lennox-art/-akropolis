@@ -11,16 +11,19 @@ class LocalFileCache extends HiveObject {
   @HiveField(1)
   final String url;
 
+  @HiveField(2)
+  final MediaType mediaType;
+
   LocalFileCache({
     required this.sha1,
     required this.url,
+    required this.mediaType,
   });
 }
 
 enum MediaType {
-  video,
   image,
-  unknown,
+  video;
 }
 
 class MediaTypeAdapter extends TypeAdapter<MediaType> {

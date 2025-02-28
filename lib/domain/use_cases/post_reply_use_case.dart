@@ -68,7 +68,7 @@ class PostReplyUseCase {
 
     //Upload thumbnail
     final Result<LocalFileCache> uploadThumbnailResult = await _remoteFileStorageService.uploadBlob(
-      thumbnailData,
+      MediaBlobData(blob: thumbnailData, mediaType: MediaType.image),
       onProgress: onProgress,
     );
 
@@ -91,7 +91,7 @@ class PostReplyUseCase {
 
     //Upload video
     final Result<LocalFileCache> uploadVideoResult = await _remoteFileStorageService.uploadBlob(
-      videoData,
+      MediaBlobData(blob: videoData, mediaType: MediaType.video),
       onProgress: onProgress,
     );
 

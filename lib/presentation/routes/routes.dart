@@ -1,4 +1,5 @@
 import 'package:akropolis/domain/use_cases/create_user_post_use_case.dart';
+import 'package:akropolis/domain/use_cases/get_media_use_case.dart';
 import 'package:akropolis/presentation/features/authentication/view/forgot_password.dart';
 import 'package:akropolis/presentation/features/authentication/view/login.dart';
 import 'package:akropolis/presentation/features/authentication/view/new_password.dart';
@@ -8,8 +9,6 @@ import 'package:akropolis/presentation/features/authentication/view/sign_up.dart
 import 'package:akropolis/presentation/features/authentication/view_model/authentication_view_model.dart';
 import 'package:akropolis/presentation/features/create_post/view_model/create_post_view_model.dart';
 import 'package:akropolis/presentation/features/create_post/views/create_post_page.dart';
-import 'package:akropolis/presentation/features/create_post/views/edit_video_post_page.dart';
-import 'package:akropolis/presentation/features/create_post/views/post_meta_data_page.dart';
 import 'package:akropolis/presentation/features/home/view/home_page.dart';
 import 'package:akropolis/presentation/features/home/view_model/home_view_model.dart';
 import 'package:akropolis/presentation/features/news_feed/view/news_detailed_view.dart';
@@ -39,8 +38,6 @@ enum AppRoutes {
   welcomePreferences("/welcomePreferences"),
   home("/home"),
   createPost("/createPostPage"),
-  videoEditingPage("/videoEditingPage"),
-  finalizePost("/finalizePost"),
   newsDetailsPage("/newsDetailsPage"),
   postReplyScreen("/postReplyScreen");
 
@@ -125,31 +122,18 @@ enum AppRoutes {
               ),
             ),
           ),
-        AppRoutes.videoEditingPage => EditVideoPostPage(
-            createPostViewModel: CreatePostViewModel(
-              createPostUseCase: CreatePostUseCase(
-                userRepository: GetIt.I(),
-                authenticationRepository: GetIt.I(),
-                postRepository: GetIt.I(),
+        AppRoutes.newsDetailsPage => NewsDetailedViewPage(
+            newsDetailPostViewModel: NewsDetailPostViewModel(
+              getMediaUseCase: GetMediaUseCase(
                 localDataStorageService: GetIt.I(),
-                remoteFileStorageService: GetIt.I(),
                 localFileStorageService: GetIt.I(),
+                remoteFileStorageService: GetIt.I(),
               ),
+              fetchPostCommentsUseCase: GetIt.I(),
             ),
           ),
-        AppRoutes.finalizePost => PostMetaDataPage(
-            createPostViewModel: CreatePostViewModel(
-              createPostUseCase: CreatePostUseCase(
-                userRepository: GetIt.I(),
-                authenticationRepository: GetIt.I(),
-                postRepository: GetIt.I(),
-                localDataStorageService: GetIt.I(),
-                remoteFileStorageService: GetIt.I(),
-                localFileStorageService: GetIt.I(),
-              ),
-            ),
-          ),
-        AppRoutes.newsDetailsPage => const NewsDetailedViewPage(),
         AppRoutes.postReplyScreen => const PostReplyScreenPage(),
       };
 }
+
+//NewsPostDto newsPostDto = ModalRoute.of(context)!.settings.arguments as NewsPostDto

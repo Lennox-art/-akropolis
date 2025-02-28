@@ -181,8 +181,6 @@ AppBarTheme get appBarTheme {
   );
 }
 
-
-
 InputDecorationTheme get inputDecorationTheme {
   return InputDecorationTheme(
     filled: true,
@@ -299,8 +297,6 @@ SliderThemeData get sliderTheme {
   showValueIndicator: ShowValueIndicator.always,
   );
 }
-
-
 
 ThemeData get lightTheme {
   return ThemeData(

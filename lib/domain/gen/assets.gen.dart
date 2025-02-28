@@ -17,7 +17,9 @@ class Assets {
 
   static const SvgGenImage akropolisLogo =
       SvgGenImage('assets/akropolis_logo.svg');
-  static const SvgGenImage akropolisLogoMark =
+  static const AssetGenImage akropolisLogoMarkPng =
+      AssetGenImage('assets/akropolis_logo_mark.png');
+  static const SvgGenImage akropolisLogoMarkSvg =
       SvgGenImage('assets/akropolis_logo_mark.svg');
   static const AssetGenImage background =
       AssetGenImage('assets/background.png');
@@ -47,7 +49,8 @@ class Assets {
   /// List of all assets
   static List<dynamic> get values => [
         akropolisLogo,
-        akropolisLogoMark,
+        akropolisLogoMarkPng,
+        akropolisLogoMarkSvg,
         background,
         chatTearDot,
         chatsCircle,

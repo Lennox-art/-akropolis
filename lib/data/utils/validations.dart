@@ -1,7 +1,9 @@
 import 'dart:io';
 
+import 'package:akropolis/data/models/dto_models/dto_models.dart';
 import 'package:akropolis/data/utils/duration_style.dart';
 import 'package:akropolis/domain/utils/functions.dart';
+import 'package:flutter/foundation.dart';
 
 import 'constants.dart';
 
@@ -57,10 +59,15 @@ Future<String?> validateVideo(String? videoFilePath) async {
   if (videoFilePath == null) return "Video path";
   if (!File(videoFilePath).existsSync()) return "Video not found";
 
-  Duration? videoDuration = await getVideoDuration(videoFilePath);
-  if (videoDuration == null) return "Failed to get video duration";
+  Result<Duration> videoDuration = await getVideoDuration(videoFilePath);
+  switch (videoDuration) {
+    case Success<Duration>():
+      if (videoDuration.data.compareTo(maxVideoDuration) > 0) {
+        return "Video must not be more than ${maxVideoDuration.format(DurationStyle.FORMAT_MM_SS)}";
+      }
 
-  if (videoDuration.compareTo(maxVideoDuration) > 0) return "Video must not be more than ${maxVideoDuration.format(DurationStyle.FORMAT_MM_SS)}";
-
-  return null;
+      return null;
+    case Error<Duration>():
+      return videoDuration.failure.message;
+  }
 }

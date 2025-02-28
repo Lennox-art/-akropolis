@@ -1,3 +1,4 @@
+import 'package:akropolis/data/models/dto_models/dto_models.dart';
 import 'package:akropolis/presentation/ui/themes.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -44,7 +45,7 @@ class CircularFiniteLoader extends StatelessWidget {
     super.key,
   });
 
-  final UploadProgress progress;
+  final ProgressModel progress;
 
   @override
   Widget build(BuildContext context) {

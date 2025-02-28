@@ -15,21 +15,18 @@ import 'package:akropolis/presentation/ui/components/toast/toast.dart';
 import 'package:flutter/cupertino.dart';
 import 'dart:io' as io;
 
-class NewsDetailPostViewModel extends ChangeNotifier {
+class PstCommentDetailPostViewModel extends ChangeNotifier {
   final GetMediaUseCase _getMediaUseCase;
-  final FetchPostCommentsUseCase _fetchPostCommentsUseCase;
   final StreamController<ToastMessage> _toastMessageStream = StreamController.broadcast();
   final StreamController<CreatePostState> _createPostStream = StreamController.broadcast();
   final StreamController<PostComment> _postCommentStream = StreamController.broadcast();
   MediaDownloadState _thumbnailMediaState = const InitialMediaState();
-  MediaDownloadState _postMediaState = InitialMediaState();
-  int? _commentCount;
+  MediaDownloadState _postMediaState = const InitialMediaState();
 
-  NewsDetailPostViewModel({
+  PstCommentDetailPostViewModel({
     required GetMediaUseCase getMediaUseCase,
     required FetchPostCommentsUseCase fetchPostCommentsUseCase,
-  })  : _fetchPostCommentsUseCase = fetchPostCommentsUseCase,
-        _getMediaUseCase = getMediaUseCase;
+  }) : _getMediaUseCase = getMediaUseCase;
 
   Stream<ToastMessage> get toastStream => _toastMessageStream.stream;
 
@@ -37,14 +34,12 @@ class NewsDetailPostViewModel extends ChangeNotifier {
 
   Stream<PostComment> get postCommentStream => _postCommentStream.stream;
 
-  int? get commentCount => _commentCount;
-
   MediaDownloadState get postMediaState => _postMediaState;
 
   MediaDownloadState get thumbnailMediaState => _thumbnailMediaState;
 
   void downloadThumbnail(String url) async {
-    if(_thumbnailMediaState is! InitialMediaState && _thumbnailMediaState is! ErrorDownloadMediaState) return;
+    if (_thumbnailMediaState is! InitialMediaState && _thumbnailMediaState is! ErrorDownloadMediaState) return;
 
     _thumbnailMediaState = const DownloadingMediaState();
     notifyListeners();
@@ -57,8 +52,7 @@ class NewsDetailPostViewModel extends ChangeNotifier {
       },
     );
 
-    switch(thumbnailResult) {
-
+    switch (thumbnailResult) {
       case Success<MediaData>():
         _thumbnailMediaState = DownloadedMediaState(media: thumbnailResult.data);
         notifyListeners();
@@ -71,7 +65,7 @@ class NewsDetailPostViewModel extends ChangeNotifier {
   }
 
   void downloadPost(String url) async {
-    if(_postMediaState is! InitialMediaState || _postMediaState is! ErrorDownloadMediaState) return;
+    if (_postMediaState is! InitialMediaState || _postMediaState is! ErrorDownloadMediaState) return;
 
     _postMediaState = const DownloadingMediaState();
     notifyListeners();
@@ -84,8 +78,7 @@ class NewsDetailPostViewModel extends ChangeNotifier {
       },
     );
 
-    switch(thumbnailResult) {
-
+    switch (thumbnailResult) {
       case Success<MediaData>():
         _postMediaState = DownloadedMediaState(media: thumbnailResult.data);
         notifyListeners();
@@ -93,43 +86,6 @@ class NewsDetailPostViewModel extends ChangeNotifier {
       case Error<MediaData>():
         _postMediaState = ErrorDownloadMediaState(failure: thumbnailResult.failure);
         notifyListeners();
-        break;
-    }
-  }
-
-  Future<Result<List<PostComment>?>> fetchPostComments({
-    required String postCollection,
-    required String postId,
-    required int pageSize,
-    required bool fromCache,
-  }) {
-    return _fetchPostCommentsUseCase.fetchPostComments(
-      postCollection: postCollection,
-      postId: postId,
-      pageSize: pageSize,
-      fromCache: fromCache,
-    );
-  }
-
-  Future<void> countComments({
-    required String postCollection,
-    required String postId,
-  }) async {
-    Result<int> commentCountResult = await _fetchPostCommentsUseCase.countPostComments(
-      postCollection: postCollection,
-      postId: postId,
-      fromCache: true,
-    );
-
-    switch (commentCountResult) {
-      case Success<int>():
-        _commentCount = commentCountResult.data;
-        notifyListeners();
-        break;
-      case Error<int>():
-        _toastMessageStream.add(
-          ToastError(title: "Comment count", message: commentCountResult.failure.message),
-        );
         break;
     }
   }

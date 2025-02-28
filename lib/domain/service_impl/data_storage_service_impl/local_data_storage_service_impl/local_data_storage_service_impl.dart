@@ -26,7 +26,7 @@ class HiveLocalStorageService extends LocalDataStorageService {
 
 
   /// Function: [findLocalFileCacheByUrl], gets a [LocalFileCache] associated by the provided [url]
-  /// Returns: [Result.success], if not found [data] will be null
+  /// Returns: [Result.success], if not found [selectedThumbnail] will be null
   @override
   Future<Result<LocalFileCache?>> findLocalFileCacheByUrl({required String url}) async {
     try {

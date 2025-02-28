@@ -12,7 +12,7 @@ abstract class LocalDataStorageService {
   });
 
   /// Function: [findLocalFileCacheByUrl], gets a [LocalFileCache] associated by a url
-  /// Returns: [Result.success], if not found [data] will be null
+  /// Returns: [Result.success], if not found [selectedThumbnail] will be null
   /// Possible Failures: [FailureType.databaseFailure]
   Future<Result<LocalFileCache?>> findLocalFileCacheByUrl({
     required String url,

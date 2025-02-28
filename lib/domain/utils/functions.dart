@@ -1,13 +1,17 @@
 import 'dart:io';
 import 'dart:math';
 
+import 'package:akropolis/data/models/dto_models/dto_models.dart';
 import 'package:akropolis/main.dart';
+import 'package:exception_base/exception_base.dart';
 import 'package:ffmpeg_kit_flutter_full_gpl/ffmpeg_kit.dart';
 import 'package:ffmpeg_kit_flutter_full_gpl/ffmpeg_session.dart';
 import 'package:ffmpeg_kit_flutter_full_gpl/ffprobe_kit.dart';
 import 'package:ffmpeg_kit_flutter_full_gpl/media_information.dart';
 import 'package:ffmpeg_kit_flutter_full_gpl/media_information_session.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'dart:typed_data';
 import 'package:path/path.dart' as path;
@@ -41,11 +45,9 @@ String formatDuration(Duration duration) {
   return '$minutes:$seconds';
 }
 
-Future<Uint8List?> generateThumbnail({
-  required String videoPath,
-  int timeInSeconds = 1,
-}) async {
+Future<Result<Uint8List>> _generateThumbnail({required String videoPath, int timeInSeconds = 1}) async {
   try {
+    BackgroundIsolateBinaryMessenger.ensureInitialized(RootIsolateToken.instance!);
     Directory d = File(videoPath).parent;
     String outputPath = path.join(d.path, "thumb_${Random().nextInt(20000)}.jpg");
 
@@ -56,78 +58,159 @@ Future<Uint8List?> generateThumbnail({
     FFmpegSession session = await FFmpegKit.execute(command);
 
     final ReturnCode? returnCode = await session.getReturnCode();
-    if (returnCode?.isValueSuccess() ?? false) {
-      log.debug("Thumbnail successfully generated: $outputPath");
-      await Future.delayed(const Duration(seconds: 1));
-      return File(outputPath).readAsBytes();
-    } else {
-      log.debug("Thumbnail generation failed: $returnCode");
-      return null;
+    if (returnCode == null || !returnCode.isValueSuccess()) {
+      return Result.error(
+        failure: AppFailure(
+          message: "Thumbnail generation failed: $returnCode",
+          trace: returnCode,
+        ),
+      );
     }
+
+    log.debug("Thumbnail successfully generated: $outputPath");
+    await Future.delayed(const Duration(seconds: 1));
+    return Result.success(data: await File(outputPath).readAsBytes());
   } catch (e, trace) {
     log.error("Error generating thumbnail $e", trace: trace);
-    return null;
+    return Result.error(
+      failure: AppFailure(
+        message: e.toString(),
+        trace: trace,
+      ),
+    );
   }
 }
 
-Future<List<Uint8List>> generateThumbnails({
-  required String videoPath,
-  required int count,
-}) async {
-  List<Uint8List> thumbnails = [];
+///GenerateThumbnails
+class GenerateThumbnailsRequest {
+  final String videoPath;
+  final int count;
 
-  Duration? duration = await getVideoDuration(videoPath);
-  if (duration == null || duration.inSeconds == 0) return [];
-
-  double interval = duration.inSeconds / count;
-
-  for (int i = 0; i < count; i++) {
-    int timeInSeconds = (interval * i).round();
-    Uint8List? thumbnail = await generateThumbnail(videoPath: videoPath, timeInSeconds: timeInSeconds);
-    if (thumbnail == null) continue;
-    thumbnails.add(thumbnail);
-  }
-
-  return thumbnails;
+  GenerateThumbnailsRequest({
+    required this.videoPath,
+    required this.count,
+  });
 }
 
-Future<Duration?> getVideoDuration(String videoPath) async {
-  final MediaInformationSession session = await FFprobeKit.getMediaInformation(videoPath);
-  final MediaInformation? mediaInfo = session.getMediaInformation();
-
-  if (mediaInfo == null) return null;
-
-  String? durationStr = mediaInfo.getDuration();
-  double? durationInSeconds = durationStr != null ? double.tryParse(durationStr) : null;
-  return durationInSeconds != null ? Duration(seconds: durationInSeconds.toInt()) : null;
-}
-
-Future<File?> trimVideoInRange({
-  required File file,
-  required Duration start,
-  required Duration end,
-}) async {
+Future<Result<List<Uint8List>>> generateThumbnails(GenerateThumbnailsRequest request) async {
   try {
-    final dir = file.parent;
+    List<Uint8List> thumbnails = [];
+
+    Result<Duration> durationResult = await getVideoDuration(request.videoPath);
+
+    switch (durationResult) {
+      case Success<Duration>():
+        double interval = durationResult.data.inSeconds / request.count;
+
+        //TODO: Check if in order
+        List<Result<Uint8List>> thumbnailsResult = await Future.wait<Result<Uint8List>>(
+          List.generate(
+            request.count,
+            (i) {
+              int timeInSeconds = (interval * i).round();
+              return _generateThumbnail(
+                videoPath: request.videoPath,
+                timeInSeconds: timeInSeconds,
+              );
+            },
+          ),
+        );
+        for (Result<Uint8List> result in thumbnailsResult) {
+          switch (result) {
+            case Success<Uint8List>():
+              thumbnails.add(result.data);
+              break;
+            case Error<Uint8List>():
+              continue;
+          }
+        }
+
+        return Result.success(data: thumbnails);
+      case Error<Duration>():
+        return Result.error(failure: durationResult.failure);
+    }
+  } catch (e, trace) {
+    return Result.error(
+      failure: AppFailure(
+        message: e.toString(),
+        trace: trace,
+      ),
+    );
+  }
+}
+
+Future<Result<Duration>> getVideoDuration(String videoPath) async {
+  try {
+    final MediaInformationSession session = await FFprobeKit.getMediaInformation(videoPath);
+    final MediaInformation? mediaInfo = session.getMediaInformation();
+
+    if (mediaInfo == null) {
+      return Result.error(
+        failure: AppFailure(
+          message: "Failed to get media info",
+        ),
+      );
+    }
+
+    String? durationStr = mediaInfo.getDuration();
+    if (durationStr == null) {
+      return Result.error(
+        failure: AppFailure(
+          message: "Failed to get media duration",
+        ),
+      );
+    }
+    double durationInSeconds = double.parse(durationStr);
+    return Result.success(data: Duration(seconds: durationInSeconds.toInt()));
+  } catch (e, trace) {
+    return Result.error(
+      failure: AppFailure(
+        message: e.toString(),
+        trace: trace,
+      ),
+    );
+  }
+}
+
+///Trim Video
+class TrimVideoRequest {
+  final File file;
+  final Duration start;
+  final Duration end;
+
+  TrimVideoRequest({
+    required this.file,
+    required this.start,
+    required this.end,
+  });
+}
+
+Future<Result<File>> trimVideoInRange(TrimVideoRequest request) async {
+  try {
+    final dir = request.file.parent;
     final outputPath = '${dir.path}/trimmed_video_${Random().nextInt(2000)}.mp4';
 
-    String command = '-i "${file.path}" -ss ${start.inSeconds} -to ${end.inSeconds} -c copy "$outputPath"';
+    String command = '-i "${request.file.path}" -ss ${request.start.inSeconds} -to ${request.end.inSeconds} -c copy "$outputPath"';
 
     FFmpegSession session = await FFmpegKit.execute(command);
     final ReturnCode? returnCode = await session.getReturnCode();
-    if (returnCode?.isValueSuccess() ?? false) {
-      log.debug("Video trimmed successfully: $outputPath");
-      return File(outputPath);
-    } else {
-      log.debug("Video trim failed: $returnCode");
-      return null;
-    }
-  } catch (e, trace) {
-    log.error("Error trimming video thumbnail $e", trace: trace);
-    return null;
-  }
-}
 
-bool isTopRoute(BuildContext context) {
-  return ModalRoute.of(context)?.isCurrent ?? false;
+    if (returnCode == null || !returnCode.isValueSuccess()) {
+      return Result.error(
+        failure: AppFailure(
+          message: "Trimming video failed: $returnCode",
+          trace: returnCode,
+        ),
+      );
+    }
+
+    return Result.success(data: File(outputPath));
+  } catch (e, trace) {
+    return Result.error(
+      failure: AppFailure(
+        message: e.toString(),
+        trace: trace,
+      ),
+    );
+  }
 }

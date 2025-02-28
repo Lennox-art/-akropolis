@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
-import 'package:akropolis/data/models/remote_models/remote_models.dart';
+
+import 'package:akropolis/data/models/dto_models/dto_models.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import 'package:flutter/material.dart';
@@ -39,9 +40,16 @@ extension TrimFunctionsX on DurationTrim {
 
 @freezed
 class CreatePostState with _$CreatePostState {
+  const factory CreatePostState.loading({ProgressModel? progress}) = LoadingCreatePostState;
 
-  const factory CreatePostState.loading({UploadProgress? progress}) = LoadingCreatePostState;
+  const factory CreatePostState.pickingVideo() = PickingVideoCreatePostState;
 
-  const factory CreatePostState.loaded() = LoadedCreatePostState;
+  const factory CreatePostState.editingVideo({
+    required File video,
+    required Uint8List selectedThumbnail,
+    required List<Uint8List> videoThumbnails,
+    required VideoEditingTools currentTool,
+  }) = EdittingVideoCreatePostState;
 
+  const factory CreatePostState.captionPost({required File video, required Uint8List thumbnail}) = CaptionPostCreatePostState;
 }
