@@ -12,8 +12,10 @@ import 'package:akropolis/presentation/features/create_post/views/create_post_pa
 import 'package:akropolis/presentation/features/home/view/home_page.dart';
 import 'package:akropolis/presentation/features/home/view_model/home_view_model.dart';
 import 'package:akropolis/presentation/features/news_feed/view/news_detailed_view.dart';
+import 'package:akropolis/presentation/features/news_feed/view/post_comment_view.dart';
 import 'package:akropolis/presentation/features/news_feed/view/post_reply_screen.dart';
 import 'package:akropolis/presentation/features/news_feed/view_models/news_detail_post_view_model.dart';
+import 'package:akropolis/presentation/features/news_feed/view_models/post_comment_detail_post_view_model.dart';
 import 'package:akropolis/presentation/features/on_boarding/view/select_default_preferences.dart';
 import 'package:akropolis/presentation/features/on_boarding/view/select_topic.dart';
 import 'package:akropolis/presentation/features/on_boarding/view/welcome_screen.dart';
@@ -39,7 +41,8 @@ enum AppRoutes {
   home("/home"),
   createPost("/createPostPage"),
   newsDetailsPage("/newsDetailsPage"),
-  postReplyScreen("/postReplyScreen");
+  postReplyScreen("/postReplyScreen"),
+  newsCommentDetailsPage("/newsCommentDetailsPage");
 
   final String path;
 
@@ -133,6 +136,16 @@ enum AppRoutes {
             ),
           ),
         AppRoutes.postReplyScreen => const PostReplyScreenPage(),
+        AppRoutes.newsCommentDetailsPage => PostCommentDetailViewPage(
+            postCommentDetailViewModel: PostCommentDetailtViewModel(
+              getMediaUseCase: GetMediaUseCase(
+                localDataStorageService: GetIt.I(),
+                localFileStorageService: GetIt.I(),
+                remoteFileStorageService: GetIt.I(),
+              ),
+              fetchPostCommentsUseCase: GetIt.I(),
+            ),
+          ),
       };
 }
 

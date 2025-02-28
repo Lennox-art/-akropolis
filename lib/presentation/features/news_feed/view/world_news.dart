@@ -4,15 +4,14 @@ import 'package:akropolis/domain/use_cases/fetch_post_comments_use_case.dart';
 import 'package:akropolis/presentation/features/news_feed/models/models.dart';
 import 'package:akropolis/presentation/features/news_feed/view_models/news_card_view_model.dart';
 import 'package:akropolis/presentation/features/news_feed/view_models/world_news_view_model.dart';
-import 'package:akropolis/presentation/ui/components/loader.dart';
-import 'package:akropolis/presentation/ui/components/toast/toast.dart';
+import 'package:akropolis/presentation/ui/components/page_list_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:paged_list_view/paged_list_view.dart';
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
 import 'news_card.dart';
 
-class WorldNewsContent extends StatelessWidget {
+class WorldNewsContent extends StatefulWidget {
   const WorldNewsContent({
     required this.worldNewsViewModel,
     required this.fetchPostCommentsUseCase,
@@ -23,6 +22,66 @@ class WorldNewsContent extends StatelessWidget {
   final WorldNewsViewModel worldNewsViewModel;
   final FetchPostCommentsUseCase fetchPostCommentsUseCase;
   final AppUser currentUser;
+
+  @override
+  State<WorldNewsContent> createState() => _WorldNewsContentState();
+}
+
+class _WorldNewsContentState extends State<WorldNewsContent> {
+
+  final PageWrapper page = PageWrapper();
+
+  late final PagingController<int, NewsPost> pagingController = PagingController(
+    firstPageKey: page.page,
+  );
+
+  Future<void> _fetchPageItems() async {
+    try {
+      Result<List<NewsPost>?> forYouHighlightResult = await widget.worldNewsViewModel.fetchWorldPostsNews(
+        pageSize: PageWrapper.pageSize,
+        fromCache: page.initialFetch,
+      );
+
+      switch (forYouHighlightResult) {
+        case Success<List<NewsPost>?>():
+          if (page.initialFetch) page.initialFetch = false;
+          List<NewsPost> newItems = forYouHighlightResult.data ?? [];
+          int noOfNewItems = newItems.length;
+
+          final isLastPage = noOfNewItems < PageWrapper.pageSize;
+          if (isLastPage) {
+            pagingController.appendLastPage(newItems);
+            return;
+          }
+
+          final int nextPageKey = page.page++;
+          pagingController.appendPage(newItems, nextPageKey);
+
+          return;
+        case Error<List<NewsPost>?>():
+          pagingController.error = forYouHighlightResult.failure.message;
+          return;
+      }
+    } catch (error, trace) {
+      pagingController.error = error;
+    }
+  }
+
+  @override
+  void initState() {
+    pagingController.addPageRequestListener((p) {
+      page.page = p;
+      _fetchPageItems();
+    });
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    pagingController.dispose();
+    super.dispose();
+  }
+
 
   /*late final ScrollOpacityController _opacityController;
   final ScrollController mainPageScrollController = ScrollController();
@@ -49,41 +108,27 @@ class WorldNewsContent extends StatelessWidget {
     mainPageScrollController.dispose();
     super.dispose();
   }*/
+
   @override
   Widget build(BuildContext context) {
-    final GlobalKey<PagedListState> pagedListKey = GlobalKey<PagedListState>();
-    return PagedList<NewsPost>(
+    return PagedListView<int, NewsPost>(
       shrinkWrap: true,
-      key: pagedListKey,
-      scrollPhysics: const NeverScrollableScrollPhysics(),
-      // Disables ListView scrolling
-      firstPageProgressIndicatorBuilder: (_) => const InfiniteLoader(),
-      newPageProgressIndicatorBuilder: (_) => const InfiniteLoader(),
-      itemBuilder: (_, news, i) => NewsCard(
-        post: news,
-        newsCardViewModel: NewsCardViewModel(
-          newsPost: news,
-          newsChannel: NewsChannel.worldNews,
-          appUser: currentUser,
-          postRepository: GetIt.I(),
-          fetchPostCommentsUseCase: fetchPostCommentsUseCase,
+      pagingController: pagingController,
+      physics: const NeverScrollableScrollPhysics(),
+      builderDelegate: pagedChildBuilderDelegate(
+        context: context,
+        itemBuilder: (_, news, i) => NewsCard(
+          post: news,
+          newsCardViewModel: NewsCardViewModel(
+            newsPost: news,
+            newsChannel: NewsChannel.worldNews,
+            appUser: widget.currentUser,
+            postRepository: GetIt.I(),
+            fetchPostCommentsUseCase: widget.fetchPostCommentsUseCase,
+          ),
         ),
+        fetchPageItems: _fetchPageItems,
       ),
-      fetchPage: (int page, int pageSize, bool initialFetch) async {
-        Result<List<NewsPost>?> headlinesResult = await worldNewsViewModel.fetchWorldPostsNews(
-          pageSize: pageSize,
-          fromCache: initialFetch,
-          country: null,
-        );
-
-        switch (headlinesResult) {
-          case Success<List<NewsPost>?>():
-            return headlinesResult.data;
-          case Error<List<NewsPost>?>():
-            ToastError(message: headlinesResult.failure.message).show();
-            return [];
-        }
-      },
     );
   }
 }

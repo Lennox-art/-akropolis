@@ -5,10 +5,12 @@ import 'package:akropolis/domain/utils/functions.dart';
 import 'package:akropolis/presentation/features/news_feed/models/enums.dart';
 import 'package:akropolis/presentation/features/news_feed/models/models.dart';
 import 'package:akropolis/presentation/features/news_feed/view_models/news_card_view_model.dart';
+import 'package:akropolis/presentation/features/news_feed/view_models/post_comment_card_view_model.dart';
 import 'package:akropolis/presentation/routes/routes.dart';
 import 'package:akropolis/presentation/ui/components/app_video_player.dart';
 import 'package:akropolis/presentation/ui/components/loader.dart';
 import 'package:akropolis/presentation/ui/components/news_post_components.dart';
+import 'package:akropolis/presentation/ui/themes.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -191,99 +193,68 @@ class PostCommentCard extends StatelessWidget {
     required this.currentUser,
     required this.post,
     required this.comment,
+    required this.postCommentCardViewModel,
     super.key,
   });
 
   final AppUser currentUser;
   final NewsPost post;
   final PostComment comment;
+  final PostCommentCardViewModel postCommentCardViewModel;
 
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
+    postCommentCardViewModel.downloadThumbnail();
 
-    return Column(
+    return Flex(
+      direction: Axis.vertical,
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.center,
       mainAxisSize: MainAxisSize.min,
       children: [
-        ListTile(
-          leading: Builder(
-            builder: (context) {
-              if (comment.author.imageUrl == null) {
-                return const Icon(Icons.person);
-              }
+        Expanded(
+          child: ListenableBuilder(
+            listenable: postCommentCardViewModel,
+            builder: (_, __) {
+              return postCommentCardViewModel.thumbnailMediaState.map(
+                initial: (_) => const SizedBox.shrink(),
+                downloadingMedia: (d) {
+                  if (d.progress == null) {
+                    return const InfiniteLoader();
+                  }
 
-              return CircleAvatar(
-                backgroundImage: CachedNetworkImageProvider(comment.author.imageUrl!),
+                  return CircularFiniteLoader(progress: d.progress!);
+                },
+                downloadedMedia: (d) {
+                  return Container(
+                    decoration: BoxDecoration(
+                      color: Colors.black12,
+                      borderRadius: const BorderRadius.all(
+                        Radius.circular(16.0),
+                      ),
+                      image: DecorationImage(
+                        image: FileImage(
+                          d.media.file,
+
+                        ),
+                        fit: BoxFit.fill,
+                      ),
+                    ),
+                  );
+                },
+                errorDownloadingMedia: (e) => IconButton(
+                  onPressed: postCommentCardViewModel.downloadThumbnail,
+                  icon: const Icon(
+                    Icons.broken_image_outlined,
+                  ),
+                ),
               );
             },
           ),
-          title: Text(comment.author.name),
-          trailing: Text(timeAgo(comment.commentedAt)),
         ),
-        SizedBox(
-          height: 400,
-          child: CachedNetworkImage(
-            imageUrl: comment.thumbnailUrl,
-            fit: BoxFit.fill,
-          ),
-        ),
-        Flex(
-          direction: Axis.horizontal,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              child: CommentReactionWidget(
-                newsPost: post,
-                postComment: comment,
-                currentUser: currentUser,
-                onLogician: () {},
-                onEmpathy: () {},
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 50.0, right: 8),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.end,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Icon(Icons.show_chart),
-                  ),
-                  MenuAnchor(
-                    builder: (_, controller, __) {
-                      return IconButton(
-                        onPressed: () {
-                          if (controller.isOpen) {
-                            controller.close();
-                            return;
-                          }
-                          controller.open();
-                        },
-                        icon: const Icon(Icons.more_vert),
-                        tooltip: 'Post options',
-                      );
-                    },
-                    menuChildren: PostMenu.values
-                        .where((e) => e != PostMenu.notInterested)
-                        .map(
-                          (menu) => MenuItemButton(
-                            onPressed: () {},
-                            child: Text(
-                              menu.title,
-                              style: TextStyle(color: menu == PostMenu.report ? Colors.red : Colors.white),
-                            ),
-                          ),
-                        ).toList(),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+        Text(comment.author.name),
+        Text(timeAgo(comment.commentedAt)),
       ],
     );
   }
@@ -527,6 +498,8 @@ class ForYouCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
+    bool alreadyVoted = post.reaction.log.contains(currentUser.id) || post.reaction.emp.contains(currentUser.id);
+    ReactionDistribution distribution = ReactionDistribution(post.reaction);
 
     return GestureDetector(
       onTap: () {
@@ -536,7 +509,7 @@ class ForYouCard extends StatelessWidget {
         );
       },
       child: Container(
-        height: 210,
+        height: 400,
         padding: const EdgeInsets.all(10.0),
         decoration: const BoxDecoration(
           border: Border(
@@ -552,174 +525,189 @@ class ForYouCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Expanded(
-              child: Flex(
-                direction: Axis.horizontal,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
                 children: [
-                  Flexible(
-                    flex: 10,
-                    fit: FlexFit.tight,
-                    child: Flex(
-                      direction: Axis.vertical,
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Row(
-                            children: [
-                              Visibility(
-                                visible: post.author.imageUrl != null,
-                                replacement: const CircleAvatar(
-                                  radius: 12,
-                                  child: Icon(
-                                    Icons.person,
-                                  ),
-                                ),
-                                child: CircleAvatar(
-                                  radius: 12,
-                                  backgroundImage: CachedNetworkImageProvider(
-                                    post.author.imageUrl ?? '',
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(left: 4.0),
-                                child: Text(
-                                  post.author.name,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: theme.textTheme.labelLarge?.copyWith(
-                                    fontSize: 14,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(
-                              post.description,
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 10,
-                              style: theme.textTheme.bodyLarge?.copyWith(
-                                fontSize: 12,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
+                  Visibility(
+                    visible: post.author.imageUrl != null,
+                    replacement: const CircleAvatar(
+                      radius: 12,
+                      child: Icon(
+                        Icons.person,
+                      ),
+                    ),
+                    child: CircleAvatar(
+                      radius: 12,
+                      backgroundImage: CachedNetworkImageProvider(
+                        post.author.imageUrl ?? '',
+                      ),
                     ),
                   ),
-                  Flexible(
-                    flex: 7,
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Visibility(
-                        visible: post.thumbnailUrl.isNotEmpty,
-                        child: ClipRRect(
-                          borderRadius: const BorderRadius.all(
-                            Radius.circular(16.0),
-                          ),
-                          child: CachedNetworkImage(
-                            imageUrl: post.thumbnailUrl,
-                            height: 50,
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                            errorWidget: (context, url, error) {
-                              log.error(error.toString());
-                              return const Icon(
-                                Icons.broken_image,
-                                size: 180,
-                              );
-                            },
-                          ),
-                        ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 4.0),
+                    child: Text(
+                      post.author.name,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.labelLarge?.copyWith(
+                        fontSize: 14,
+                        color: Colors.white,
                       ),
                     ),
                   ),
                 ],
               ),
             ),
+            Expanded(
+              child: Visibility(
+                visible: post.thumbnailUrl.isNotEmpty,
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.all(
+                    Radius.circular(16.0),
+                  ),
+                  child: CachedNetworkImage(
+                    imageUrl: post.thumbnailUrl,
+                    height: 50,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    errorWidget: (context, url, error) {
+                      log.error(error.toString());
+                      return const Icon(
+                        Icons.broken_image,
+                        size: 180,
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                post.description,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 10,
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  fontSize: 12,
+                  color: Colors.white,
+                ),
+              ),
+            ),
             Flex(
               direction: Axis.horizontal,
-              crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Flex(
-                  direction: Axis.horizontal,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Visibility(
-                        visible: post.author.imageUrl != null,
-                        replacement: const CircleAvatar(
-                          radius: 12,
-                          child: Icon(
-                            Icons.person,
-                          ),
-                        ),
-                        child: CircleAvatar(
-                          radius: 12,
-                          backgroundImage: CachedNetworkImageProvider(
-                            post.author.imageUrl ?? '',
-                          ),
-                        ),
+                Expanded(
+                  flex: distribution.logFlex,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 12),
+                    decoration: const BoxDecoration(
+                      color: primaryColor,
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(10),
                       ),
                     ),
-                    ListenableBuilder(
-                      listenable: newsCardViewModel,
-                      builder: (_, __) {
-                        return Visibility(
-                          visible: !newsCardViewModel.loadingComments,
-                          replacement: const InfiniteLoader(),
-                          child: Text(
-                            "+${newsCardViewModel.commentsCount ?? 0} Replies",
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: Colors.white,
-                            ),
-                          ),
-                        );
-                      },
+                    child: Text(
+                      "${distribution.logPercent} % (${distribution.logCount})",
+                      style: theme.textTheme.bodySmall,
                     ),
-                    const Padding(
-                      padding: EdgeInsets.only(left: 8.0),
-                      child: Icon(
-                        Icons.circle,
-                        size: 6,
-                      ),
-                    ),
-                    const Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Icon(
-                        Icons.share_outlined,
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
-                Flex(
-                  direction: Axis.horizontal,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Assets.minusCircle.svg(
-                      color: Colors.orange,
-                      height: 20,
-                      width: 20,
+                const SizedBox(
+                  width: 15,
+                ),
+                Expanded(
+                  flex: distribution.empFlex,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 12),
+                    decoration: const BoxDecoration(
+                      color: Colors.orangeAccent,
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(10),
+                      ),
                     ),
-                    const Icon(Icons.more_vert)
-                  ],
+                    child: Text(
+                      "${distribution.empPercent} % (${distribution.empCount})",
+                      style: theme.textTheme.bodySmall,
+                    ),
+                  ),
                 ),
               ],
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+                    decoration: const BoxDecoration(
+                      color: primaryColor,
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(10),
+                      ),
+                    ),
+                    child: GestureDetector(
+                      onTap: alreadyVoted ? null : () {},
+                      child: Flex(
+                        direction: Axis.horizontal,
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Flexible(
+                            child: Assets.fatArrowUp.svg(),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                            child: Text(
+                              "LGN",
+                              style: theme.textTheme.labelSmall?.copyWith(color: secondaryColor),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+                    decoration: BoxDecoration(
+                      borderRadius: const BorderRadius.all(
+                        Radius.circular(10),
+                      ),
+                      border: Border.all(
+                        color: Colors.orange,
+                        width: 1.0,
+                      ),
+                    ),
+                    child: GestureDetector(
+                      onTap: alreadyVoted ? null : () {},
+                      child: Flex(
+                        direction: Axis.horizontal,
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Flexible(
+                            child: Assets.fatArrowUp.svg(
+                              color: Colors.orange,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                            child: Text(
+                              "Emp",
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                color: Colors.orange,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),

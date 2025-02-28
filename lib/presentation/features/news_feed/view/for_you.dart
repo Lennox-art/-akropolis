@@ -6,14 +6,14 @@ import 'package:akropolis/presentation/features/news_feed/view/news_card.dart';
 import 'package:akropolis/presentation/features/news_feed/view_models/for_you_view_model.dart';
 import 'package:akropolis/presentation/features/news_feed/view_models/news_card_view_model.dart';
 import 'package:akropolis/presentation/ui/components/loader.dart';
-import 'package:akropolis/presentation/ui/components/toast/toast.dart';
+import 'package:akropolis/presentation/ui/components/page_list_widgets.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:infinite_carousel/infinite_carousel.dart';
-import 'package:paged_list_view/paged_list_view.dart';
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
-class ForYouContent extends StatelessWidget {
+class ForYouContent extends StatefulWidget {
   const ForYouContent({
     required this.currentUser,
     required this.forYouViewModel,
@@ -24,6 +24,64 @@ class ForYouContent extends StatelessWidget {
   final AppUser currentUser;
   final ForYouViewModel forYouViewModel;
   final FetchPostCommentsUseCase fetchPostCommentsUseCase;
+
+  @override
+  State<ForYouContent> createState() => _ForYouContentState();
+}
+
+class _ForYouContentState extends State<ForYouContent> {
+  final PageWrapper page = PageWrapper();
+
+  late final PagingController<int, NewsPost> pagingController = PagingController(
+    firstPageKey: page.page,
+  );
+
+  Future<void> _fetchPageItems() async {
+    try {
+      Result<List<NewsPost>?> forYouHighlightResult = await widget.forYouViewModel.fetchForYouPostsNews(
+        pageSize: PageWrapper.pageSize,
+        fromCache: page.initialFetch,
+      );
+
+      switch (forYouHighlightResult) {
+        case Success<List<NewsPost>?>():
+          if (page.initialFetch) page.initialFetch = false;
+          List<NewsPost> newItems = forYouHighlightResult.data ?? [];
+          int noOfNewItems = newItems.length;
+
+          final isLastPage = noOfNewItems < PageWrapper.pageSize;
+          if (isLastPage) {
+            pagingController.appendLastPage(newItems);
+            return;
+          }
+
+          final int nextPageKey = page.page++;
+          pagingController.appendPage(newItems, nextPageKey);
+
+          return;
+        case Error<List<NewsPost>?>():
+          pagingController.error = forYouHighlightResult.failure.message;
+          return;
+      }
+    } catch (error, trace) {
+      pagingController.error = error;
+    }
+  }
+
+  @override
+  void initState() {
+    pagingController.addPageRequestListener((p) {
+      page.page = p;
+      _fetchPageItems();
+    });
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    pagingController.dispose();
+    super.dispose();
+  }
 
   /*late final ScrollOpacityController _opacityController;
   final ScrollController mainPageScrollController = ScrollController();
@@ -50,10 +108,9 @@ class ForYouContent extends StatelessWidget {
     mainPageScrollController.dispose();
     super.dispose();
   }*/
+
   @override
   Widget build(BuildContext context) {
-    final GlobalKey<PagedListState> pagedListKey = GlobalKey<PagedListState>();
-
     return SingleChildScrollView(
       child: Container(
         decoration: const BoxDecoration(
@@ -78,7 +135,7 @@ class ForYouContent extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             FutureBuilder(
-              future: forYouViewModel.fetchForYouPostsNews(
+              future: widget.forYouViewModel.fetchForYouPostsNews(
                 pageSize: 10,
                 fromCache: true,
               ),
@@ -93,45 +150,33 @@ class ForYouContent extends StatelessWidget {
                   case Success<List<NewsPost>?>():
                     return ForYouHighlightCarrousel(
                       newsPost: forYouHighlightResult.data ?? [],
-                      currentUser: currentUser,
-                      fetchPostCommentsUseCase: fetchPostCommentsUseCase,
+                      currentUser: widget.currentUser,
+                      fetchPostCommentsUseCase: widget.fetchPostCommentsUseCase,
                     );
                   case Error<List<NewsPost>?>():
                     return Text(forYouHighlightResult.failure.message);
                 }
               },
             ),
-            PagedList<NewsPost>(
+            PagedListView<int, NewsPost>(
               shrinkWrap: true,
-              key: pagedListKey,
-              scrollPhysics: const ClampingScrollPhysics(),
-              firstPageProgressIndicatorBuilder: (_) => const InfiniteLoader(),
-              newPageProgressIndicatorBuilder: (_) => const InfiniteLoader(),
-              itemBuilder: (_, news, i) => ForYouCard(
-                post: news,
-                newsCardViewModel: NewsCardViewModel(
-                  newsPost: news,
-                  newsChannel: NewsChannel.userPosts,
-                  appUser: currentUser,
-                  postRepository: GetIt.I(),
-                  fetchPostCommentsUseCase: fetchPostCommentsUseCase,
+              pagingController: pagingController,
+              physics: const ClampingScrollPhysics(),
+              builderDelegate: pagedChildBuilderDelegate(
+                context: context,
+                itemBuilder: (_, news, i) => ForYouCard(
+                  post: news,
+                  newsCardViewModel: NewsCardViewModel(
+                    newsPost: news,
+                    newsChannel: NewsChannel.userPosts,
+                    appUser: widget.currentUser,
+                    postRepository: GetIt.I(),
+                    fetchPostCommentsUseCase: widget.fetchPostCommentsUseCase,
+                  ),
+                  currentUser: widget.currentUser,
                 ),
-                currentUser: currentUser,
+                fetchPageItems: _fetchPageItems,
               ),
-              fetchPage: (int page, int pageSize, bool initialFetch) async {
-                Result<List<NewsPost>?> forYouHighlightResult = await forYouViewModel.fetchForYouPostsNews(
-                  pageSize: pageSize,
-                  fromCache: initialFetch,
-                );
-
-                switch (forYouHighlightResult) {
-                  case Success<List<NewsPost>?>():
-                    return forYouHighlightResult.data;
-                  case Error<List<NewsPost>?>():
-                    ToastError(message: forYouHighlightResult.failure.message).show();
-                    return [];
-                }
-              },
             ),
           ],
         ),

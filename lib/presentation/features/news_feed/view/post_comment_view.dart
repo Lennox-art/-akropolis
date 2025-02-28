@@ -1,97 +1,42 @@
 import 'dart:async';
 
-import 'package:akropolis/data/models/dto_models/dto_models.dart';
 import 'package:akropolis/data/models/local_models/local_models.dart';
 import 'package:akropolis/data/models/remote_models/remote_models.dart';
-import 'package:akropolis/domain/use_cases/get_media_use_case.dart';
+import 'package:akropolis/domain/gen/assets.gen.dart';
 
 import 'package:akropolis/data/utils/date_format.dart';
 import 'package:akropolis/presentation/features/news_feed/models/enums.dart';
 import 'package:akropolis/presentation/features/news_feed/models/models.dart';
-import 'package:akropolis/presentation/features/news_feed/view_models/news_detail_post_view_model.dart';
-import 'package:akropolis/presentation/features/news_feed/view_models/post_comment_card_view_model.dart';
-import 'package:akropolis/presentation/features/news_feed/view_models/reply_post_view_model.dart';
-import 'package:akropolis/presentation/routes/routes.dart';
+import 'package:akropolis/presentation/features/news_feed/view_models/post_comment_detail_post_view_model.dart';
 import 'package:akropolis/presentation/ui/components/app_video_player.dart';
 import 'package:akropolis/presentation/ui/components/loader.dart';
-import 'package:akropolis/presentation/ui/components/page_list_widgets.dart';
-import 'package:akropolis/presentation/ui/themes.dart';
+import 'package:akropolis/presentation/ui/components/news_post_components.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:get_it/get_it.dart';
-import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
-import 'news_card.dart';
 
-class NewsDetailedViewPage extends StatefulWidget {
-  const NewsDetailedViewPage({
-    required this.newsDetailPostViewModel,
+class PostCommentDetailViewPage extends StatefulWidget {
+  const PostCommentDetailViewPage({
+    required this.postCommentDetailViewModel,
     super.key,
   });
 
-  final NewsDetailPostViewModel newsDetailPostViewModel;
+  final PostCommentDetailtViewModel postCommentDetailViewModel;
 
   @override
-  State<NewsDetailedViewPage> createState() => _NewsDetailedViewPageState();
+  State<PostCommentDetailViewPage> createState() => _PostCommentDetailViewPageState();
 }
 
-class _NewsDetailedViewPageState extends State<NewsDetailedViewPage> {
+class _PostCommentDetailViewPageState extends State<PostCommentDetailViewPage> {
   late final StreamSubscription<PostComment> commentPostedStreamSubscription;
-  late final ReplyPostViewModel replyPostViewModel;
-  late final NewsPost newsPost;
-  late final NewsChannel newsChannel;
-  late final AppUser currentUser;
-  final PageWrapper page = PageWrapper();
-
-  late final PagingController<int, PostComment> pagingController = PagingController(
-    firstPageKey: page.page,
-  );
-
-  Future<void> _fetchPageItems() async {
-    try {
-      Result<List<PostComment>?> fetchCommentsResult = await widget.newsDetailPostViewModel.fetchPostComments(
-        postCollection: newsChannel.collection,
-        postId: newsPost.id,
-        pageSize: PageWrapper.pageSize,
-        fromCache: page.initialFetch,
-      );
-
-      switch (fetchCommentsResult) {
-        case Success<List<PostComment>?>():
-          if (page.initialFetch) page.initialFetch = false;
-          List<PostComment> newItems = fetchCommentsResult.data ?? [];
-          int noOfNewItems = newItems.length;
-
-          final isLastPage = noOfNewItems < PageWrapper.pageSize;
-          if (isLastPage) {
-            pagingController.appendLastPage(newItems);
-            return;
-          }
-
-          final int nextPageKey = page.page++;
-          pagingController.appendPage(newItems, nextPageKey);
-
-          return;
-        case Error<List<PostComment>?>():
-          pagingController.error = fetchCommentsResult.failure.message;
-          return;
-      }
-    } catch (error, trace) {
-      pagingController.error = error;
-    }
-  }
 
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback(
       (_) {
-        commentPostedStreamSubscription = widget.newsDetailPostViewModel.postCommentStream.listen(_onCommentPosted);
+        commentPostedStreamSubscription = widget.postCommentDetailViewModel.postCommentStream.listen(_onCommentPosted);
       },
     );
-    pagingController.addPageRequestListener((p) {
-      page.page = p;
-      _fetchPageItems();
-    });
     super.initState();
   }
 
@@ -99,26 +44,26 @@ class _NewsDetailedViewPageState extends State<NewsDetailedViewPage> {
 
   @override
   void dispose() {
-    widget.newsDetailPostViewModel.dispose();
-    pagingController.dispose();
+    widget.postCommentDetailViewModel.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    NewsPostDto newsPostDto = ModalRoute.of(context)!.settings.arguments as NewsPostDto;
-    newsPost = newsPostDto.newsPost;
-    newsChannel = newsPostDto.channel;
-    currentUser = newsPostDto.currentUser;
-    ReactionDistribution distribution = ReactionDistribution(newsPost.reaction);
+    NewsPostCommentDto newsPostDto = ModalRoute.of(context)!.settings.arguments as NewsPostCommentDto;
+    NewsPost newsPost = newsPostDto.newsPost;
+    NewsChannel newsChannel = newsPostDto.channel;
+    AppUser currentUser = newsPostDto.currentUser;
+    PostComment comment = newsPostDto.comment;
 
-    widget.newsDetailPostViewModel.downloadThumbnail(newsPost.thumbnailUrl);
+    widget.postCommentDetailViewModel.downloadThumbnail(newsPost.thumbnailUrl);
+
+
     final ThemeData theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: Colors.transparent,
       appBar: AppBar(
-        title: null,
+        backgroundColor: Colors.transparent,
         actions: [
           /*Padding(
             padding: const EdgeInsets.all(8.0),
@@ -168,7 +113,10 @@ class _NewsDetailedViewPageState extends State<NewsDetailedViewPage> {
           ),*/
         ],
       ),
-      body: ListView(
+      backgroundColor: Colors.transparent,
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -230,11 +178,11 @@ class _NewsDetailedViewPageState extends State<NewsDetailedViewPage> {
             height: 400,
             color: Colors.black12,
             child: ListenableBuilder(
-              listenable: widget.newsDetailPostViewModel,
+              listenable: widget.postCommentDetailViewModel,
               builder: (_, __) {
-                return widget.newsDetailPostViewModel.postMediaState.map(
+                return widget.postCommentDetailViewModel.postMediaState.map(
                   initial: (_) {
-                    return widget.newsDetailPostViewModel.thumbnailMediaState.map(
+                    return widget.postCommentDetailViewModel.thumbnailMediaState.map(
                       initial: (_) => const SizedBox.shrink(),
                       downloadingMedia: (d) {
                         if (d.progress == null) {
@@ -253,7 +201,7 @@ class _NewsDetailedViewPageState extends State<NewsDetailedViewPage> {
                       },
                       errorDownloadingMedia: (e) => IconButton(
                         onPressed: () {
-                          widget.newsDetailPostViewModel.downloadThumbnail(newsPost.thumbnailUrl);
+                          widget.postCommentDetailViewModel.downloadThumbnail(newsPost.thumbnailUrl);
                         },
                         icon: const Icon(
                           Icons.broken_image_outlined,
@@ -286,7 +234,7 @@ class _NewsDetailedViewPageState extends State<NewsDetailedViewPage> {
                   },
                   errorDownloadingMedia: (e) => IconButton(
                     onPressed: () {
-                      widget.newsDetailPostViewModel.downloadPost(
+                      widget.postCommentDetailViewModel.downloadPost(
                         newsPost.postUrl,
                       );
                     },
@@ -306,69 +254,49 @@ class _NewsDetailedViewPageState extends State<NewsDetailedViewPage> {
               textAlign: TextAlign.start,
             ),
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 8.0, top: 4.0),
-                child: Text(
-                  newsPost.publishedAt.commentDateTime,
-                  style: theme.textTheme.labelMedium?.copyWith(
-                    fontSize: 14,
-                    color: Colors.grey,
-                  ),
-                  textAlign: TextAlign.start,
-                ),
+          Padding(
+            padding: const EdgeInsets.only(left: 8.0, top: 4.0),
+            child: Text(
+              newsPost.publishedAt.commentDateTime,
+              style: theme.textTheme.labelMedium?.copyWith(
+                fontSize: 14,
+                color: Colors.grey,
               ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  "View Post Activity",
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: Colors.grey,
-                  ),
-                ),
-              ),
-            ],
+              textAlign: TextAlign.start,
+            ),
           ),
           Flex(
             direction: Axis.horizontal,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisSize: MainAxisSize.max,
             children: [
               Expanded(
-                flex: distribution.logFlex,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 12),
-                  decoration: const BoxDecoration(
-                    color: primaryColor,
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(10),
+                child: Flex(
+                  direction: Axis.horizontal,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Expanded(
+                      child: NewsPostReactionWidget(
+                        newsPost: newsPost,
+                        currentUser: currentUser,
+                        onEmpathy: () {},
+                        onLogician: () {},
+                      ),
                     ),
-                  ),
-                  child: Text(
-                    "${distribution.logPercent} % (${distribution.logCount})",
-                    style: theme.textTheme.bodySmall,
-                  ),
+                    Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Assets.medal.svg(),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(
-                width: 15,
-              ),
-              Expanded(
-                flex: distribution.empFlex,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 12),
-                  decoration: const BoxDecoration(
-                    color: Colors.orangeAccent,
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(10),
-                    ),
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(
+                    8.0,
                   ),
-                  child: Text(
-                    "${distribution.empPercent} % (${distribution.empCount})",
-                    style: theme.textTheme.bodySmall,
-                  ),
+                  child: Assets.share.svg(),
                 ),
               ),
             ],
@@ -376,49 +304,29 @@ class _NewsDetailedViewPageState extends State<NewsDetailedViewPage> {
           const Divider(
             color: Colors.white12,
           ),
-          PagedGridView<int, PostComment>(
-            shrinkWrap: true,
-            showNewPageProgressIndicatorAsGridChild: false,
-            showNewPageErrorIndicatorAsGridChild: false,
-            showNoMoreItemsIndicatorAsGridChild: false,
-            pagingController: pagingController,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              childAspectRatio: 100 / 150,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-              crossAxisCount: 2,
-            ),
-            physics: const NeverScrollableScrollPhysics(),
-            builderDelegate: pagedChildBuilderDelegate(
-              context: context,
-              itemBuilder: (_, comment, i) =>  GestureDetector(
-                onTap: () {
-                  Navigator.of(context).pushNamed(
-                    AppRoutes.newsCommentDetailsPage.path,
-                    arguments: NewsPostCommentDto(
-                      newsPost,
-                      newsChannel,
-                      currentUser,
-                      comment,
-                    ),
-                  );
-                },
-                child: PostCommentCard(
-                  postCommentCardViewModel: PostCommentCardViewModel(
-                      comment: comment,
-                      getMediaUseCase: GetMediaUseCase(
-                        localDataStorageService: GetIt.I(),
-                        localFileStorageService: GetIt.I(),
-                        remoteFileStorageService: GetIt.I(),
-                      )
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text("Replies",
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: Colors.grey,
+                    )),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  "View Activity",
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: Colors.grey,
                   ),
-                  post: newsPost,
-                  comment: comment,
-                  currentUser: currentUser,
                 ),
               ),
-              fetchPageItems: _fetchPageItems,
-            ),
+            ],
+          ),
+          const Divider(
+            color: Colors.white12,
           ),
         ],
       ),

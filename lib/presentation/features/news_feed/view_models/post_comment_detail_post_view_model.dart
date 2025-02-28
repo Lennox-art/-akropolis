@@ -15,7 +15,7 @@ import 'package:akropolis/presentation/ui/components/toast/toast.dart';
 import 'package:flutter/cupertino.dart';
 import 'dart:io' as io;
 
-class PstCommentDetailPostViewModel extends ChangeNotifier {
+class PostCommentDetailtViewModel extends ChangeNotifier {
   final GetMediaUseCase _getMediaUseCase;
   final StreamController<ToastMessage> _toastMessageStream = StreamController.broadcast();
   final StreamController<CreatePostState> _createPostStream = StreamController.broadcast();
@@ -23,7 +23,7 @@ class PstCommentDetailPostViewModel extends ChangeNotifier {
   MediaDownloadState _thumbnailMediaState = const InitialMediaState();
   MediaDownloadState _postMediaState = const InitialMediaState();
 
-  PstCommentDetailPostViewModel({
+  PostCommentDetailtViewModel({
     required GetMediaUseCase getMediaUseCase,
     required FetchPostCommentsUseCase fetchPostCommentsUseCase,
   }) : _getMediaUseCase = getMediaUseCase;

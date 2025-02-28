@@ -32,10 +32,7 @@ dependencies:
     git:
       url: https://bruc3balo:glpat-45CSRAxm48QD31nbADxz@gitlab.com/flutter_starter/common_fn.git
       ref: main
-  paged_list_view:
-    git:
-      url: https://bruc3balo:glpat-45CSRAxm48QD31nbADxz@gitlab.com/flutter_starter/paged_list_view.git
-      ref: main
+  infinite_scroll_pagination: ^4.1.0
   exception_base:
     git:
       url: https://bruc3balo:glpat-45CSRAxm48QD31nbADxz@gitlab.com/flutter_starter/exception_base.git
