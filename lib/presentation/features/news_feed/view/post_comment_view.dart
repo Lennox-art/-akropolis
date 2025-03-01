@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:akropolis/data/models/local_models/local_models.dart';
 import 'package:akropolis/data/models/remote_models/remote_models.dart';
-import 'package:akropolis/domain/gen/assets.gen.dart';
 
 import 'package:akropolis/data/utils/date_format.dart';
 import 'package:akropolis/presentation/features/news_feed/models/enums.dart';
@@ -10,10 +9,8 @@ import 'package:akropolis/presentation/features/news_feed/models/models.dart';
 import 'package:akropolis/presentation/features/news_feed/view_models/post_comment_detail_post_view_model.dart';
 import 'package:akropolis/presentation/ui/components/app_video_player.dart';
 import 'package:akropolis/presentation/ui/components/loader.dart';
-import 'package:akropolis/presentation/ui/components/news_post_components.dart';
+import 'package:akropolis/presentation/ui/themes.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-
 
 class PostCommentDetailViewPage extends StatefulWidget {
   const PostCommentDetailViewPage({
@@ -50,14 +47,13 @@ class _PostCommentDetailViewPageState extends State<PostCommentDetailViewPage> {
 
   @override
   Widget build(BuildContext context) {
-    NewsPostCommentDto newsPostDto = ModalRoute.of(context)!.settings.arguments as NewsPostCommentDto;
-    NewsPost newsPost = newsPostDto.newsPost;
-    NewsChannel newsChannel = newsPostDto.channel;
-    AppUser currentUser = newsPostDto.currentUser;
-    PostComment comment = newsPostDto.comment;
+    NewsPost newsPost = widget.postCommentDetailViewModel.newsPost;
+    NewsChannel newsChannel = widget.postCommentDetailViewModel.newsChannel;
+    AppUser currentUser = widget.postCommentDetailViewModel.currentUser;
+    PostComment comment = widget.postCommentDetailViewModel.comment;
+    ReactionDistribution distribution = ReactionDistribution(newsPost.reaction);
 
     widget.postCommentDetailViewModel.downloadThumbnail(newsPost.thumbnailUrl);
-
 
     final ThemeData theme = Theme.of(context);
 
@@ -163,13 +159,13 @@ class _PostCommentDetailViewPageState extends State<PostCommentDetailViewPage> {
                 menuChildren: PostMenu.values
                     .map(
                       (menu) => MenuItemButton(
-                    onPressed: () {},
-                    child: Text(
-                      menu.title,
-                      style: TextStyle(color: menu == PostMenu.report ? Colors.red : Colors.white),
-                    ),
-                  ),
-                )
+                        onPressed: () {},
+                        child: Text(
+                          menu.title,
+                          style: TextStyle(color: menu == PostMenu.report ? Colors.red : Colors.white),
+                        ),
+                      ),
+                    )
                     .toList(),
               )
             ],
@@ -267,66 +263,45 @@ class _PostCommentDetailViewPageState extends State<PostCommentDetailViewPage> {
           ),
           Flex(
             direction: Axis.horizontal,
-            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Expanded(
-                child: Flex(
-                  direction: Axis.horizontal,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Expanded(
-                      child: NewsPostReactionWidget(
-                        newsPost: newsPost,
-                        currentUser: currentUser,
-                        onEmpathy: () {},
-                        onLogician: () {},
-                      ),
+                flex: distribution.logFlex,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 12),
+                  decoration: const BoxDecoration(
+                    color: primaryColor,
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(10),
                     ),
-                    Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Assets.medal.svg(),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(
-                    8.0,
                   ),
-                  child: Assets.share.svg(),
+                  child: Text(
+                    "${distribution.logPercent} % (${distribution.logCount})",
+                    style: theme.textTheme.bodySmall,
+                  ),
                 ),
               ),
-            ],
-          ),
-          const Divider(
-            color: Colors.white12,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text("Replies",
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: Colors.grey,
-                    )),
+              const SizedBox(
+                width: 15,
               ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  "View Activity",
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: Colors.grey,
+              Expanded(
+                flex: distribution.empFlex,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 12),
+                  decoration: const BoxDecoration(
+                    color: Colors.orangeAccent,
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(10),
+                    ),
+                  ),
+                  child: Text(
+                    "${distribution.empPercent} % (${distribution.empCount})",
+                    style: theme.textTheme.bodySmall,
                   ),
                 ),
               ),
             ],
-          ),
-          const Divider(
-            color: Colors.white12,
           ),
         ],
       ),

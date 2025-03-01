@@ -38,9 +38,9 @@ class NewsDetailedViewPage extends StatefulWidget {
 class _NewsDetailedViewPageState extends State<NewsDetailedViewPage> {
   late final StreamSubscription<PostComment> commentPostedStreamSubscription;
   late final ReplyPostViewModel replyPostViewModel;
-  late final NewsPost newsPost;
-  late final NewsChannel newsChannel;
-  late final AppUser currentUser;
+  late final NewsPost newsPost = widget.newsDetailPostViewModel.newsPost;
+  late final NewsChannel newsChannel = widget.newsDetailPostViewModel.newsChannel;
+  late final AppUser currentUser = widget.newsDetailPostViewModel.currentUser;
   final PageWrapper page = PageWrapper();
 
   late final PagingController<int, PostComment> pagingController = PagingController(
@@ -106,10 +106,6 @@ class _NewsDetailedViewPageState extends State<NewsDetailedViewPage> {
 
   @override
   Widget build(BuildContext context) {
-    NewsPostDto newsPostDto = ModalRoute.of(context)!.settings.arguments as NewsPostDto;
-    newsPost = newsPostDto.newsPost;
-    newsChannel = newsPostDto.channel;
-    currentUser = newsPostDto.currentUser;
     ReactionDistribution distribution = ReactionDistribution(newsPost.reaction);
 
     widget.newsDetailPostViewModel.downloadThumbnail(newsPost.thumbnailUrl);
@@ -215,13 +211,13 @@ class _NewsDetailedViewPageState extends State<NewsDetailedViewPage> {
                 menuChildren: PostMenu.values
                     .map(
                       (menu) => MenuItemButton(
-                    onPressed: () {},
-                    child: Text(
-                      menu.title,
-                      style: TextStyle(color: menu == PostMenu.report ? Colors.red : Colors.white),
-                    ),
-                  ),
-                )
+                        onPressed: () {},
+                        child: Text(
+                          menu.title,
+                          style: TextStyle(color: menu == PostMenu.report ? Colors.red : Colors.white),
+                        ),
+                      ),
+                    )
                     .toList(),
               )
             ],
@@ -244,11 +240,27 @@ class _NewsDetailedViewPageState extends State<NewsDetailedViewPage> {
                         return CircularFiniteLoader(progress: d.progress!);
                       },
                       downloadedMedia: (d) {
-                        return Image.file(
-                          d.media.file,
-                          height: 350,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
+                        return Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Image.file(
+                              d.media.file,
+                              height: 350,
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                            ),
+                            IconButton(
+                              onPressed: () {
+                                widget.newsDetailPostViewModel.downloadPost(
+                                  newsPost.postUrl,
+                                );
+                              },
+                              icon: const Icon(
+                                Icons.play_arrow,
+                                size: 25,
+                              ),
+                            ),
+                          ],
                         );
                       },
                       errorDownloadingMedia: (e) => IconButton(
@@ -256,7 +268,7 @@ class _NewsDetailedViewPageState extends State<NewsDetailedViewPage> {
                           widget.newsDetailPostViewModel.downloadThumbnail(newsPost.thumbnailUrl);
                         },
                         icon: const Icon(
-                          Icons.broken_image_outlined,
+                          Icons.refresh,
                         ),
                       ),
                     );
@@ -391,7 +403,7 @@ class _NewsDetailedViewPageState extends State<NewsDetailedViewPage> {
             physics: const NeverScrollableScrollPhysics(),
             builderDelegate: pagedChildBuilderDelegate(
               context: context,
-              itemBuilder: (_, comment, i) =>  GestureDetector(
+              itemBuilder: (_, comment, i) => GestureDetector(
                 onTap: () {
                   Navigator.of(context).pushNamed(
                     AppRoutes.newsCommentDetailsPage.path,
@@ -410,8 +422,7 @@ class _NewsDetailedViewPageState extends State<NewsDetailedViewPage> {
                         localDataStorageService: GetIt.I(),
                         localFileStorageService: GetIt.I(),
                         remoteFileStorageService: GetIt.I(),
-                      )
-                  ),
+                      )),
                   post: newsPost,
                   comment: comment,
                   currentUser: currentUser,

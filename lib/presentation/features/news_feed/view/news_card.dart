@@ -236,7 +236,6 @@ class PostCommentCard extends StatelessWidget {
                       image: DecorationImage(
                         image: FileImage(
                           d.media.file,
-
                         ),
                         fit: BoxFit.fill,
                       ),
@@ -708,6 +707,85 @@ class ForYouCard extends StatelessWidget {
                   ),
                 ],
               ),
+            ),
+            ListenableBuilder(
+              listenable: newsCardViewModel,
+              builder: (_, __) {
+                int? commentsCount = newsCardViewModel.commentsCount;
+                if (commentsCount == null) {
+                  return const Text("Replies");
+                }
+
+                return Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    "Replies ($commentsCount)",
+                    textAlign: TextAlign.start,
+                  ),
+                );
+              },
+            ),
+            ListenableBuilder(
+              listenable: newsCardViewModel,
+              builder: (_, __) {
+                return newsCardViewModel.newsCardRepliesState.map(
+                  initial: (_) => const SizedBox.shrink(),
+                  loading: (_) => const InfiniteLoader(),
+                  errorState: (e) => IconButton(
+                    onPressed: newsCardViewModel.fetchPostComments,
+                    icon: const Icon(
+                      Icons.refresh,
+                    ),
+                  ),
+                  loaded: (e) {
+                    bool hasReplies = (newsCardViewModel.commentsThumbnails?.entries ?? {}).isNotEmpty;
+                    if (!hasReplies) return const SizedBox.shrink();
+
+                    return SizedBox(
+                      height: 70,
+                      child: Flex(
+                        direction: Axis.horizontal,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: newsCardViewModel.commentsThumbnails?.entries.map((e) {
+                              return Flexible(
+                                fit: FlexFit.loose,
+                                child: e.value.map(
+                                  initial: (i) => const Icon(Icons.image),
+                                  downloadingMedia: (i) => const InfiniteLoader(),
+                                  downloadedMedia: (d) {
+                                    return Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                      child: Container(
+                                        constraints: BoxConstraints(
+                                          maxHeight: 70,
+                                          maxWidth: 50,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.all(Radius.circular(12)),
+                                          image: DecorationImage(
+                                            image: FileImage(d.media.file),
+                                            fit: BoxFit.fill,
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  errorDownloadingMedia: (e) => IconButton(
+                                    onPressed: () {},
+                                    icon: const Icon(
+                                      Icons.refresh,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }).toList() ??
+                            [],
+                      ),
+                    );
+                  },
+                );
+              },
             ),
           ],
         ),

@@ -1,6 +1,7 @@
 import 'package:akropolis/data/models/dto_models/dto_models.dart';
 import 'package:akropolis/data/models/remote_models/remote_models.dart';
 import 'package:akropolis/domain/use_cases/fetch_post_comments_use_case.dart';
+import 'package:akropolis/domain/use_cases/get_media_use_case.dart';
 import 'package:akropolis/presentation/features/news_feed/models/models.dart';
 import 'package:akropolis/presentation/features/news_feed/view_models/news_card_view_model.dart';
 import 'package:akropolis/presentation/features/news_feed/view_models/world_news_view_model.dart';
@@ -122,6 +123,11 @@ class _WorldNewsContentState extends State<WorldNewsContent> {
           newsCardViewModel: NewsCardViewModel(
             newsPost: news,
             newsChannel: NewsChannel.worldNews,
+            getMediaUseCase: GetMediaUseCase(
+              localDataStorageService: GetIt.I(),
+              localFileStorageService: GetIt.I(),
+              remoteFileStorageService:GetIt.I(),
+            ),
             appUser: widget.currentUser,
             postRepository: GetIt.I(),
             fetchPostCommentsUseCase: widget.fetchPostCommentsUseCase,

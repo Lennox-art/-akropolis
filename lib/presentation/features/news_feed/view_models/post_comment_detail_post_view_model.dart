@@ -17,6 +17,10 @@ import 'dart:io' as io;
 
 class PostCommentDetailtViewModel extends ChangeNotifier {
   final GetMediaUseCase _getMediaUseCase;
+  final NewsPost newsPost;
+  final NewsChannel newsChannel;
+  final AppUser currentUser;
+  final PostComment comment;
   final StreamController<ToastMessage> _toastMessageStream = StreamController.broadcast();
   final StreamController<CreatePostState> _createPostStream = StreamController.broadcast();
   final StreamController<PostComment> _postCommentStream = StreamController.broadcast();
@@ -25,8 +29,13 @@ class PostCommentDetailtViewModel extends ChangeNotifier {
 
   PostCommentDetailtViewModel({
     required GetMediaUseCase getMediaUseCase,
+    required NewsPostCommentDto newsPostCommentDto,
     required FetchPostCommentsUseCase fetchPostCommentsUseCase,
-  }) : _getMediaUseCase = getMediaUseCase;
+  })  : _getMediaUseCase = getMediaUseCase,
+        newsChannel = newsPostCommentDto.channel,
+        currentUser = newsPostCommentDto.currentUser,
+        comment = newsPostCommentDto.comment,
+        newsPost = newsPostCommentDto.newsPost;
 
   Stream<ToastMessage> get toastStream => _toastMessageStream.stream;
 

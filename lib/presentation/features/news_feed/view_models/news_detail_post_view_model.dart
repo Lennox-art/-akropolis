@@ -16,20 +16,27 @@ import 'package:flutter/cupertino.dart';
 import 'dart:io' as io;
 
 class NewsDetailPostViewModel extends ChangeNotifier {
+  late final NewsPost newsPost;
+  late final NewsChannel newsChannel;
+  late final AppUser currentUser;
   final GetMediaUseCase _getMediaUseCase;
   final FetchPostCommentsUseCase _fetchPostCommentsUseCase;
   final StreamController<ToastMessage> _toastMessageStream = StreamController.broadcast();
   final StreamController<CreatePostState> _createPostStream = StreamController.broadcast();
   final StreamController<PostComment> _postCommentStream = StreamController.broadcast();
   MediaDownloadState _thumbnailMediaState = const InitialMediaState();
-  MediaDownloadState _postMediaState = InitialMediaState();
+  MediaDownloadState _postMediaState = const InitialMediaState();
   int? _commentCount;
 
   NewsDetailPostViewModel({
+    required NewsPostDto newsPostDto,
     required GetMediaUseCase getMediaUseCase,
     required FetchPostCommentsUseCase fetchPostCommentsUseCase,
   })  : _fetchPostCommentsUseCase = fetchPostCommentsUseCase,
-        _getMediaUseCase = getMediaUseCase;
+        _getMediaUseCase = getMediaUseCase,
+        newsPost = newsPostDto.newsPost,
+        newsChannel = newsPostDto.channel,
+        currentUser = newsPostDto.currentUser;
 
   Stream<ToastMessage> get toastStream => _toastMessageStream.stream;
 
@@ -44,7 +51,7 @@ class NewsDetailPostViewModel extends ChangeNotifier {
   MediaDownloadState get thumbnailMediaState => _thumbnailMediaState;
 
   void downloadThumbnail(String url) async {
-    if(_thumbnailMediaState is! InitialMediaState && _thumbnailMediaState is! ErrorDownloadMediaState) return;
+    if (_thumbnailMediaState is! InitialMediaState && _thumbnailMediaState is! ErrorDownloadMediaState) return;
 
     _thumbnailMediaState = const DownloadingMediaState();
     notifyListeners();
@@ -57,8 +64,9 @@ class NewsDetailPostViewModel extends ChangeNotifier {
       },
     );
 
-    switch(thumbnailResult) {
+    print("Thumbnail result = $thumbnailResult");
 
+    switch (thumbnailResult) {
       case Success<MediaData>():
         _thumbnailMediaState = DownloadedMediaState(media: thumbnailResult.data);
         notifyListeners();
@@ -71,7 +79,7 @@ class NewsDetailPostViewModel extends ChangeNotifier {
   }
 
   void downloadPost(String url) async {
-    if(_postMediaState is! InitialMediaState || _postMediaState is! ErrorDownloadMediaState) return;
+    if (_postMediaState is! InitialMediaState && _postMediaState is! ErrorDownloadMediaState) return;
 
     _postMediaState = const DownloadingMediaState();
     notifyListeners();
@@ -84,8 +92,7 @@ class NewsDetailPostViewModel extends ChangeNotifier {
       },
     );
 
-    switch(thumbnailResult) {
-
+    switch (thumbnailResult) {
       case Success<MediaData>():
         _postMediaState = DownloadedMediaState(media: thumbnailResult.data);
         notifyListeners();

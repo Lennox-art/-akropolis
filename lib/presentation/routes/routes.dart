@@ -11,6 +11,7 @@ import 'package:akropolis/presentation/features/create_post/view_model/create_po
 import 'package:akropolis/presentation/features/create_post/views/create_post_page.dart';
 import 'package:akropolis/presentation/features/home/view/home_page.dart';
 import 'package:akropolis/presentation/features/home/view_model/home_view_model.dart';
+import 'package:akropolis/presentation/features/news_feed/models/models.dart';
 import 'package:akropolis/presentation/features/news_feed/view/news_detailed_view.dart';
 import 'package:akropolis/presentation/features/news_feed/view/post_comment_view.dart';
 import 'package:akropolis/presentation/features/news_feed/view/post_reply_screen.dart';
@@ -48,7 +49,7 @@ enum AppRoutes {
 
   const AppRoutes(this.path);
 
-  Widget get page => switch (this) {
+  Widget page(BuildContext context) => switch (this) {
         AppRoutes.splashScreen => SplashScreen(
             splashScreenViewModel: SplashScreenViewModel(
               userRepository: GetIt.I(),
@@ -127,6 +128,7 @@ enum AppRoutes {
           ),
         AppRoutes.newsDetailsPage => NewsDetailedViewPage(
             newsDetailPostViewModel: NewsDetailPostViewModel(
+              newsPostDto: ModalRoute.of(context)!.settings.arguments as NewsPostDto,
               getMediaUseCase: GetMediaUseCase(
                 localDataStorageService: GetIt.I(),
                 localFileStorageService: GetIt.I(),
@@ -138,6 +140,7 @@ enum AppRoutes {
         AppRoutes.postReplyScreen => const PostReplyScreenPage(),
         AppRoutes.newsCommentDetailsPage => PostCommentDetailViewPage(
             postCommentDetailViewModel: PostCommentDetailtViewModel(
+              newsPostCommentDto: ModalRoute.of(context)!.settings.arguments as NewsPostCommentDto,
               getMediaUseCase: GetMediaUseCase(
                 localDataStorageService: GetIt.I(),
                 localFileStorageService: GetIt.I(),

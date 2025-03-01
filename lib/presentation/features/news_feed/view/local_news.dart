@@ -1,13 +1,12 @@
 import 'package:akropolis/data/models/dto_models/dto_models.dart';
 import 'package:akropolis/data/models/remote_models/remote_models.dart';
 import 'package:akropolis/domain/use_cases/fetch_post_comments_use_case.dart';
+import 'package:akropolis/domain/use_cases/get_media_use_case.dart';
 import 'package:akropolis/main.dart';
 import 'package:akropolis/presentation/features/news_feed/models/models.dart';
 import 'package:akropolis/presentation/features/news_feed/view_models/local_news_view_model.dart';
 import 'package:akropolis/presentation/features/news_feed/view_models/news_card_view_model.dart';
-import 'package:akropolis/presentation/ui/components/loader.dart';
 import 'package:akropolis/presentation/ui/components/page_list_widgets.dart';
-import 'package:akropolis/presentation/ui/components/toast/toast.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get_it/get_it.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
@@ -112,6 +111,7 @@ class _LocalNewsContentState extends State<LocalNewsContent> {
     mainPageScrollController.dispose();
     super.dispose();
   }*/
+
   @override
   Widget build(BuildContext context) {
     return PagedListView<int, NewsPost>(
@@ -125,6 +125,11 @@ class _LocalNewsContentState extends State<LocalNewsContent> {
           newsCardViewModel: NewsCardViewModel(
             newsPost: news,
             newsChannel: NewsChannel.worldNews,
+            getMediaUseCase: GetMediaUseCase(
+              localDataStorageService: GetIt.I(),
+              localFileStorageService: GetIt.I(),
+              remoteFileStorageService:GetIt.I(),
+            ),
             appUser: widget.currentUser,
             postRepository: GetIt.I(),
             fetchPostCommentsUseCase: widget.fetchPostCommentsUseCase,

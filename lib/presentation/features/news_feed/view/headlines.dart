@@ -1,6 +1,7 @@
 import 'package:akropolis/data/models/dto_models/dto_models.dart';
 import 'package:akropolis/data/models/remote_models/remote_models.dart';
 import 'package:akropolis/domain/use_cases/fetch_post_comments_use_case.dart';
+import 'package:akropolis/domain/use_cases/get_media_use_case.dart';
 import 'package:akropolis/presentation/features/news_feed/models/models.dart';
 import 'package:akropolis/presentation/features/news_feed/view/news_card.dart';
 import 'package:akropolis/presentation/features/news_feed/view_models/headlines_view_model.dart';
@@ -122,6 +123,11 @@ class _HeadlinesContentState extends State<HeadlinesContent> {
           post: news,
           newsCardViewModel: NewsCardViewModel(
             newsPost: news,
+            getMediaUseCase: GetMediaUseCase(
+              localDataStorageService: GetIt.I(),
+              localFileStorageService: GetIt.I(),
+              remoteFileStorageService:GetIt.I(),
+            ),
             newsChannel: NewsChannel.newsHeadlines,
             appUser: widget.currentUser,
             postRepository: GetIt.I(),

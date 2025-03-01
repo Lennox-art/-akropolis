@@ -1,6 +1,7 @@
 import 'package:akropolis/data/models/dto_models/dto_models.dart';
 import 'package:akropolis/data/models/remote_models/remote_models.dart';
 import 'package:akropolis/domain/use_cases/fetch_post_comments_use_case.dart';
+import 'package:akropolis/domain/use_cases/get_media_use_case.dart';
 import 'package:akropolis/presentation/features/news_feed/models/models.dart';
 import 'package:akropolis/presentation/features/news_feed/view/news_card.dart';
 import 'package:akropolis/presentation/features/news_feed/view_models/for_you_view_model.dart';
@@ -170,6 +171,11 @@ class _ForYouContentState extends State<ForYouContent> {
                     newsPost: news,
                     newsChannel: NewsChannel.userPosts,
                     appUser: widget.currentUser,
+                    getMediaUseCase: GetMediaUseCase(
+                      localDataStorageService: GetIt.I(),
+                      localFileStorageService: GetIt.I(),
+                      remoteFileStorageService:GetIt.I(),
+                    ),
                     postRepository: GetIt.I(),
                     fetchPostCommentsUseCase: widget.fetchPostCommentsUseCase,
                   ),
@@ -220,6 +226,11 @@ class ForYouHighlightCarrousel extends StatelessWidget {
                 newsCardViewModel: NewsCardViewModel(
                   newsPost: newsPost[itemIndex],
                   newsChannel: NewsChannel.userPosts,
+                  getMediaUseCase: GetMediaUseCase(
+                    localDataStorageService: GetIt.I(),
+                    localFileStorageService: GetIt.I(),
+                    remoteFileStorageService:GetIt.I(),
+                  ),
                   appUser: currentUser,
                   postRepository: GetIt.I(),
                   fetchPostCommentsUseCase: fetchPostCommentsUseCase,

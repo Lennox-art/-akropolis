@@ -124,7 +124,7 @@ class AkropolisApplication extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       initialRoute: AppRoutes.splashScreen.path,
       routes: {
-        for (var r in AppRoutes.values) r.path: (_) => r.page,
+        for (var r in AppRoutes.values) r.path: r.page,
       },
     );
   }
