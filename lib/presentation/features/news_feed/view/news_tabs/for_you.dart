@@ -30,6 +30,27 @@ class ForYouContent extends StatefulWidget {
 
 class _ForYouContentState extends State<ForYouContent> {
   final PageWrapper page = PageWrapper();
+  late final Future highlights = widget.forYouViewModel.fetchForYouPostsNews(
+    pageSize: 10,
+    fromCache: true,
+  );
+  final ScrollController _scrollController = ScrollController();
+
+  void _scrollToIndex(int index, int itemCount) {
+    // Ensure the index is within bounds
+    if (index < 0 || index >= itemCount) return;
+
+    // Calculate the offset (assuming each item has the same height)
+    double itemHeight = 400.0; // Adjust based on your item height
+    double offset = index * itemHeight;
+
+    _scrollController.animateTo(
+      offset,
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeInOut,
+    );
+  }
+
 
   late final PagingController<int, NewsCardPostModel> pagingController = PagingController(
     firstPageKey: page.page,
@@ -68,10 +89,10 @@ class _ForYouContentState extends State<ForYouContent> {
 
   @override
   void initState() {
-    pagingController.addPageRequestListener((p) {
+    /*pagingController.addPageRequestListener((p) {
       page.page = p;
       _fetchPageItems();
-    });
+    });*/
     super.initState();
   }
 
@@ -132,10 +153,7 @@ class _ForYouContentState extends State<ForYouContent> {
           mainAxisSize: MainAxisSize.min,
           children: [
             FutureBuilder(
-              future: widget.forYouViewModel.fetchForYouPostsNews(
-                pageSize: 10,
-                fromCache: true,
-              ),
+              future: highlights,
               builder: (_, snap) {
                 if (snap.connectionState != ConnectionState.done) {
                   return const InfiniteLoader();
@@ -159,63 +177,23 @@ class _ForYouContentState extends State<ForYouContent> {
                 }
               },
             ),
-            FutureBuilder(
-              future: widget.forYouViewModel.fetchForYouPostsNews(
-                pageSize: 10,
-                fromCache: true,
-              ),
-              builder: (_, snap) {
-                if (snap.connectionState != ConnectionState.done) {
-                  return const InfiniteLoader();
-                }
-
-                Result<List<NewsCardPostModel>?> forYouHighlightResult = snap.requireData;
-
-                switch (forYouHighlightResult) {
-                  case Success<List<NewsCardPostModel>?>():
-                    List<NewsCardPostModel> data = forYouHighlightResult.data ?? [];
-                    return Visibility(
-                      visible: data.isNotEmpty,
-                      replacement: const Text("No Highlights"),
-                      child: Column(
-                        children: data
-                            .map(
-                              (e) => ForYouCard(
-                                currentUser: widget.currentUser,
-                                post: e,
-                                newsCardViewModel: GetIt.I(),
-                              ),
-                            ).toList(),
-                      ),
+            ListenableBuilder(
+              listenable: widget.forYouViewModel,
+              builder: (_, __) {
+                return ListView.builder(
+                  shrinkWrap: true,
+                  controller: _scrollController,
+                  itemCount: widget.forYouViewModel.list.length,
+                  itemBuilder: (_, i) {
+                    return ForYouCard(
+                      currentUser: widget.currentUser,
+                      post: widget.forYouViewModel.list.elementAt(i),
+                      newsCardViewModel: GetIt.I(),
                     );
-                  case Error<List<NewsCardPostModel>?>():
-                    return Text(forYouHighlightResult.failure.message);
-                }
-              },
+                  },
+                );
+              }
             ),
-
-            /*PagedListView<int, NewsCardPostModel>(
-              shrinkWrap: true,
-              pagingController: pagingController,
-              physics: const ClampingScrollPhysics(),
-              builderDelegate: pagedChildBuilderDelegate(
-                context: context,
-                itemBuilder: (_, news, i) {
-                  return SizedBox(
-                    height: 500,
-                    width: 350,
-                    child: Text(news.toString()),
-                  );
-                },
-                */
-            /*itemBuilder: (_, news, i) => ForYouCard(
-                  post: news,
-                  newsCardViewModel: GetIt.I(),
-                  currentUser: widget.currentUser,
-                ),*/ /*
-                fetchPageItems: _fetchPageItems,
-              ),
-            ),*/
           ],
         ),
       ),

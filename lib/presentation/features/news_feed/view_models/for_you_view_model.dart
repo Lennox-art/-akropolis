@@ -11,12 +11,18 @@ import 'package:flutter/material.dart';
 class ForYouViewModel extends ChangeNotifier {
   final FetchForYouPostUseCase _fetchForYouPostUseCase;
   final NewsCardUseCase _newsCardUseCase;
+  final LinkedHashSet<NewsCardPostModel> _postCache = LinkedHashSet();
+
+
+  UnmodifiableListView<NewsCardPostModel> get list => UnmodifiableListView(_postCache);
 
   ForYouViewModel({
     required FetchForYouPostUseCase fetchForYouPostUseCase,
     required NewsCardUseCase newsCardUseCase,
   })  : _fetchForYouPostUseCase = fetchForYouPostUseCase,
         _newsCardUseCase = newsCardUseCase;
+
+
 
   Future<Result<List<NewsCardPostModel>?>> fetchForYouPostsNews({
     required int pageSize,
@@ -33,6 +39,8 @@ class ForYouViewModel extends ChangeNotifier {
           post: newsResults.data ?? [],
           channel: NewsChannel.userPosts,
         );
+        notifyListeners();
+        _postCache.addAll(newsPosts);
         return Result.success(data: newsPosts);
       case Error<List<NewsPost>?>():
         return Result.error(failure: newsResults.failure);
