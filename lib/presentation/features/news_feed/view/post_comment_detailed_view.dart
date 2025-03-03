@@ -5,7 +5,6 @@ import 'package:akropolis/data/models/remote_models/remote_models.dart';
 
 import 'package:akropolis/data/utils/date_format.dart';
 import 'package:akropolis/presentation/features/news_feed/models/enums.dart';
-import 'package:akropolis/presentation/features/news_feed/models/models.dart';
 import 'package:akropolis/presentation/features/news_feed/view_models/post_comment_detail_post_view_model.dart';
 import 'package:akropolis/presentation/ui/components/app_video_player.dart';
 import 'package:akropolis/presentation/ui/components/loader.dart';
@@ -18,20 +17,23 @@ class PostCommentDetailViewPage extends StatefulWidget {
     super.key,
   });
 
-  final PostCommentDetailtViewModel postCommentDetailViewModel;
+  final PostCommentDetailViewModel postCommentDetailViewModel;
 
   @override
   State<PostCommentDetailViewPage> createState() => _PostCommentDetailViewPageState();
 }
 
 class _PostCommentDetailViewPageState extends State<PostCommentDetailViewPage> {
+
   late final StreamSubscription<PostComment> commentPostedStreamSubscription;
+
 
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback(
       (_) {
         commentPostedStreamSubscription = widget.postCommentDetailViewModel.postCommentStream.listen(_onCommentPosted);
+        widget.postCommentDetailViewModel.downloadThumbnail();
       },
     );
     super.initState();
@@ -47,67 +49,11 @@ class _PostCommentDetailViewPageState extends State<PostCommentDetailViewPage> {
 
   @override
   Widget build(BuildContext context) {
-    NewsPost newsPost = widget.postCommentDetailViewModel.newsPost;
-    NewsChannel newsChannel = widget.postCommentDetailViewModel.newsChannel;
-    AppUser currentUser = widget.postCommentDetailViewModel.currentUser;
-    PostComment comment = widget.postCommentDetailViewModel.comment;
-    ReactionDistribution distribution = ReactionDistribution(newsPost.reaction);
-
-    widget.postCommentDetailViewModel.downloadThumbnail(newsPost.thumbnailUrl);
-
     final ThemeData theme = Theme.of(context);
 
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        actions: [
-          /*Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ElevatedButton(
-              onPressed: () async {
-                Duration? videoDuration = await showDurationPickerDialog(
-                  context,
-                  maxDuration: maxVideoDuration,
-                );
-                if (videoDuration == null || !context.mounted) return;
-
-                XFile? videoData = await getIt<ImagePicker>().pickVideo(
-                  source: ImageSource.camera,
-                  preferredCameraDevice: CameraDevice.rear,
-                  maxDuration: videoDuration,
-                );
-                if (videoData == null || !context.mounted) return;
-
-                String? videoError = await validateVideo(videoData.path);
-                if (!context.mounted) return;
-
-                if (videoError != null) {
-                  ToastError(title: "Post Video", message: videoError).show();
-                  return;
-                }
-
-                await widget.newsDetailPostViewModel.setVideo(
-                  File(videoData.path)
-                    ..writeAsBytesSync(
-                      await videoData.readAsBytes(),
-                    ),
-                );
-
-                if (!context.mounted) return;
-
-                Navigator.of(context).pushNamed(
-                  AppRoutes.postReplyScreen.path,
-                );
-              },
-              style: theme.elevatedButtonTheme.style?.copyWith(
-                fixedSize: const WidgetStatePropertyAll(
-                  Size(100, 40),
-                ),
-              ),
-              child: const Text("Reply"),
-            ),
-          ),*/
-        ],
       ),
       backgroundColor: Colors.transparent,
       body: Column(
@@ -128,17 +74,17 @@ class _PostCommentDetailViewPageState extends State<PostCommentDetailViewPage> {
                       padding: const EdgeInsets.all(8.0),
                       child: Builder(
                         builder: (context) {
-                          if (newsPost.author.imageUrl == null) {
+                          if (widget.postCommentDetailViewModel.newsPost.newsPost.author.imageUrl == null) {
                             return const Icon(Icons.person);
                           }
 
                           return CircleAvatar(
-                            backgroundImage: NetworkImage(newsPost.author.imageUrl!),
+                            backgroundImage: NetworkImage(widget.postCommentDetailViewModel.newsPost.newsPost.author.imageUrl!),
                           );
                         },
                       ),
                     ),
-                    Text(newsPost.author.name),
+                    Text(widget.postCommentDetailViewModel.newsPost.newsPost.author.name),
                   ],
                 ),
               ),
@@ -188,17 +134,27 @@ class _PostCommentDetailViewPageState extends State<PostCommentDetailViewPage> {
                         return CircularFiniteLoader(progress: d.progress!);
                       },
                       downloadedMedia: (d) {
-                        return Image.file(
-                          d.media.file,
-                          height: 350,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
+                        return Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Image.file(
+                              d.media.file,
+                              height: 350,
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                            ),
+                            IconButton(
+                              onPressed: widget.postCommentDetailViewModel.downloadPost,
+                              icon: const Icon(
+                                Icons.play_arrow,
+                                size: 25,
+                              ),
+                            ),
+                          ],
                         );
                       },
                       errorDownloadingMedia: (e) => IconButton(
-                        onPressed: () {
-                          widget.postCommentDetailViewModel.downloadThumbnail(newsPost.thumbnailUrl);
-                        },
+                        onPressed: widget.postCommentDetailViewModel.downloadThumbnail,
                         icon: const Icon(
                           Icons.broken_image_outlined,
                         ),
@@ -229,11 +185,7 @@ class _PostCommentDetailViewPageState extends State<PostCommentDetailViewPage> {
                     }
                   },
                   errorDownloadingMedia: (e) => IconButton(
-                    onPressed: () {
-                      widget.postCommentDetailViewModel.downloadPost(
-                        newsPost.postUrl,
-                      );
-                    },
+                    onPressed: widget.postCommentDetailViewModel.downloadPost,
                     icon: const Icon(
                       Icons.broken_image_outlined,
                     ),
@@ -242,18 +194,11 @@ class _PostCommentDetailViewPageState extends State<PostCommentDetailViewPage> {
               },
             ),
           ),
+
           Padding(
             padding: const EdgeInsets.only(left: 8.0, top: 4.0),
             child: Text(
-              newsPost.description,
-              style: theme.textTheme.labelLarge,
-              textAlign: TextAlign.start,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 8.0, top: 4.0),
-            child: Text(
-              newsPost.publishedAt.commentDateTime,
+              widget.postCommentDetailViewModel.comment.commentedAt.commentDateTime,
               style: theme.textTheme.labelMedium?.copyWith(
                 fontSize: 14,
                 color: Colors.grey,
@@ -261,49 +206,115 @@ class _PostCommentDetailViewPageState extends State<PostCommentDetailViewPage> {
               textAlign: TextAlign.start,
             ),
           ),
-          Flex(
-            direction: Axis.horizontal,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Expanded(
-                flex: distribution.logFlex,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 12),
-                  decoration: const BoxDecoration(
-                    color: primaryColor,
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(10),
+          ListenableBuilder(
+            listenable: widget.postCommentDetailViewModel,
+            builder: (_, __) {
+              return Flex(
+                direction: Axis.horizontal,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    flex: widget.postCommentDetailViewModel.distribution.logFlex,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 12),
+                      decoration: const BoxDecoration(
+                        color: primaryColor,
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(10),
+                        ),
+                      ),
+                      child: Text(
+                        "${widget.postCommentDetailViewModel.distribution.logPercent} % (${widget.postCommentDetailViewModel.distribution.logCount})",
+                        style: theme.textTheme.bodySmall,
+                      ),
                     ),
                   ),
-                  child: Text(
-                    "${distribution.logPercent} % (${distribution.logCount})",
-                    style: theme.textTheme.bodySmall,
+                  const SizedBox(
+                    width: 15,
                   ),
-                ),
-              ),
-              const SizedBox(
-                width: 15,
-              ),
-              Expanded(
-                flex: distribution.empFlex,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 12),
-                  decoration: const BoxDecoration(
-                    color: Colors.orangeAccent,
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(10),
+                  Expanded(
+                    flex: widget.postCommentDetailViewModel.distribution.empFlex,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 12),
+                      decoration: const BoxDecoration(
+                        color: Colors.orangeAccent,
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(10),
+                        ),
+                      ),
+                      child: Text(
+                        "${widget.postCommentDetailViewModel.distribution.empPercent} % (${widget.postCommentDetailViewModel.distribution.empCount})",
+                        style: theme.textTheme.bodySmall,
+                      ),
                     ),
                   ),
-                  child: Text(
-                    "${distribution.empPercent} % (${distribution.empCount})",
-                    style: theme.textTheme.bodySmall,
-                  ),
-                ),
-              ),
-            ],
+                ],
+              );
+            }
           ),
         ],
+      ),
+      bottomNavigationBar: ListenableBuilder(
+          listenable: widget.postCommentDetailViewModel,
+          builder: (_, __) {
+            return Container(
+              color: Colors.white12,
+              child: Flex(
+                direction: Axis.horizontal,
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(15.0),
+                      child: ElevatedButton(
+                        onPressed: widget.postCommentDetailViewModel.alreadyReacted ? null : widget.postCommentDetailViewModel.log,
+                        style: ButtonStyle(
+                          backgroundColor: WidgetStateProperty.all(
+                            widget.postCommentDetailViewModel.isLogReaction ? logicianColor : Colors.transparent,
+                          ),
+                          foregroundColor: WidgetStateProperty.all(
+                            widget.postCommentDetailViewModel.isLogReaction ? secondaryColor : logicianColor,
+                          ),
+                          side: const WidgetStatePropertyAll(
+                            BorderSide(color: logicianColor, width: 1.0),
+                          ),
+                          shape: WidgetStatePropertyAll(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                        ),
+                        child: const Text("Logician"),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(15.0),
+                      child: ElevatedButton(
+                        onPressed: widget.postCommentDetailViewModel.alreadyReacted ? null : widget.postCommentDetailViewModel.emp,
+                        style: ButtonStyle(
+                          backgroundColor: WidgetStateProperty.all(widget.postCommentDetailViewModel.isEmpReaction ? empathyColor : Colors.transparent),
+                          foregroundColor: WidgetStateProperty.all(widget.postCommentDetailViewModel.isEmpReaction ? secondaryColor : empathyColor),
+                          side: const WidgetStatePropertyAll(
+                            BorderSide(color: empathyColor, width: 1.0),
+                          ),
+                          shape: WidgetStatePropertyAll(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                        ),
+                        child: const Text("Empath"),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
       ),
     );
   }

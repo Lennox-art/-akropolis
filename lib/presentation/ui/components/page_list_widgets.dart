@@ -4,11 +4,11 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
 class PageWrapper {
   int page;
-  bool initialFetch;
 
-  PageWrapper({this.page = 0, this.initialFetch = true});
+  PageWrapper({this.page = 0});
 
   static const pageSize = 10;
+  bool get initialFetch => page == 0;
 }
 
 PagedChildBuilderDelegate<T> pagedChildBuilderDelegate<T>({

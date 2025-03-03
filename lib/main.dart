@@ -14,7 +14,12 @@ import 'package:akropolis/domain/repository_impl/post_respository_impl/post_repo
 import 'package:akropolis/domain/repository_impl/user_repository_impl/user_repository_impl.dart';
 import 'package:akropolis/domain/service_impl/data_storage_service_impl/remote_data_storage_service_impl/firestore_remote_storage_service.dart';
 import 'package:akropolis/domain/service_impl/file_storage_service_impl/local_file_storage_service_impl/local_file_system_local_storage_service_impl.dart';
+import 'package:akropolis/domain/use_cases/create_user_post_use_case.dart';
 import 'package:akropolis/domain/use_cases/fetch_post_comments_use_case.dart';
+import 'package:akropolis/domain/use_cases/get_media_use_case.dart';
+import 'package:akropolis/domain/use_cases/news_card_use_case.dart';
+import 'package:akropolis/presentation/features/create_post/view_model/create_post_view_model.dart';
+import 'package:akropolis/presentation/features/news_feed/view_models/news_card_view_model.dart';
 import 'package:akropolis/presentation/routes/routes.dart';
 import 'package:akropolis/presentation/ui/themes.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -103,8 +108,42 @@ Future<void> main() async {
   getIt.registerSingleton(postRepository);
 
   ///Use cases
-  FetchPostCommentsUseCase fetchPostCommentsUseCase = FetchPostCommentsUseCase(postRepository: postRepository);
+  FetchPostCommentsUseCase fetchPostCommentsUseCase = FetchPostCommentsUseCase(
+    postRepository: postRepository,
+  );
   getIt.registerSingleton(fetchPostCommentsUseCase);
+
+  GetMediaUseCase getMediaUseCase = GetMediaUseCase(
+    localDataStorageService: localDataStorageService,
+    localFileStorageService: localFileStorageService,
+    remoteFileStorageService: remoteFileStorageService,
+  );
+  getIt.registerSingleton(getMediaUseCase);
+
+  ///Outlive application
+  ///Homepage and Create post page
+  CreatePostViewModel createPostViewModel = CreatePostViewModel(
+    createPostUseCase: CreatePostUseCase(
+      userRepository: userRepository,
+      authenticationRepository: authenticationRepository,
+      postRepository: postRepository,
+      localDataStorageService: localDataStorageService,
+      remoteFileStorageService: remoteFileStorageService,
+      localFileStorageService: localFileStorageService,
+    ),
+  );
+  getIt.registerSingleton(createPostViewModel);
+
+  NewsCardViewModel newsCardViewModel = NewsCardViewModel(
+    postRepository: postRepository,
+  );
+  getIt.registerSingleton(newsCardViewModel);
+
+  NewsCardUseCase newsCardUseCase = NewsCardUseCase(
+    getMediaUseCase: getMediaUseCase,
+    fetchPostCommentsUseCase: fetchPostCommentsUseCase,
+  );
+  getIt.registerSingleton(newsCardUseCase);
 
   ///Adapters
   Hive.registerAdapter(LocalFileCacheAdapter());

@@ -233,7 +233,6 @@ class VideoThumbnailTimelineViewer extends StatelessWidget {
               child: Container(
                 decoration: bytes == selectedThumbnail
                     ? BoxDecoration(
-
                         border: Border.all(
                           width: 2.0,
                           color: bytes == selectedThumbnail ? primaryColor : Colors.transparent,

@@ -3,15 +3,14 @@ import 'package:akropolis/domain/gen/assets.gen.dart';
 import 'package:akropolis/domain/use_cases/fetch_for_you_post_use_case.dart';
 import 'package:akropolis/domain/use_cases/fetch_highlights_post_use_case.dart';
 import 'package:akropolis/domain/use_cases/fetch_local_news_post_use_case.dart';
-import 'package:akropolis/domain/use_cases/fetch_post_comments_use_case.dart';
 import 'package:akropolis/domain/use_cases/fetch_world_news_post_use_case.dart';
 import 'package:akropolis/main.dart';
 import 'package:akropolis/presentation/features/home/view_model/home_view_model.dart';
 import 'package:akropolis/presentation/features/news_feed/models/enums.dart';
-import 'package:akropolis/presentation/features/news_feed/view/for_you.dart';
-import 'package:akropolis/presentation/features/news_feed/view/headlines.dart';
-import 'package:akropolis/presentation/features/news_feed/view/local_news.dart';
-import 'package:akropolis/presentation/features/news_feed/view/world_news.dart';
+import 'package:akropolis/presentation/features/news_feed/view/news_tabs/for_you.dart';
+import 'package:akropolis/presentation/features/news_feed/view/news_tabs/headlines.dart';
+import 'package:akropolis/presentation/features/news_feed/view/news_tabs/local_news.dart';
+import 'package:akropolis/presentation/features/news_feed/view/news_tabs/world_news.dart';
 import 'package:akropolis/presentation/features/news_feed/view_models/for_you_view_model.dart';
 import 'package:akropolis/presentation/features/news_feed/view_models/headlines_view_model.dart';
 import 'package:akropolis/presentation/features/news_feed/view_models/local_news_view_model.dart';
@@ -44,7 +43,6 @@ class NewsFeedTab extends StatefulWidget {
 class _NewsFeedTabState extends State<NewsFeedTab> {
   final InfiniteScrollController carrouselController = InfiniteScrollController();
 
-
   late final ForYouViewModel forYouViewModel;
   late final WorldNewsViewModel worldNewsViewModel;
   late final HeadlinesViewModel headlinesViewModel;
@@ -56,21 +54,25 @@ class _NewsFeedTabState extends State<NewsFeedTab> {
       fetchForYouPostUseCase: FetchForYouPostUseCase(
         postRepository: GetIt.I(),
       ),
+      newsCardUseCase: GetIt.I(),
     );
     worldNewsViewModel = WorldNewsViewModel(
       fetchWorldNewsPostUseCase: FetchWorldNewsPostUseCase(
         postRepository: GetIt.I(),
       ),
+      newsCardUseCase: GetIt.I(),
     );
     headlinesViewModel = HeadlinesViewModel(
       fetchHeadlinesPostUseCase: FetchHeadlinesPostUseCase(
         postRepository: GetIt.I(),
       ),
+      newsCardUseCase: GetIt.I(),
     );
     localNewsViewModel = LocalNewsViewModel(
       fetchLocalNewsPostUseCase: FetchLocalNewsPostUseCase(
         postRepository: GetIt.I(),
       ),
+      newsCardUseCase: GetIt.I(),
     );
     super.initState();
   }
@@ -87,7 +89,6 @@ class _NewsFeedTabState extends State<NewsFeedTab> {
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-
     return DefaultTabController(
       length: widget.newsFeedViewModel.allTabs.length,
       child: NestedScrollView(
@@ -431,6 +432,7 @@ class _NewsFeedTabState extends State<NewsFeedTab> {
       ),
     );
   }
+
 }
 
 // Custom Delegate for SliverPersistentHeader

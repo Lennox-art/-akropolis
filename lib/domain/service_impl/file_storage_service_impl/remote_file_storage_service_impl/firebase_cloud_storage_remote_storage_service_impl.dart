@@ -46,7 +46,7 @@ class FirebaseCloudStorageRemoteStorageServiceImpl extends RemoteFileStorageServ
           break;
       }
 
-      UploadTask uploadBlobTask = blobRef.putBlob(blob.blob);
+      UploadTask uploadBlobTask = blobRef.putData(blob.blob);
 
       await for (TaskSnapshot snapshot in uploadBlobTask.snapshotEvents) {
         if (snapshot.totalBytes == 0) continue;

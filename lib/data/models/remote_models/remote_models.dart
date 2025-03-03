@@ -163,6 +163,15 @@ class NewsPost {
     'viewers': viewers.toList(),
     'reaction': reaction.toJson(),
   };
+
+  @override
+  int get hashCode => id.hashCode;
+
+  @override
+  bool operator ==(Object other) {
+    if(other is! NewsPost) return false;
+    return id == other.id;
+  }
 }
 
 class PostReaction {

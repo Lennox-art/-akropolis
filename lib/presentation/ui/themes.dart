@@ -8,6 +8,9 @@ const Color backgroundColor = Color(0xFF0D0F11);
 const Color iconColor = Color(0xFFFEFEFE);
 const Color errorColor = Color(0xFFF3473E);
 
+const Color empathyColor = Colors.orangeAccent;
+const Color logicianColor = primaryColor;
+
 TextTheme get textTheme {
   return const TextTheme(
     titleLarge: TextStyle(

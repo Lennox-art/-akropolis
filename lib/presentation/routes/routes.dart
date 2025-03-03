@@ -1,5 +1,4 @@
-import 'package:akropolis/domain/use_cases/create_user_post_use_case.dart';
-import 'package:akropolis/domain/use_cases/get_media_use_case.dart';
+import 'package:akropolis/domain/use_cases/post_reply_use_case.dart';
 import 'package:akropolis/presentation/features/authentication/view/forgot_password.dart';
 import 'package:akropolis/presentation/features/authentication/view/login.dart';
 import 'package:akropolis/presentation/features/authentication/view/new_password.dart';
@@ -7,16 +6,16 @@ import 'package:akropolis/presentation/features/authentication/view/partial_sign
 import 'package:akropolis/presentation/features/authentication/view/sign_in.dart';
 import 'package:akropolis/presentation/features/authentication/view/sign_up.dart';
 import 'package:akropolis/presentation/features/authentication/view_model/authentication_view_model.dart';
-import 'package:akropolis/presentation/features/create_post/view_model/create_post_view_model.dart';
 import 'package:akropolis/presentation/features/create_post/views/create_post_page.dart';
 import 'package:akropolis/presentation/features/home/view/home_page.dart';
 import 'package:akropolis/presentation/features/home/view_model/home_view_model.dart';
 import 'package:akropolis/presentation/features/news_feed/models/models.dart';
 import 'package:akropolis/presentation/features/news_feed/view/news_detailed_view.dart';
-import 'package:akropolis/presentation/features/news_feed/view/post_comment_view.dart';
+import 'package:akropolis/presentation/features/news_feed/view/post_comment_detailed_view.dart';
 import 'package:akropolis/presentation/features/news_feed/view/post_reply_screen.dart';
 import 'package:akropolis/presentation/features/news_feed/view_models/news_detail_post_view_model.dart';
 import 'package:akropolis/presentation/features/news_feed/view_models/post_comment_detail_post_view_model.dart';
+import 'package:akropolis/presentation/features/news_feed/view_models/reply_post_view_model.dart';
 import 'package:akropolis/presentation/features/on_boarding/view/select_default_preferences.dart';
 import 'package:akropolis/presentation/features/on_boarding/view/select_topic.dart';
 import 'package:akropolis/presentation/features/on_boarding/view/welcome_screen.dart';
@@ -108,15 +107,28 @@ enum AppRoutes {
           ),
         AppRoutes.welcomePreferences => const SelectDefaultPreferencesScreen(),
         AppRoutes.home => HomePage(
+            createPostViewModel: GetIt.I(),
             homeViewModel: HomeViewModel(
               authenticationRepository: GetIt.I(),
               userRepository: GetIt.I(),
             ),
           ),
         AppRoutes.createPost => CreatePostPage(
-            //TODO: Create GetIt.I() services
-            createPostViewModel: CreatePostViewModel(
-              createPostUseCase: CreatePostUseCase(
+            createPostViewModel: GetIt.I(),
+          ),
+        AppRoutes.newsDetailsPage => NewsDetailedViewPage(
+            newsDetailPostViewModel: NewsDetailPostViewModel(
+              newsCardUseCase: GetIt.I(),
+              newsPostDto: ModalRoute.of(context)!.settings.arguments as NewsPostDto,
+              postRepository: GetIt.I(),
+              getMediaUseCase: GetIt.I(),
+              fetchPostCommentsUseCase: GetIt.I(),
+            ),
+          ),
+        AppRoutes.postReplyScreen => PostReplyScreenPage(
+            replyPostViewModel: ReplyPostViewModel(
+              newsPostReplyDto: ModalRoute.of(context)!.settings.arguments as NewsPostReplyDto,
+              postReplyUseCase: PostReplyUseCase(
                 userRepository: GetIt.I(),
                 authenticationRepository: GetIt.I(),
                 postRepository: GetIt.I(),
@@ -126,26 +138,11 @@ enum AppRoutes {
               ),
             ),
           ),
-        AppRoutes.newsDetailsPage => NewsDetailedViewPage(
-            newsDetailPostViewModel: NewsDetailPostViewModel(
-              newsPostDto: ModalRoute.of(context)!.settings.arguments as NewsPostDto,
-              getMediaUseCase: GetMediaUseCase(
-                localDataStorageService: GetIt.I(),
-                localFileStorageService: GetIt.I(),
-                remoteFileStorageService: GetIt.I(),
-              ),
-              fetchPostCommentsUseCase: GetIt.I(),
-            ),
-          ),
-        AppRoutes.postReplyScreen => const PostReplyScreenPage(),
         AppRoutes.newsCommentDetailsPage => PostCommentDetailViewPage(
-            postCommentDetailViewModel: PostCommentDetailtViewModel(
+            postCommentDetailViewModel: PostCommentDetailViewModel(
               newsPostCommentDto: ModalRoute.of(context)!.settings.arguments as NewsPostCommentDto,
-              getMediaUseCase: GetMediaUseCase(
-                localDataStorageService: GetIt.I(),
-                localFileStorageService: GetIt.I(),
-                remoteFileStorageService: GetIt.I(),
-              ),
+              postRepository: GetIt.I(),
+              getMediaUseCase: GetIt.I(),
               fetchPostCommentsUseCase: GetIt.I(),
             ),
           ),

@@ -12,10 +12,11 @@ class InfiniteLoader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: LoadingAnimationWidget.staggeredDotsWave(
+      /*child: LoadingAnimationWidget.staggeredDotsWave(
         color: primaryColor,
         size: size,
-      ),
+      ),*/
+      child: Text("..."),
     );
   }
 }
@@ -26,7 +27,7 @@ class FiniteLoader extends StatelessWidget {
     super.key,
   });
 
-  final UploadProgress progress;
+  final ProgressModel progress;
 
   @override
   Widget build(BuildContext context) {

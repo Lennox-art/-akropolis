@@ -1,5 +1,6 @@
 import 'package:akropolis/data/models/dto_models/dto_models.dart';
 import 'package:akropolis/data/models/remote_models/remote_models.dart';
+import 'package:akropolis/domain/models/news_card_model.dart';
 import 'package:akropolis/domain/use_cases/fetch_post_comments_use_case.dart';
 import 'package:akropolis/domain/use_cases/get_media_use_case.dart';
 import 'package:akropolis/presentation/features/news_feed/models/models.dart';
@@ -33,21 +34,20 @@ class _HeadlinesContentState extends State<HeadlinesContent> {
 
   final PageWrapper page = PageWrapper();
 
-  late final PagingController<int, NewsPost> pagingController = PagingController(
+  late final PagingController<int, NewsCardPostModel> pagingController = PagingController(
     firstPageKey: page.page,
   );
 
   Future<void> _fetchPageItems() async {
     try {
-      Result<List<NewsPost>?> headlinesResult = await widget.headlinesViewModel.fetchHeadlinesPostsNews(
+      Result<List<NewsCardPostModel>?> headlinesResult = await widget.headlinesViewModel.fetchHeadlinesPostsNews(
         pageSize: PageWrapper.pageSize,
         fromCache: page.initialFetch,
       );
 
       switch (headlinesResult) {
-        case Success<List<NewsPost>?>():
-          if (page.initialFetch) page.initialFetch = false;
-          List<NewsPost> newItems = headlinesResult.data ?? [];
+        case Success<List<NewsCardPostModel>?>():
+          List<NewsCardPostModel> newItems = headlinesResult.data ?? [];
           int noOfNewItems = newItems.length;
 
           final isLastPage = noOfNewItems < PageWrapper.pageSize;
@@ -60,7 +60,7 @@ class _HeadlinesContentState extends State<HeadlinesContent> {
           pagingController.appendPage(newItems, nextPageKey);
 
           return;
-        case Error<List<NewsPost>?>():
+        case Error<List<NewsCardPostModel>?>():
           pagingController.error = headlinesResult.failure.message;
           return;
       }
@@ -80,7 +80,6 @@ class _HeadlinesContentState extends State<HeadlinesContent> {
 
   @override
   void dispose() {
-    pagingController.dispose();
     super.dispose();
   }
 
@@ -113,7 +112,7 @@ class _HeadlinesContentState extends State<HeadlinesContent> {
   }*/
   @override
   Widget build(BuildContext context) {
-    return PagedListView<int, NewsPost>(
+    return PagedListView<int, NewsCardPostModel>(
       shrinkWrap: true,
       pagingController: pagingController,
       physics: const NeverScrollableScrollPhysics(),
@@ -121,18 +120,8 @@ class _HeadlinesContentState extends State<HeadlinesContent> {
         context: context,
         itemBuilder: (_, news, i) => NewsCard(
           post: news,
-          newsCardViewModel: NewsCardViewModel(
-            newsPost: news,
-            getMediaUseCase: GetMediaUseCase(
-              localDataStorageService: GetIt.I(),
-              localFileStorageService: GetIt.I(),
-              remoteFileStorageService:GetIt.I(),
-            ),
-            newsChannel: NewsChannel.newsHeadlines,
-            appUser: widget.currentUser,
-            postRepository: GetIt.I(),
-            fetchPostCommentsUseCase: widget.fetchPostCommentsUseCase,
-          ),
+          user: widget.currentUser,
+          newsCardViewModel: GetIt.I(),
         ),
         fetchPageItems: _fetchPageItems,
       ),

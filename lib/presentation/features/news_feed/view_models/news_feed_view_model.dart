@@ -4,9 +4,10 @@ import 'package:akropolis/presentation/features/news_feed/models/enums.dart';
 import 'package:flutter/cupertino.dart';
 
 class NewsFeedViewModel extends ChangeNotifier {
-  FetchPostCommentsUseCase fetchPostCommentsUseCase;
+  final FetchPostCommentsUseCase fetchPostCommentsUseCase;
 
   final List<NewsFeedTabEnum> allTabs = NewsFeedTabEnum.values;
+
   final List<Story> _stories = const [
     Story(
       title: "CNN",
@@ -37,6 +38,7 @@ class NewsFeedViewModel extends ChangeNotifier {
   }
 
   List<Story> get stories => _stories;
+
   NewsFeedTabEnum get currentTab => _currentTab;
 
 }

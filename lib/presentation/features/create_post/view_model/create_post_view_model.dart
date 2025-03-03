@@ -10,7 +10,6 @@ import 'package:akropolis/domain/use_cases/create_user_post_use_case.dart';
 import 'package:akropolis/domain/utils/functions.dart';
 import 'package:akropolis/presentation/features/create_post/models/create_post_models.dart';
 import 'package:akropolis/presentation/ui/components/toast/toast.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 
 class CreatePostViewModel extends ChangeNotifier {
@@ -129,14 +128,29 @@ class CreatePostViewModel extends ChangeNotifier {
 
     switch (trimmedVideoResult) {
       case Success<io.File>():
-        _videoData = trimmedVideoResult.data;
-        _createPostState = EdittingVideoCreatePostState(
-          video: _videoData!,
-          selectedThumbnail: _selectedThumbnail!,
-          videoThumbnails: _videoThumbnails!,
-          currentTool: _currentTool,
+        Result<List<Uint8List>> thumbnailResult = await generateThumbnails(
+          GenerateThumbnailsRequest(
+            videoPath: trimmedVideoResult.data.path,
+            count: 8,
+          ),
         );
-        notifyListeners();
+        switch (thumbnailResult) {
+          case Success<List<Uint8List>>():
+            _videoData = trimmedVideoResult.data;
+            _createPostState = EdittingVideoCreatePostState(
+              video: _videoData!,
+              videoThumbnails: _videoThumbnails!,
+              selectedThumbnail: _selectedThumbnail!,
+              currentTool: _currentTool,
+            );
+            notifyListeners();
+            break;
+          case Error<List<Uint8List>>():
+            _toastMessageStream.add(
+              ToastSuccess(message: thumbnailResult.failure.message),
+            );
+            break;
+        }
         break;
       case Error<io.File>():
         _toastMessageStream.add(
@@ -148,6 +162,7 @@ class CreatePostViewModel extends ChangeNotifier {
 
   Future<void> modifyThumbnail(Uint8List thumbnail) async {
     if (_createPostState is! EdittingVideoCreatePostState) return;
+
     _selectedThumbnail = thumbnail;
     _createPostState = EdittingVideoCreatePostState(
       video: _videoData!,
@@ -210,5 +225,12 @@ class CreatePostViewModel extends ChangeNotifier {
     } finally {
       notifyListeners();
     }
+  }
+
+  void reset() {
+    _videoData = null;
+    _selectedThumbnail = null;
+    _videoThumbnails = null;
+    _createPostState = const PickingVideoCreatePostState();
   }
 }

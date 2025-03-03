@@ -1,24 +1,27 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:akropolis/data/models/dto_models/dto_models.dart';
 import 'package:akropolis/data/models/local_models/local_models.dart';
 import 'package:akropolis/data/models/remote_models/remote_models.dart';
-import 'package:akropolis/domain/use_cases/get_media_use_case.dart';
+import 'package:akropolis/data/utils/constants.dart';
 
 import 'package:akropolis/data/utils/date_format.dart';
+import 'package:akropolis/domain/models/news_card_model.dart';
+import 'package:akropolis/main.dart';
 import 'package:akropolis/presentation/features/news_feed/models/enums.dart';
 import 'package:akropolis/presentation/features/news_feed/models/models.dart';
 import 'package:akropolis/presentation/features/news_feed/view_models/news_detail_post_view_model.dart';
 import 'package:akropolis/presentation/features/news_feed/view_models/post_comment_card_view_model.dart';
-import 'package:akropolis/presentation/features/news_feed/view_models/reply_post_view_model.dart';
 import 'package:akropolis/presentation/routes/routes.dart';
 import 'package:akropolis/presentation/ui/components/app_video_player.dart';
+import 'package:akropolis/presentation/ui/components/duration_picker.dart';
 import 'package:akropolis/presentation/ui/components/loader.dart';
 import 'package:akropolis/presentation/ui/components/page_list_widgets.dart';
 import 'package:akropolis/presentation/ui/themes.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
 import 'news_card.dart';
@@ -36,20 +39,18 @@ class NewsDetailedViewPage extends StatefulWidget {
 }
 
 class _NewsDetailedViewPageState extends State<NewsDetailedViewPage> {
-  late final StreamSubscription<PostComment> commentPostedStreamSubscription;
-  late final ReplyPostViewModel replyPostViewModel;
-  late final NewsPost newsPost = widget.newsDetailPostViewModel.newsPost;
-  late final NewsChannel newsChannel = widget.newsDetailPostViewModel.newsChannel;
+  late final NewsPost newsPost = widget.newsDetailPostViewModel.newsPost.newsPost;
+  late final NewsChannel newsChannel = widget.newsDetailPostViewModel.newsPost.newsChannel;
   late final AppUser currentUser = widget.newsDetailPostViewModel.currentUser;
   final PageWrapper page = PageWrapper();
 
-  late final PagingController<int, PostComment> pagingController = PagingController(
+  late final PagingController<int, NewsCardCommentModel> pagingController = PagingController(
     firstPageKey: page.page,
   );
 
   Future<void> _fetchPageItems() async {
     try {
-      Result<List<PostComment>?> fetchCommentsResult = await widget.newsDetailPostViewModel.fetchPostComments(
+      Result<List<NewsCardCommentModel>?> fetchCommentsResult = await widget.newsDetailPostViewModel.fetchPostComments(
         postCollection: newsChannel.collection,
         postId: newsPost.id,
         pageSize: PageWrapper.pageSize,
@@ -57,9 +58,8 @@ class _NewsDetailedViewPageState extends State<NewsDetailedViewPage> {
       );
 
       switch (fetchCommentsResult) {
-        case Success<List<PostComment>?>():
-          if (page.initialFetch) page.initialFetch = false;
-          List<PostComment> newItems = fetchCommentsResult.data ?? [];
+        case Success<List<NewsCardCommentModel>?>():
+          List<NewsCardCommentModel> newItems = fetchCommentsResult.data ?? [];
           int noOfNewItems = newItems.length;
 
           final isLastPage = noOfNewItems < PageWrapper.pageSize;
@@ -72,7 +72,7 @@ class _NewsDetailedViewPageState extends State<NewsDetailedViewPage> {
           pagingController.appendPage(newItems, nextPageKey);
 
           return;
-        case Error<List<PostComment>?>():
+        case Error<List<NewsCardCommentModel>?>():
           pagingController.error = fetchCommentsResult.failure.message;
           return;
       }
@@ -85,7 +85,7 @@ class _NewsDetailedViewPageState extends State<NewsDetailedViewPage> {
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback(
       (_) {
-        commentPostedStreamSubscription = widget.newsDetailPostViewModel.postCommentStream.listen(_onCommentPosted);
+
       },
     );
     pagingController.addPageRequestListener((p) {
@@ -100,15 +100,12 @@ class _NewsDetailedViewPageState extends State<NewsDetailedViewPage> {
   @override
   void dispose() {
     widget.newsDetailPostViewModel.dispose();
-    pagingController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    ReactionDistribution distribution = ReactionDistribution(newsPost.reaction);
-
-    widget.newsDetailPostViewModel.downloadThumbnail(newsPost.thumbnailUrl);
+    widget.newsDetailPostViewModel.downloadThumbnail();
     final ThemeData theme = Theme.of(context);
 
     return Scaffold(
@@ -116,7 +113,7 @@ class _NewsDetailedViewPageState extends State<NewsDetailedViewPage> {
       appBar: AppBar(
         title: null,
         actions: [
-          /*Padding(
+          Padding(
             padding: const EdgeInsets.all(8.0),
             child: ElevatedButton(
               onPressed: () async {
@@ -124,6 +121,7 @@ class _NewsDetailedViewPageState extends State<NewsDetailedViewPage> {
                   context,
                   maxDuration: maxVideoDuration,
                 );
+
                 if (videoDuration == null || !context.mounted) return;
 
                 XFile? videoData = await getIt<ImagePicker>().pickVideo(
@@ -133,25 +131,15 @@ class _NewsDetailedViewPageState extends State<NewsDetailedViewPage> {
                 );
                 if (videoData == null || !context.mounted) return;
 
-                String? videoError = await validateVideo(videoData.path);
-                if (!context.mounted) return;
-
-                if (videoError != null) {
-                  ToastError(title: "Post Video", message: videoError).show();
-                  return;
-                }
-
-                await widget.newsDetailPostViewModel.setVideo(
-                  File(videoData.path)
-                    ..writeAsBytesSync(
-                      await videoData.readAsBytes(),
-                    ),
-                );
-
                 if (!context.mounted) return;
 
                 Navigator.of(context).pushNamed(
                   AppRoutes.postReplyScreen.path,
+                  arguments: NewsPostReplyDto(
+                    widget.newsDetailPostViewModel.newsPost,
+                    currentUser,
+                    File(videoData.path),
+                  ),
                 );
               },
               style: theme.elevatedButtonTheme.style?.copyWith(
@@ -161,7 +149,7 @@ class _NewsDetailedViewPageState extends State<NewsDetailedViewPage> {
               ),
               child: const Text("Reply"),
             ),
-          ),*/
+          ),
         ],
       ),
       body: ListView(
@@ -251,9 +239,7 @@ class _NewsDetailedViewPageState extends State<NewsDetailedViewPage> {
                             ),
                             IconButton(
                               onPressed: () {
-                                widget.newsDetailPostViewModel.downloadPost(
-                                  newsPost.postUrl,
-                                );
+                                widget.newsDetailPostViewModel.downloadPost();
                               },
                               icon: const Icon(
                                 Icons.play_arrow,
@@ -265,7 +251,7 @@ class _NewsDetailedViewPageState extends State<NewsDetailedViewPage> {
                       },
                       errorDownloadingMedia: (e) => IconButton(
                         onPressed: () {
-                          widget.newsDetailPostViewModel.downloadThumbnail(newsPost.thumbnailUrl);
+                          widget.newsDetailPostViewModel.downloadThumbnail();
                         },
                         icon: const Icon(
                           Icons.refresh,
@@ -298,9 +284,7 @@ class _NewsDetailedViewPageState extends State<NewsDetailedViewPage> {
                   },
                   errorDownloadingMedia: (e) => IconButton(
                     onPressed: () {
-                      widget.newsDetailPostViewModel.downloadPost(
-                        newsPost.postUrl,
-                      );
+                      widget.newsDetailPostViewModel.downloadPost();
                     },
                     icon: const Icon(
                       Icons.broken_image_outlined,
@@ -343,52 +327,58 @@ class _NewsDetailedViewPageState extends State<NewsDetailedViewPage> {
               ),
             ],
           ),
-          Flex(
-            direction: Axis.horizontal,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Expanded(
-                flex: distribution.logFlex,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 12),
-                  decoration: const BoxDecoration(
-                    color: primaryColor,
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(10),
+          ListenableBuilder(
+            listenable: widget.newsDetailPostViewModel,
+            builder: (_, __) {
+              return Flex(
+                direction: Axis.horizontal,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    flex: widget.newsDetailPostViewModel.distribution.logFlex,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 12),
+                      decoration: const BoxDecoration(
+                        color: logicianColor,
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(10),
+                        ),
+                      ),
+                      child: Text(
+                        "${widget.newsDetailPostViewModel.distribution.logPercent} % (${widget.newsDetailPostViewModel.distribution.logCount})",
+                        style: theme.textTheme.bodySmall,
+                      ),
                     ),
                   ),
-                  child: Text(
-                    "${distribution.logPercent} % (${distribution.logCount})",
-                    style: theme.textTheme.bodySmall,
+                  const SizedBox(
+                    width: 15,
                   ),
-                ),
-              ),
-              const SizedBox(
-                width: 15,
-              ),
-              Expanded(
-                flex: distribution.empFlex,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 12),
-                  decoration: const BoxDecoration(
-                    color: Colors.orangeAccent,
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(10),
+                  Expanded(
+                    flex: widget.newsDetailPostViewModel.distribution.empFlex,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 12),
+                      decoration: const BoxDecoration(
+                        color: empathyColor,
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(10),
+                        ),
+                      ),
+                      child: Text(
+                        "${widget.newsDetailPostViewModel.distribution.empPercent} % (${widget.newsDetailPostViewModel.distribution.empCount})",
+                        style: theme.textTheme.bodySmall,
+                      ),
                     ),
                   ),
-                  child: Text(
-                    "${distribution.empPercent} % (${distribution.empCount})",
-                    style: theme.textTheme.bodySmall,
-                  ),
-                ),
-              ),
-            ],
+                ],
+              );
+            }
           ),
           const Divider(
             color: Colors.white12,
           ),
-          PagedGridView<int, PostComment>(
+
+          PagedGridView<int, NewsCardCommentModel>(
             shrinkWrap: true,
             showNewPageProgressIndicatorAsGridChild: false,
             showNewPageErrorIndicatorAsGridChild: false,
@@ -408,8 +398,7 @@ class _NewsDetailedViewPageState extends State<NewsDetailedViewPage> {
                   Navigator.of(context).pushNamed(
                     AppRoutes.newsCommentDetailsPage.path,
                     arguments: NewsPostCommentDto(
-                      newsPost,
-                      newsChannel,
+                      widget.newsDetailPostViewModel.newsPost,
                       currentUser,
                       comment,
                     ),
@@ -417,21 +406,86 @@ class _NewsDetailedViewPageState extends State<NewsDetailedViewPage> {
                 },
                 child: PostCommentCard(
                   postCommentCardViewModel: PostCommentCardViewModel(
-                      comment: comment,
-                      getMediaUseCase: GetMediaUseCase(
-                        localDataStorageService: GetIt.I(),
-                        localFileStorageService: GetIt.I(),
-                        remoteFileStorageService: GetIt.I(),
-                      )),
-                  post: newsPost,
-                  comment: comment,
-                  currentUser: currentUser,
+                    comment: comment,
+                    appUser: currentUser,
+                    newsPost: newsPost,
+                    getMediaUseCase: GetIt.I(),
+                  ),
                 ),
               ),
               fetchPageItems: _fetchPageItems,
+              noItemsFoundIndicatorBuilder: (_) => Text(
+                "No comments on this post",
+                textAlign: TextAlign.center,
+              ),
+              noMoreItemsIndicatorBuilder: (_) => Text(
+                "END",
+                textAlign: TextAlign.center,
+              ),
             ),
           ),
         ],
+      ),
+      bottomNavigationBar: ListenableBuilder(
+          listenable: widget.newsDetailPostViewModel,
+          builder: (_, __) {
+          return Container(
+            color: Colors.white12,
+            child: Flex(
+              direction: Axis.horizontal,
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(15.0),
+                    child: ElevatedButton(
+                      onPressed: widget.newsDetailPostViewModel.alreadyReacted ? null : widget.newsDetailPostViewModel.log,
+                      style: ButtonStyle(
+                        backgroundColor: WidgetStateProperty.all(
+                          widget.newsDetailPostViewModel.isLogReaction ? logicianColor : Colors.transparent,
+                        ),
+                        foregroundColor: WidgetStateProperty.all(
+                          widget.newsDetailPostViewModel.isLogReaction ? secondaryColor : logicianColor,
+                        ),
+                        side: const WidgetStatePropertyAll(
+                          BorderSide(color: logicianColor, width: 1.0),
+                        ),
+                        shape: WidgetStatePropertyAll(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                      ),
+                      child: const Text("Logician"),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(15.0),
+                    child: ElevatedButton(
+                      onPressed: widget.newsDetailPostViewModel.alreadyReacted ? null : widget.newsDetailPostViewModel.emp,
+                      style: ButtonStyle(
+                        backgroundColor: WidgetStateProperty.all(widget.newsDetailPostViewModel.isEmpReaction ? empathyColor : Colors.transparent),
+                        foregroundColor: WidgetStateProperty.all(widget.newsDetailPostViewModel.isEmpReaction ? secondaryColor : empathyColor),
+                        side: const WidgetStatePropertyAll(
+                          BorderSide(color: empathyColor, width: 1.0),
+                        ),
+                        shape: WidgetStatePropertyAll(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                      ),
+                      child: const Text("Empath"),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
       ),
     );
   }

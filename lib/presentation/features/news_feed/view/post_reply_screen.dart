@@ -1,20 +1,23 @@
-import 'dart:io';
+import 'dart:async';
 
-import 'package:akropolis/domain/use_cases/post_reply_use_case.dart';
 import 'package:akropolis/main.dart';
 import 'package:akropolis/presentation/features/create_post/models/create_post_models.dart';
-import 'package:akropolis/presentation/features/news_feed/models/models.dart';
-import 'package:akropolis/presentation/features/news_feed/view_models/news_detail_post_view_model.dart';
+import 'package:akropolis/presentation/features/news_feed/models/reply_post_state.dart';
 import 'package:akropolis/presentation/features/news_feed/view_models/reply_post_view_model.dart';
 import 'package:akropolis/presentation/features/video_editing/view/video_editing.dart';
 import 'package:akropolis/presentation/ui/components/loader.dart';
+import 'package:akropolis/presentation/ui/components/toast/toast.dart';
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
+
+import '../../../ui/themes.dart';
 
 class PostReplyScreenPage extends StatefulWidget {
   const PostReplyScreenPage({
+    required this.replyPostViewModel,
     super.key,
   });
+
+  final ReplyPostViewModel replyPostViewModel;
 
   @override
   State<PostReplyScreenPage> createState() => _PostReplyScreenPageState();
@@ -22,101 +25,120 @@ class PostReplyScreenPage extends StatefulWidget {
 
 class _PostReplyScreenPageState extends State<PostReplyScreenPage> {
 
-  late final ReplyPostViewModel replyPostViewModel;
+  ReplyPostViewModel get replyPostViewModel => widget.replyPostViewModel;
+  late final StreamSubscription<ToastMessage> toastSubscription;
+  late final StreamSubscription<ReplyPostState> replyPostStateSubscription;
 
   @override
   void initState() {
-    NewsPostDto newsPostDto = ModalRoute.of(context)!.settings.arguments as NewsPostDto;
-    replyPostViewModel = ReplyPostViewModel(
-      newsPost: newsPostDto.newsPost,
-      newsChannel: newsPostDto.channel,
-      postReplyUseCase: PostReplyUseCase(
-        userRepository: GetIt.I(),
-        authenticationRepository: GetIt.I(),
-        postRepository: GetIt.I(),
-        localDataStorageService: GetIt.I(),
-        remoteFileStorageService: GetIt.I(),
-        localFileStorageService: GetIt.I(),
-      ),
-    );
+    toastSubscription = replyPostViewModel.toastStream.listen(_onToastMessage);
+    replyPostStateSubscription = replyPostViewModel.replyPostStream.listen(_onReplyStateChanged);
     super.initState();
   }
 
   @override
-  Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: replyPostViewModel,
-      builder: (_, __) {
-        return replyPostViewModel.replyPostState.map(
-          loading: (_) => const InfiniteLoader(),
-          idlePostState: (_) => const Text("Idle"),
-          errorState: (e) => Text(e.failure.message),
-          editingVideo: (l) {
-            return Flex(
-              direction: Axis.vertical,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Flex(
-                    direction: Axis.vertical,
-                    children: [
-                      Expanded(
-                        child: switch (l.currentTool) {
-                          VideoEditingTools.trimVideo => TrimVideoWidget(
-                              data: l.video,
-                              thumbnails: l.videoThumbnails,
-                              onConfirm: ({
-                                required Duration start,
-                                required Duration end,
-                              }) {
-                                log.debug("Modifying trim video");
+  void dispose() {
+    toastSubscription.cancel();
+    replyPostStateSubscription.cancel();
+    super.dispose();
+  }
 
-                                replyPostViewModel.trimVideo(
-                                  startTime: start,
-                                  endTime: end,
-                                );
-                              },
-                            ),
-                          VideoEditingTools.thumbnailPicker => ThumbnailVideoWidget(
-                              selectedThumbnail: l.selectedThumbnail,
-                              videoThumbnails: l.videoThumbnails,
-                              onSelect:replyPostViewModel.modifyThumbnail,
-                            ),
-                        },
-                      ),
-                      SizedBox(
-                        height: 80,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: VideoEditingTools.values
-                              .map(
-                                (t) => IconButton(
-                                  onPressed: () => replyPostViewModel.changeCurrentTool(t),
-                                  icon: Icon(t.iconData),
-                                ),
-                              )
-                              .toList(),
+  void _onToastMessage(ToastMessage toast) {
+    toast.show();
+  }
+
+  void _onReplyStateChanged(ReplyPostState state) {
+    state.mapOrNull(
+      idlePostState: (_) => Navigator.of(context).pop(),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: ListenableBuilder(
+        listenable: replyPostViewModel,
+        builder: (_, __) {
+          return replyPostViewModel.replyPostState.map(
+            loading: (_) => const InfiniteLoader(),
+            idlePostState: (_) => Center(child: const Text("Idle")),
+            errorState: (e) => Text(e.failure.message),
+            editingVideo: (l) {
+              return Flex(
+                direction: Axis.vertical,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Flex(
+                      direction: Axis.vertical,
+                      children: [
+                        Expanded(
+                          child: switch (l.currentTool) {
+                            VideoEditingTools.trimVideo => TrimVideoWidget(
+                                data: l.video,
+                                thumbnails: l.videoThumbnails,
+                                onConfirm: ({
+                                  required Duration start,
+                                  required Duration end,
+                                }) {
+                                  log.debug("Modifying trim video");
+      
+                                  replyPostViewModel.trimVideo(
+                                    startTime: start,
+                                    endTime: end,
+                                  );
+
+                                },
+                              ),
+                            VideoEditingTools.thumbnailPicker => ThumbnailVideoWidget(
+                                selectedThumbnail: l.selectedThumbnail,
+                                videoThumbnails: l.videoThumbnails,
+                                onSelect:replyPostViewModel.modifyThumbnail,
+                              ),
+                          },
                         ),
-                      ),
-                    ],
+                        SizedBox(
+                          height: 80,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: VideoEditingTools.values
+                                .map((t) => Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                IconButton(
+                                  onPressed: () {
+                                    widget.replyPostViewModel.changeCurrentTool(t);
+                                  },
+                                  icon: Icon(t.iconData),
+                                  color: t == l.currentTool ? primaryColor : Colors.white70,
+                                ),
+                                Text(t.title),
+                              ],
+                            ),
+                            )
+                                .toList(),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                ListTile(
-                  trailing: TextButton(
-                    onPressed: () async {
-                      await replyPostViewModel.doPost();
-                      if (!context.mounted) return;
-                      Navigator.of(context).pop();
-                    },
-                    child: const Text("Post"),
+                  ListTile(
+                    trailing: TextButton(
+                      onPressed: () async {
+                        await replyPostViewModel.doPost();
+                      },
+                      child: const Text("Post"),
+                    ),
                   ),
-                ),
-              ],
-            );
-          },
-        );
-      },
+                ],
+              );
+            },
+          );
+        },
+      ),
     );
   }
 

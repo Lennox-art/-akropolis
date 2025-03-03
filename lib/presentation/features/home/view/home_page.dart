@@ -1,7 +1,9 @@
 import 'dart:async';
 
+import 'package:akropolis/data/models/dto_models/dto_models.dart';
 import 'package:akropolis/domain/gen/assets.gen.dart';
 import 'package:akropolis/domain/use_cases/fetch_post_comments_use_case.dart';
+import 'package:akropolis/presentation/features/create_post/view_model/create_post_view_model.dart';
 
 import 'package:akropolis/presentation/features/home/models/home_models.dart';
 import 'package:akropolis/presentation/features/home/view_model/home_view_model.dart';
@@ -11,20 +13,20 @@ import 'package:akropolis/presentation/routes/routes.dart';
 import 'package:akropolis/presentation/ui/components/loader.dart';
 import 'package:akropolis/presentation/ui/components/toast/toast.dart';
 import 'package:akropolis/presentation/ui/themes.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:infinite_carousel/infinite_carousel.dart';
 
 final ValueNotifier<double> bottomNavigationOpacity = ValueNotifier(1.0);
 
 class HomePage extends StatefulWidget {
   const HomePage({
     required this.homeViewModel,
+    required this.createPostViewModel,
     super.key,
   });
 
   final HomeViewModel homeViewModel;
+  final CreatePostViewModel createPostViewModel;
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -45,7 +47,13 @@ class _HomePageState extends State<HomePage> {
     toast.show();
   }
 
-  void _onStateChange(HomeState state) {}
+  void _onStateChange(HomeState state) {
+    state.mapOrNull(initial: (_) {
+      //User has logged out
+      GetIt.I<FetchPostCommentsUseCase>().reset();
+      GetIt.I<CreatePostViewModel>().reset();
+    });
+  }
 
   @override
   void dispose() {
@@ -82,9 +90,7 @@ class _HomePageState extends State<HomePage> {
                             currentUser: r.appUser,
                             homeViewModel: widget.homeViewModel,
                             newsFeedViewModel: NewsFeedViewModel(
-                              FetchPostCommentsUseCase(
-                                postRepository: GetIt.I(),
-                              ),
+                              GetIt.I(),
                             ),
                           ),
                         BottomNavigationTabs.search => const SizedBox.shrink(),
@@ -96,6 +102,21 @@ class _HomePageState extends State<HomePage> {
                   );
                 },
               ),
+              Align(
+                alignment: Alignment.topCenter,
+                child: ListenableBuilder(
+                  listenable: widget.createPostViewModel,
+                  builder: (_, __) {
+                    return widget.createPostViewModel.createPostState.mapOrNull(
+                      loading: (l) {
+                        ProgressModel? progressModel = l.progress;
+                        if (progressModel == null) return const InfiniteLoader();
+                        return FiniteLoader(progress: progressModel);
+                      },
+                    ) ?? const SizedBox.shrink();
+                  },
+                ),
+              )
             ],
           ),
           bottomNavigationBar: ListenableBuilder(

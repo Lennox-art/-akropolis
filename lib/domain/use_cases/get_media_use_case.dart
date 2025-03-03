@@ -19,7 +19,7 @@ class GetMediaUseCase {
         _localFileStorageService = localFileStorageService,
         _remoteFileStorageService = remoteFileStorageService;
 
-  Future<Result<MediaData>> getMediaFromUrl(
+  Future<Result<MapEntry<String, MediaData>>> getMediaFromUrl(
     String url, {
     Function(ProgressModel)? onProgress,
   }) async {
@@ -36,7 +36,7 @@ class GetMediaUseCase {
       );
 
       if (fetchLocalFileResult is Success<File?> && fetchLocalFileResult.data != null) {
-        return Result.success(data: MediaData(file: fetchLocalFileResult.data!, mediaType: localFileCacheResult.data!.mediaType));
+        return Result.success(data: MapEntry(url, MediaData(file: fetchLocalFileResult.data!, mediaType: localFileCacheResult.data!.mediaType)));
       }
     }
 
@@ -63,8 +63,7 @@ class GetMediaUseCase {
               ),
             );
 
-            switch(cacheLocalFileResult) {
-
+            switch (cacheLocalFileResult) {
               case Success<LocalFileCache>():
                 print("Successfully cached file ${cacheLocalFileResult.data.sha1}");
                 break;
@@ -73,7 +72,12 @@ class GetMediaUseCase {
                 break;
             }
 
-            return Result.success(data: MediaData(file: cacheFileResult.data.file, mediaType: fetchRemoteFileResult.data.mediaType));
+            return Result.success(
+              data: MapEntry(
+                url,
+                MediaData(file: cacheFileResult.data.file, mediaType: fetchRemoteFileResult.data.mediaType),
+              ),
+            );
           case Error<CacheFileResult>():
             return Result.error(failure: cacheFileResult.failure);
         }

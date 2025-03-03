@@ -5,11 +5,13 @@ import 'package:akropolis/data/models/dto_models/dto_models.dart';
 import 'package:akropolis/data/models/remote_models/remote_models.dart';
 import 'package:akropolis/data/repositories/authentication_repository/authentication_repository.dart';
 import 'package:akropolis/data/repositories/user_repository/user_repository.dart';
+import 'package:akropolis/domain/use_cases/fetch_post_comments_use_case.dart';
 import 'package:akropolis/presentation/features/home/models/home_models.dart';
 import 'package:akropolis/presentation/ui/components/toast/toast.dart';
 import 'package:exception_base/exception_base.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:get_it/get_it.dart';
 
 class HomeViewModel extends ChangeNotifier {
   final AuthenticationRepository _authenticationRepository;
@@ -121,6 +123,7 @@ class HomeViewModel extends ChangeNotifier {
           break;
       }
     } finally {
+      _onHomeStateStreamController.add(_homeState);
       notifyListeners();
     }
   }

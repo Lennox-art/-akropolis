@@ -1,7 +1,7 @@
 import 'package:akropolis/data/models/dto_models/dto_models.dart';
 import 'package:akropolis/data/models/remote_models/remote_models.dart';
+import 'package:akropolis/domain/models/news_card_model.dart';
 import 'package:akropolis/domain/use_cases/fetch_post_comments_use_case.dart';
-import 'package:akropolis/domain/use_cases/get_media_use_case.dart';
 import 'package:akropolis/main.dart';
 import 'package:akropolis/presentation/features/news_feed/models/models.dart';
 import 'package:akropolis/presentation/features/news_feed/view_models/local_news_view_model.dart';
@@ -11,7 +11,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:get_it/get_it.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
-import 'news_card.dart';
+import '../news_card.dart';
 
 class LocalNewsContent extends StatefulWidget {
   const LocalNewsContent({
@@ -33,22 +33,21 @@ class _LocalNewsContentState extends State<LocalNewsContent> {
 
   final PageWrapper page = PageWrapper();
 
-  late final PagingController<int, NewsPost> pagingController = PagingController(
+  late final PagingController<int, NewsCardPostModel> pagingController = PagingController(
     firstPageKey: page.page,
   );
 
   Future<void> _fetchPageItems() async {
     try {
-      Result<List<NewsPost>?> fetchLocalNewsResult = await widget.localNewsViewModel.fetchLocalPostsNews(
+      Result<List<NewsCardPostModel>?> fetchLocalNewsResult = await widget.localNewsViewModel.fetchLocalPostsNews(
         pageSize: PageWrapper.pageSize,
         fromCache: page.initialFetch,
         country: deviceCountry ?? 'us',
       );
 
       switch (fetchLocalNewsResult) {
-        case Success<List<NewsPost>?>():
-          if (page.initialFetch) page.initialFetch = false;
-          List<NewsPost> newItems = fetchLocalNewsResult.data ?? [];
+        case Success<List<NewsCardPostModel>?>():
+          List<NewsCardPostModel> newItems = fetchLocalNewsResult.data ?? [];
           int noOfNewItems = newItems.length;
 
           final isLastPage = noOfNewItems < PageWrapper.pageSize;
@@ -61,7 +60,7 @@ class _LocalNewsContentState extends State<LocalNewsContent> {
           pagingController.appendPage(newItems, nextPageKey);
 
           return;
-        case Error<List<NewsPost>?>():
+        case Error<List<NewsCardPostModel>?>():
           pagingController.error = fetchLocalNewsResult.failure.message;
           return;
       }
@@ -81,7 +80,6 @@ class _LocalNewsContentState extends State<LocalNewsContent> {
 
   @override
   void dispose() {
-    pagingController.dispose();
     super.dispose();
   }
 
@@ -114,7 +112,7 @@ class _LocalNewsContentState extends State<LocalNewsContent> {
 
   @override
   Widget build(BuildContext context) {
-    return PagedListView<int, NewsPost>(
+    return PagedListView<int, NewsCardPostModel>(
       shrinkWrap: true,
       pagingController: pagingController,
       physics: const ClampingScrollPhysics(),
@@ -122,21 +120,12 @@ class _LocalNewsContentState extends State<LocalNewsContent> {
         context: context,
         itemBuilder: (_, news, i) => NewsCard(
           post: news,
-          newsCardViewModel: NewsCardViewModel(
-            newsPost: news,
-            newsChannel: NewsChannel.worldNews,
-            getMediaUseCase: GetMediaUseCase(
-              localDataStorageService: GetIt.I(),
-              localFileStorageService: GetIt.I(),
-              remoteFileStorageService:GetIt.I(),
-            ),
-            appUser: widget.currentUser,
-            postRepository: GetIt.I(),
-            fetchPostCommentsUseCase: widget.fetchPostCommentsUseCase,
-          ),
+          user: widget.currentUser,
+          newsCardViewModel: GetIt.I(),
         ),
         fetchPageItems: _fetchPageItems,
       ),
     );
   }
+
 }

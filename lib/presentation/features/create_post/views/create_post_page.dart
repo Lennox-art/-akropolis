@@ -55,13 +55,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
     return PopScope(
-      canPop: false,
-      onPopInvokedWithResult: (_, __) {
-        bool wentBack = widget.createPostViewModel.goBack();
-        if(!wentBack) {
-          Navigator.of(context).pop();
-        }
-      },
+      canPop: true,
       child: Scaffold(
         body: ListenableBuilder(
           listenable: widget.createPostViewModel,
@@ -289,11 +283,11 @@ class _CreatePostPageState extends State<CreatePostPage> {
                                     padding: const EdgeInsets.all(8.0),
                                     child: Column(
                                       mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Row(
                                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             Assets.circlesThree.svg(
                                               height: 30,
@@ -382,10 +376,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                     ListTile(
                       leading: TextButton(
                         onPressed: () {
-                          bool wentBack = widget.createPostViewModel.goBack();
-                          if(!wentBack) {
-                            Navigator.of(context).pop();
-                          }
+
                         },
                         child: const Text(
                           "Cancel",

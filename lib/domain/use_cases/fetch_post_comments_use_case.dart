@@ -7,7 +7,7 @@ import 'package:common_fn/common_fn.dart';
 
 class FetchPostCommentsUseCase {
   final PostRepository _postRepository;
-  static final LinkedHashMap<String, List<PostComment>> _cachedPostComments = LinkedHashMap();
+  static final HashMap<String, LinkedHashSet<PostComment>> _cachedPostComments = HashMap();
   static final LinkedHashMap<String, int> _postCommentsCount = LinkedHashMap();
   static final Map<String, PostComment?> lastFetchedCommentMap = {};
 
@@ -38,8 +38,15 @@ class FetchPostCommentsUseCase {
     );
 
     if (fetchPostResult is Success<List<PostComment>> && fetchPostResult.data.isNotEmpty) {
-      _cachedPostComments.update(postId, (l) => l + fetchPostResult.data, ifAbsent: () => fetchPostResult.data);
-      lastFetchedCommentMap.update(postId, (_) => fetchPostResult.data.last, ifAbsent: ()=> fetchPostResult.data.last);
+      _cachedPostComments.update(
+        postId,
+        (l) => l..addAll(fetchPostResult.data),
+        ifAbsent: () => LinkedHashSet(
+          equals: (p1, p2) => p1.id == p2.id,
+          hashCode: (p) => p.id.hashCode,
+        )..addAll(fetchPostResult.data),
+      );
+      lastFetchedCommentMap.update(postId, (_) => fetchPostResult.data.last, ifAbsent: () => fetchPostResult.data.last);
     }
 
     return fetchPostResult;
@@ -50,7 +57,6 @@ class FetchPostCommentsUseCase {
     required String postId,
     required bool fromCache,
   }) async {
-
     if (fromCache && _postCommentsCount.containsKey(postId)) {
       return Result.success(
         data: _postCommentsCount[postId]!,
@@ -63,11 +69,19 @@ class FetchPostCommentsUseCase {
     );
 
     if (countPostCommentResult is Success<int>) {
-      _postCommentsCount.update(postId, (l) => l + countPostCommentResult.data, ifAbsent: () => countPostCommentResult.data);
+      _postCommentsCount.update(
+        postId,
+        (l) => l + countPostCommentResult.data,
+        ifAbsent: () => countPostCommentResult.data,
+      );
     }
 
     return countPostCommentResult;
   }
-  
 
+  void reset() {
+    _cachedPostComments.clear();
+    _postCommentsCount.clear();
+    lastFetchedCommentMap.clear();
+  }
 }

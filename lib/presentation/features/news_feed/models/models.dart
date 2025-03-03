@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:akropolis/data/models/remote_models/remote_models.dart';
+import 'package:akropolis/domain/models/news_card_model.dart';
 
 enum NewsChannel {
   worldNews("world_news"),
@@ -53,30 +54,34 @@ class PostReply {
 }*/
 
 class NewsPostDto {
-  final NewsPost newsPost;
-  final NewsChannel channel;
+  final NewsCardPostModel newsPost;
   final AppUser currentUser;
 
-  NewsPostDto(this.newsPost, this.channel, this.currentUser);
+  NewsPostDto(this.newsPost,this.currentUser);
+}
+
+class NewsPostReplyDto {
+  final NewsCardPostModel newsPost;
+  final AppUser currentUser;
+  final File commentVideo;
+
+  NewsPostReplyDto(this.newsPost,this.currentUser, this.commentVideo);
 }
 
 class NewsPostCommentDto {
-  final NewsPost newsPost;
-  final NewsChannel channel;
+  final NewsCardPostModel newsPost;
   final AppUser currentUser;
-  final PostComment comment;
+  final NewsCardCommentModel comment;
 
-  NewsPostCommentDto(this.newsPost, this.channel, this.currentUser, this.comment);
+  NewsPostCommentDto(this.newsPost,  this.currentUser, this.comment);
 }
 
-
 class CommentReplyDto {
-  final NewsPost newsPost;
+  final NewsCardPostModel newsPost;
   final File commentVideo;
 
   CommentReplyDto(this.newsPost, this.commentVideo);
 }
-
 
 class ReactionDistribution {
   final PostReaction postReaction;
@@ -96,6 +101,5 @@ class ReactionDistribution {
   double get logPercent => _total == 0 ? 0 : (postReaction.log.length / _total) * 100;
 
   double get empPercent => _total == 0 ? 0 : (postReaction.emp.length / _total) * 100;
-
 
 }

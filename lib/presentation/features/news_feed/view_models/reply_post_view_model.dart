@@ -4,6 +4,7 @@ import 'dart:io' as io;
 import 'package:akropolis/data/models/dto_models/dto_models.dart';
 import 'package:akropolis/data/models/remote_models/remote_models.dart';
 import 'package:akropolis/data/utils/validations.dart';
+import 'package:akropolis/domain/models/news_card_model.dart';
 import 'package:akropolis/domain/use_cases/post_reply_use_case.dart';
 import 'package:akropolis/domain/utils/functions.dart';
 import 'package:akropolis/presentation/features/create_post/models/create_post_models.dart';
@@ -18,19 +19,19 @@ class ReplyPostViewModel extends ChangeNotifier {
   final StreamController<ReplyPostState> _replyPostStream = StreamController.broadcast();
   VideoEditingTools _currentTool = VideoEditingTools.thumbnailPicker;
   ReplyPostState _replyPostState = const IdlePostState();
-  io.File? _videoData;
+  io.File _videoData;
   Uint8List? _selectedThumbnail;
   List<Uint8List>? _videoThumbnails;
-  final NewsPost _newsPost;
-  final NewsChannel _newsChannel;
+  final NewsCardPostModel _newsPost;
 
   ReplyPostViewModel({
-    required NewsPost newsPost,
-    required NewsChannel newsChannel,
+    required NewsPostReplyDto newsPostReplyDto,
     required PostReplyUseCase postReplyUseCase,
   })  : _postReplyUseCase = postReplyUseCase,
-        _newsPost = newsPost,
-        _newsChannel = newsChannel;
+        _newsPost = newsPostReplyDto.newsPost,
+        _videoData = newsPostReplyDto.commentVideo {
+    setVideo(file: _videoData);
+  }
 
   Stream<ToastMessage> get toastStream => _toastMessageStream.stream;
 
@@ -42,6 +43,12 @@ class ReplyPostViewModel extends ChangeNotifier {
 
   void changeCurrentTool(VideoEditingTools tool) {
     _currentTool = tool;
+    _replyPostState = ReplyPostState.editingVideo(
+      video: _videoData,
+      selectedThumbnail: _selectedThumbnail!,
+      videoThumbnails: _videoThumbnails!,
+      currentTool: _currentTool,
+    );
     notifyListeners();
   }
 
@@ -68,8 +75,9 @@ class ReplyPostViewModel extends ChangeNotifier {
           _videoData = file;
           _videoThumbnails = thumbnailResult.data;
           _selectedThumbnail = thumbnailResult.data.first;
+
           _replyPostState = EdittingVideoReplyPostState(
-            video: _videoData!,
+            video: _videoData,
             videoThumbnails: _videoThumbnails!,
             selectedThumbnail: _selectedThumbnail!,
             currentTool: currentTool,
@@ -87,11 +95,11 @@ class ReplyPostViewModel extends ChangeNotifier {
   }
 
   Future<void> trimVideo({required Duration startTime, required Duration endTime}) async {
-    if (_replyPostState is! EdittingVideoCreatePostState) return;
+    if (_replyPostState is! EdittingVideoReplyPostState) return;
 
     Result<io.File> trimmedVideoResult = await trimVideoInRange(
       TrimVideoRequest(
-        file: _videoData!,
+        file: _videoData,
         start: startTime,
         end: endTime,
       ),
@@ -108,10 +116,9 @@ class ReplyPostViewModel extends ChangeNotifier {
 
         switch (thumbnailResult) {
           case Success<List<Uint8List>>():
-            _videoThumbnails = thumbnailResult.data;
             _videoData = trimmedVideoResult.data;
             _replyPostState = EdittingVideoReplyPostState(
-              video: _videoData!,
+              video: _videoData,
               videoThumbnails: _videoThumbnails!,
               selectedThumbnail: _selectedThumbnail!,
               currentTool: _currentTool,
@@ -135,11 +142,13 @@ class ReplyPostViewModel extends ChangeNotifier {
   }
 
   Future<void> modifyThumbnail(Uint8List thumbnail) async {
-    if (_replyPostState is! EdittingVideoCreatePostState) return;
+    if (_replyPostState is! EdittingVideoReplyPostState) return;
+
+    print("Modifying thumbnail");
 
     _selectedThumbnail = thumbnail;
     _replyPostState = EdittingVideoReplyPostState(
-      video: _videoData!,
+      video: _videoData,
       selectedThumbnail: _selectedThumbnail!,
       videoThumbnails: _videoThumbnails!,
       currentTool: _currentTool,
@@ -149,16 +158,14 @@ class ReplyPostViewModel extends ChangeNotifier {
 
   Future<void> doPost() async {
     if (_replyPostState is! EdittingVideoReplyPostState) return;
-
-    assert(_selectedThumbnail == null);
-    assert(_videoData == null);
+    assert(_selectedThumbnail != null);
 
     try {
       Result<PostComment> newPostResult = await _postReplyUseCase.post(
         thumbnailData: _selectedThumbnail!,
-        videoData: await _videoData!.readAsBytes(),
-        collection: _newsChannel.collection,
-        postId: _newsPost.id,
+        videoData: await _videoData.readAsBytes(),
+        collection: _newsPost.newsChannel.collection,
+        postId: _newsPost.newsPost.id,
         onProgress: (p) {
           _replyPostState = LoadingReplyPostState(progress: p);
           notifyListeners();
@@ -175,7 +182,7 @@ class ReplyPostViewModel extends ChangeNotifier {
 
         case Error<PostComment>():
           _replyPostState = EdittingVideoReplyPostState(
-            video: _videoData!,
+            video: _videoData,
             selectedThumbnail: _selectedThumbnail!,
             videoThumbnails: _videoThumbnails!,
             currentTool: _currentTool,
@@ -186,7 +193,9 @@ class ReplyPostViewModel extends ChangeNotifier {
           break;
       }
     } finally {
+      _replyPostStream.add(_replyPostState);
       notifyListeners();
     }
   }
+
 }
