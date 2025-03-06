@@ -84,6 +84,7 @@ class PostReplyUseCase {
             }
           },
         );
+
         break;
       case Error<LocalFileCache>():
         return Result.error(failure: uploadThumbnailResult.failure);
@@ -107,6 +108,7 @@ class PostReplyUseCase {
             }
           },
         );
+
         break;
       case Error<LocalFileCache>():
         return Result.error(failure: uploadVideoResult.failure);

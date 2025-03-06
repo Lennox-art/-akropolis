@@ -30,6 +30,8 @@ class ForYouContent extends StatefulWidget {
 
 class _ForYouContentState extends State<ForYouContent> {
   final PageWrapper page = PageWrapper();
+
+  int get cardHeight => 400;
   late final Future highlights = widget.forYouViewModel.fetchForYouPostsNews(
     pageSize: 10,
     fromCache: true,
@@ -41,7 +43,7 @@ class _ForYouContentState extends State<ForYouContent> {
     if (index < 0 || index >= itemCount) return;
 
     // Calculate the offset (assuming each item has the same height)
-    double itemHeight = 400.0; // Adjust based on your item height
+    double itemHeight = cardHeight.toDouble(); // Adjust based on your item height
     double offset = index * itemHeight;
 
     _scrollController.animateTo(
@@ -50,7 +52,6 @@ class _ForYouContentState extends State<ForYouContent> {
       curve: Curves.easeInOut,
     );
   }
-
 
   late final PagingController<int, NewsCardPostModel> pagingController = PagingController(
     firstPageKey: page.page,
@@ -87,12 +88,20 @@ class _ForYouContentState extends State<ForYouContent> {
     }
   }
 
+  void _onScroll() {
+    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - cardHeight) {
+      _fetchPageItems();
+    }
+  }
+
   @override
   void initState() {
     /*pagingController.addPageRequestListener((p) {
       page.page = p;
       _fetchPageItems();
     });*/
+
+    _scrollController.addListener(_onScroll);
     super.initState();
   }
 
@@ -180,6 +189,7 @@ class _ForYouContentState extends State<ForYouContent> {
             ListenableBuilder(
               listenable: widget.forYouViewModel,
               builder: (_, __) {
+
                 return ListView.builder(
                   shrinkWrap: true,
                   controller: _scrollController,
@@ -199,6 +209,7 @@ class _ForYouContentState extends State<ForYouContent> {
       ),
     );
   }
+
 }
 
 class ForYouHighlightCarrousel extends StatelessWidget {
@@ -221,7 +232,7 @@ class ForYouHighlightCarrousel extends StatelessWidget {
       children: [
         Visibility(
           visible: newsPost.isNotEmpty,
-          replacement: Text("No posts"),
+          replacement: const Text("No posts"),
           child: SizedBox(
             height: 320,
             child: InfiniteCarousel.builder(
