@@ -71,3 +71,6 @@ Future<String?> validateVideo(String? videoFilePath) async {
       return videoDuration.failure.message;
   }
 }
+
+
+int maxBioLength = 300;

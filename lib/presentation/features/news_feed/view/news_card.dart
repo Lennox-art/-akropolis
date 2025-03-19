@@ -634,7 +634,7 @@ class _ForYouCardState extends State<ForYouCard> {
                         ),
                       ),
                       child: Text(
-                        "${widget.newsCardViewModel.getDistribution(widget.post.newsPost).logPercent} % (${widget.newsCardViewModel.getDistribution(widget.post.newsPost).logCount})",
+                        "${widget.newsCardViewModel.getDistribution(widget.post.newsPost).logPercent.toStringAsFixed(0)} % (${widget.newsCardViewModel.getDistribution(widget.post.newsPost).logCount})",
                         style: theme.textTheme.bodySmall,
                       ),
                     ),
@@ -653,7 +653,7 @@ class _ForYouCardState extends State<ForYouCard> {
                         ),
                       ),
                       child: Text(
-                        "${widget.newsCardViewModel.getDistribution(widget.post.newsPost).empPercent} % (${widget.newsCardViewModel.getDistribution(widget.post.newsPost).empCount})",
+                        "${widget.newsCardViewModel.getDistribution(widget.post.newsPost).empPercent.toStringAsFixed(0)} % (${widget.newsCardViewModel.getDistribution(widget.post.newsPost).empCount})",
                         style: theme.textTheme.bodySmall,
                       ),
                     ),

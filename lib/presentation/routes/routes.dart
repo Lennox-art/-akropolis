@@ -20,6 +20,10 @@ import 'package:akropolis/presentation/features/on_boarding/view/select_default_
 import 'package:akropolis/presentation/features/on_boarding/view/select_topic.dart';
 import 'package:akropolis/presentation/features/on_boarding/view/welcome_screen.dart';
 import 'package:akropolis/presentation/features/on_boarding/view_model/on_boarding_view_model.dart';
+import 'package:akropolis/presentation/features/profile/view/edit_profile_screen.dart';
+import 'package:akropolis/presentation/features/profile/view/profile_screen.dart';
+import 'package:akropolis/presentation/features/profile/view_model/edit_profile_view_model.dart';
+import 'package:akropolis/presentation/features/profile/view_model/profile_view_model.dart';
 import 'package:akropolis/presentation/features/splash_screen/view/splash_screen.dart';
 import 'package:akropolis/presentation/features/splash_screen/view_model/splash_screen_view_model.dart';
 import 'package:flutter/material.dart';
@@ -42,7 +46,9 @@ enum AppRoutes {
   createPost("/createPostPage"),
   newsDetailsPage("/newsDetailsPage"),
   postReplyScreen("/postReplyScreen"),
-  newsCommentDetailsPage("/newsCommentDetailsPage");
+  newsCommentDetailsPage("/newsCommentDetailsPage"),
+  profile("/profile"),
+  editProfile("/editProfile");
 
   final String path;
 
@@ -146,6 +152,12 @@ enum AppRoutes {
               fetchPostCommentsUseCase: GetIt.I(),
             ),
           ),
+        AppRoutes.profile => ProfileScreen(
+          profileViewModel: ProfileViewModel(),
+        ),
+    AppRoutes.editProfile => EditProfileScreen(
+          editProfileViewModel: EditProfileViewModel(),
+        ),
       };
 }
 

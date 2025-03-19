@@ -102,26 +102,31 @@ class _NewsFeedTabState extends State<NewsFeedTab> {
                   left: 12.0,
                   top: 12.0,
                 ),
-                child: ListenableBuilder(
-                  listenable: widget.homeViewModel,
-                  builder: (_, __) {
-                    return widget.homeViewModel.homeState.map(
-                      initial: (_) => Assets.profilePic.svg(),
-                      error: (e) => Text(e.failure.message),
-                      loading: (_) => const InfiniteLoader(),
-                      ready: (r) {
-                        String? profilePicture = r.appUser.profilePicture;
-                        if (profilePicture == null) {
-                          return Assets.profilePic.svg();
-                        }
-
-                        return CircleAvatar(
-                          backgroundImage: CachedNetworkImageProvider(profilePicture),
-                        );
-                      },
-                    ) ??
-                        const SizedBox.shrink();
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).pushNamed(AppRoutes.profile.path);
                   },
+                  child: ListenableBuilder(
+                    listenable: widget.homeViewModel,
+                    builder: (_, __) {
+                      return widget.homeViewModel.homeState.map(
+                        initial: (_) => Assets.profilePic.svg(),
+                        error: (e) => Text(e.failure.message),
+                        loading: (_) => const InfiniteLoader(),
+                        ready: (r) {
+                          String? profilePicture = r.appUser.profilePicture;
+                          if (profilePicture == null) {
+                            return Assets.profilePic.svg();
+                          }
+
+                          return CircleAvatar(
+                            backgroundImage: CachedNetworkImageProvider(profilePicture),
+                          );
+                        },
+                      ) ??
+                          const SizedBox.shrink();
+                    },
+                  ),
                 ),
               ),
               actions: [
