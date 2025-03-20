@@ -53,6 +53,7 @@ class EditProfileViewModel extends ChangeNotifier {
           _toastMessageStream.add(
             const ToastSuccess(message: "Profile picture uploaded"),
           );
+          updateUser(currentUser..profilePicture = uploadProfilePicResult.data.url);
           break;
         case Error<LocalFileCache>():
           _toastMessageStream.add(

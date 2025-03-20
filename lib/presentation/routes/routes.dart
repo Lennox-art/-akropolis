@@ -27,6 +27,8 @@ import 'package:akropolis/presentation/features/profile/view_model/edit_profile_
 import 'package:akropolis/presentation/features/profile/view_model/profile_view_model.dart';
 import 'package:akropolis/presentation/features/splash_screen/view/splash_screen.dart';
 import 'package:akropolis/presentation/features/splash_screen/view_model/splash_screen_view_model.dart';
+import 'package:akropolis/presentation/features/topics/view/topics_screen.dart';
+import 'package:akropolis/presentation/features/topics/view_model/topics_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
@@ -48,8 +50,8 @@ enum AppRoutes {
   newsDetailsPage("/newsDetailsPage"),
   postReplyScreen("/postReplyScreen"),
   newsCommentDetailsPage("/newsCommentDetailsPage"),
-  profile("/profile"),
-  editProfile("/editProfile");
+  editProfile("/editProfile"),
+  editTopics("/editTopics");
 
   final String path;
 
@@ -102,12 +104,14 @@ enum AppRoutes {
         AppRoutes.newPassword => const NewPasswordScreen(),
         AppRoutes.welcome => WelcomeScreen(
             onBoardingViewModel: OnBoardingViewModel(
+              topicRepository: GetIt.I(),
               userRepository: GetIt.I(),
               authenticationRepository: GetIt.I(),
             ),
           ),
         AppRoutes.welcomeTopics => SelectTopicScreen(
             onBoardingViewModel: OnBoardingViewModel(
+              topicRepository: GetIt.I(),
               userRepository: GetIt.I(),
               authenticationRepository: GetIt.I(),
             ),
@@ -153,18 +157,19 @@ enum AppRoutes {
               fetchPostCommentsUseCase: GetIt.I(),
             ),
           ),
-        AppRoutes.profile => ProfileScreen(
-          profileViewModel: ProfileViewModel(
-            userRepository: GetIt.I(),
-            authenticationRepository: GetIt.I(),
-            postRepository: GetIt.I(),
-          ),
-        ),
+
     AppRoutes.editProfile => EditProfileScreen(
           editProfileViewModel: EditProfileViewModel(
             currentUser: ModalRoute.of(context)!.settings.arguments as AppUser,
             userRepository: GetIt.I(),
             remoteFileStorageService: GetIt.I(),
+          ),
+        ),
+    AppRoutes.editTopics => EditTopicsScreen(
+          topicsViewModel: TopicsViewModel(
+            userRepository: GetIt.I(),
+            authenticationRepository: GetIt.I(),
+            topicRepository: GetIt.I(),
           ),
         ),
       };

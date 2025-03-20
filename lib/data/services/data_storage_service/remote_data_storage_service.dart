@@ -89,4 +89,7 @@ abstract class RemoteDataStorageService {
 
   Future<Result<int>> countUserPosts({required String userId});
 
+
+  /// Fetch comments
+  Future<Result<List<Topic>>> fetchTopics();
 }

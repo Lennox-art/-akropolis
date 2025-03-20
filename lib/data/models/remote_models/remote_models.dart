@@ -244,3 +244,28 @@ class PostComment {
     'reaction': reaction.toJson(),
   };
 }
+
+class Topic {
+  final String name;
+
+  Topic({
+    required this.name,
+  });
+
+  factory Topic.fromJson(Map<String, dynamic> json) => Topic(
+    name: json['name'] as String,
+  );
+
+  Map<String, dynamic> toJson() => {
+    'name': name,
+  };
+
+  @override
+  int get hashCode => name.hashCode;
+
+  @override
+  bool operator ==(Object other) {
+    if(other is! Topic) return false;
+    return name == other.name;
+  }
+}

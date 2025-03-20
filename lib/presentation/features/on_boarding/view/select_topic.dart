@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:collection';
 
+import 'package:akropolis/data/models/remote_models/remote_models.dart';
 import 'package:akropolis/presentation/features/on_boarding/models/on_boarding_models.dart';
 import 'package:akropolis/presentation/features/on_boarding/view_model/on_boarding_view_model.dart';
 import 'package:akropolis/presentation/routes/routes.dart';
@@ -54,7 +55,7 @@ class _SelectTopicScreenState extends State<SelectTopicScreen> {
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    final Set<String> selectedTopics = HashSet();
+    final Set<Topic> selectedTopics = HashSet();
 
     return SafeArea(
       top: false,
@@ -84,13 +85,19 @@ class _SelectTopicScreenState extends State<SelectTopicScreen> {
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: InterestChips(
-                  selectedTopics: selectedTopics,
-                  minSelection: 6,
-                  topics: widget.onBoardingViewModel.topics,
-                  onSelectionChanged: (selectedTopics) {
-                    print('Selected topics: $selectedTopics');
-                  },
+                child: ListenableBuilder(
+                  listenable: widget.onBoardingViewModel,
+                  builder: (_, __) {
+
+                    return InterestChips(
+                      selectedTopics: selectedTopics,
+                      minSelection: 6,
+                      topics: widget.onBoardingViewModel.topics,
+                      onSelectionChanged: (selectedTopics) {
+                        print('Selected topics: $selectedTopics');
+                      },
+                    );
+                  }
                 ),
               ),
             ),
@@ -104,7 +111,7 @@ class _SelectTopicScreenState extends State<SelectTopicScreen> {
 
                 return ElevatedButton(
                   onPressed: () async {
-                    widget.onBoardingViewModel.setTopics(topics: selectedTopics);
+                    widget.onBoardingViewModel.setTopics(topics: selectedTopics.map((t) => t.name).toSet());
                   },
                   child: const Text("Next"),
                 );
@@ -127,9 +134,9 @@ class InterestChips extends StatefulWidget {
   });
 
   final int minSelection;
-  final List<String> topics;
-  final Set<String> selectedTopics;
-  final void Function(List<String>)? onSelectionChanged;
+  final List<Topic> topics;
+  final Set<Topic> selectedTopics;
+  final void Function(List<Topic>)? onSelectionChanged;
 
   @override
   State<InterestChips> createState() => _InterestChipsState();
@@ -145,7 +152,7 @@ class _InterestChipsState extends State<InterestChips> {
         final isSelected = widget.selectedTopics.contains(topic);
         return FilterChip(
           selected: isSelected,
-          label: Text(topic),
+          label: Text(topic.name),
           onSelected: (selected) {
             setState(() {
               if (selected) {

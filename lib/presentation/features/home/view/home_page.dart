@@ -9,6 +9,8 @@ import 'package:akropolis/presentation/features/home/models/home_models.dart';
 import 'package:akropolis/presentation/features/home/view_model/home_view_model.dart';
 import 'package:akropolis/presentation/features/news_feed/view/news_feed_tab.dart';
 import 'package:akropolis/presentation/features/news_feed/view_models/news_feed_view_model.dart';
+import 'package:akropolis/presentation/features/profile/view/profile_screen.dart';
+import 'package:akropolis/presentation/features/profile/view_model/profile_view_model.dart';
 import 'package:akropolis/presentation/routes/routes.dart';
 import 'package:akropolis/presentation/ui/components/loader.dart';
 import 'package:akropolis/presentation/ui/components/toast/toast.dart';
@@ -96,7 +98,13 @@ class _HomePageState extends State<HomePage> {
                         BottomNavigationTabs.search => const SizedBox.shrink(),
                         BottomNavigationTabs.post => const SizedBox.shrink(),
                         BottomNavigationTabs.chat => const SizedBox.shrink(),
-                        BottomNavigationTabs.profile => const SizedBox.shrink(),
+                        BottomNavigationTabs.profile => ProfileScreen(
+                            profileViewModel: ProfileViewModel(
+                              userRepository: GetIt.I(),
+                              authenticationRepository: GetIt.I(),
+                              postRepository: GetIt.I(),
+                            ),
+                          ),
                       };
                     },
                   );
@@ -108,12 +116,13 @@ class _HomePageState extends State<HomePage> {
                   listenable: widget.createPostViewModel,
                   builder: (_, __) {
                     return widget.createPostViewModel.createPostState.mapOrNull(
-                      loading: (l) {
-                        ProgressModel? progressModel = l.progress;
-                        if (progressModel == null) return const InfiniteLoader();
-                        return FiniteLoader(progress: progressModel);
-                      },
-                    ) ?? const SizedBox.shrink();
+                          loading: (l) {
+                            ProgressModel? progressModel = l.progress;
+                            if (progressModel == null) return const InfiniteLoader();
+                            return FiniteLoader(progress: progressModel);
+                          },
+                        ) ??
+                        const SizedBox.shrink();
                   },
                 ),
               )

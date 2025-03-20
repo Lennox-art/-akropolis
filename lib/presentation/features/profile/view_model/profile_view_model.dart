@@ -5,6 +5,7 @@ import 'package:akropolis/data/models/remote_models/remote_models.dart';
 import 'package:akropolis/data/repositories/authentication_repository/authentication_repository.dart';
 import 'package:akropolis/data/repositories/post_repository/post_repository.dart';
 import 'package:akropolis/data/repositories/user_repository/user_repository.dart';
+import 'package:akropolis/domain/use_cases/get_media_use_case.dart';
 import 'package:akropolis/presentation/features/profile/model/profile_models.dart';
 import 'package:akropolis/presentation/ui/components/toast/toast.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -93,4 +94,5 @@ class ProfileViewModel extends ChangeNotifier {
         break;
     }
   }
+
 }

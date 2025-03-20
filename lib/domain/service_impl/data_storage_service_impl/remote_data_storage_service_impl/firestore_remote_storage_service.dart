@@ -35,6 +35,12 @@ class FirestoreRemoteStorageService extends RemoteDataStorageService {
             toFirestore: (model, _) => model.toJson(),
           );
 
+  CollectionReference get topicCollectionRef =>
+      FirebaseFirestore.instance.collection("topics").withConverter<Topic>(
+        fromFirestore: (snapshot, _) => Topic.fromJson(snapshot.data()!),
+        toFirestore: (model, _) => model.toJson(),
+      );
+
   CollectionReference postCommentCollectionRef({required String collection, required String postId}) =>
       FirebaseFirestore.instance.collection(collection).doc(postId).collection(PostComment.collection).withConverter<PostComment>(
             fromFirestore: (snapshot, _) => PostComment.fromJson(snapshot.data()!),
@@ -374,6 +380,23 @@ class FirestoreRemoteStorageService extends RemoteDataStorageService {
           failureType: FailureType.networkServerFailure,
         ),
       );
+    } catch (e, trace) {
+      return Result.error(
+        failure: AppFailure(
+          message: e.toString(),
+          trace: trace,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Result<List<Topic>>> fetchTopics() async {
+    topicCollectionRef.get();
+    try {
+      QuerySnapshot topicSnapshot = await topicCollectionRef.get();
+      List<Topic> topics = topicSnapshot.docs.map((d) => d.data() as Topic).toList();
+      return Result.success(data: topics);
     } catch (e, trace) {
       return Result.error(
         failure: AppFailure(

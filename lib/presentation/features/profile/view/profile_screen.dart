@@ -20,21 +20,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    ThemeData theme = Theme.of(context);
     return DefaultTabController(
       length: sections.length,
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Profile'),
-          actions: [
-            IconButton(
-              icon: const Icon(
-                Icons.settings,
-                color: Colors.white,
-              ),
-              onPressed: () {},
-            )
-          ],
-        ),
         body: ListenableBuilder(
           listenable: widget.profileViewModel,
           builder: (_, __) {
@@ -51,26 +40,46 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     return [
                       SliverToBoxAdapter(
                         child: Padding(
+                          padding: const EdgeInsets.only(top: 20.0, left: 10),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Builder(
+                                builder: (context) {
+                                  String? profilePic = currentUser.profilePicture;
+                                  if (profilePic == null) {
+                                    return CircleAvatar(
+                                      radius: 60,
+                                      backgroundColor: Colors.grey[800],
+                                      child: const Icon(Icons.person, color: Colors.white, size: 30),
+                                    );
+                                  }
+                                  return CircleAvatar(
+                                    radius: 60,
+                                    backgroundColor: Colors.grey[800],
+                                    backgroundImage: NetworkImage(profilePic),
+                                  );
+                                },
+                              ),
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.settings,
+                                  color: Colors.white,
+                                ),
+                                onPressed: () {},
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      SliverToBoxAdapter(
+                        child: Padding(
                           padding: const EdgeInsets.all(16.0),
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              Builder(builder: (context) {
-                                String? profilePic = currentUser.profilePicture;
-                                if (profilePic == null) {
-                                  return CircleAvatar(
-                                    radius: 30,
-                                    backgroundColor: Colors.grey[800],
-                                    child: const Icon(Icons.person, color: Colors.white, size: 30),
-                                  );
-                                }
-                                return CircleAvatar(
-                                  radius: 30,
-                                  backgroundColor: Colors.grey[800],
-                                  backgroundImage: NetworkImage(profilePic),
-                                );
-                              }),
-                              const SizedBox(width: 10),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -81,6 +90,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,
                                     ),
+                                  ),
+                                  Text(
+                                    currentUser.bio ?? '. . .',
+                                    style: theme.textTheme.bodyLarge,
                                   ),
                                   TextButton(
                                     style: const ButtonStyle(
@@ -100,30 +113,60 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   ),
                                   Row(
                                     children: [
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                                        child: Text(
-                                          '${widget.profileViewModel.logicianCount?.toString() ?? '-'} LOGICIAN',
-                                          style: const TextStyle(
-                                            color: Colors.grey,
-                                            fontSize: 12,
+                                      Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                                            child: Text(
+                                              widget.profileViewModel.logicianCount?.toString() ?? '-',
+                                              style: const TextStyle(
+                                                color: Colors.grey,
+                                                fontSize: 12,
+                                              ),
+                                            ),
                                           ),
-                                        ),
+                                          const Padding(
+                                            padding: EdgeInsets.symmetric(horizontal: 5.0),
+                                            child: Text(
+                                              'LOGICIAN',
+                                              style: TextStyle(
+                                                color: Colors.grey,
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                                        child: Text(
-                                          '${widget.profileViewModel.empathCount?.toString() ?? '-'} EMPATH',
-                                          style: const TextStyle(
-                                            color: Colors.grey,
-                                            fontSize: 12,
+                                      Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                                            child: Text(
+                                              widget.profileViewModel.empathCount?.toString() ?? '-',
+                                              style: const TextStyle(
+                                                color: Colors.grey,
+                                                fontSize: 12,
+                                              ),
+                                            ),
                                           ),
-                                        ),
+                                          const Padding(
+                                            padding: EdgeInsets.symmetric(horizontal: 5.0),
+                                            child: Text(
+                                              'EMPATH',
+                                              style: TextStyle(
+                                                color: Colors.grey,
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ],
                                   )
                                 ],
-                              )
+                              ),
                             ],
                           ),
                         ),
@@ -204,7 +247,11 @@ class FinishProfileWidget extends StatelessWidget {
                 );
                 break;
               case ProfileTask.followTopics:
-                const ToastInfo(message: "Follow not yet implemented").show();
+                //
+                Navigator.of(context).pushNamed(
+                  AppRoutes.editTopics.path,
+                  arguments: appUser,
+                );
                 break;
             }
           },

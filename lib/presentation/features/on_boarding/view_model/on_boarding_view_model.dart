@@ -4,6 +4,7 @@ import 'dart:collection';
 import 'package:akropolis/data/models/dto_models/dto_models.dart';
 import 'package:akropolis/data/models/remote_models/remote_models.dart';
 import 'package:akropolis/data/repositories/authentication_repository/authentication_repository.dart';
+import 'package:akropolis/data/repositories/topics_repository/topics_repository.dart';
 import 'package:akropolis/data/repositories/user_repository/user_repository.dart';
 import 'package:akropolis/presentation/features/on_boarding/models/on_boarding_models.dart';
 import 'package:akropolis/presentation/ui/components/toast/toast.dart';
@@ -13,53 +14,26 @@ import 'package:flutter/cupertino.dart';
 class OnBoardingViewModel extends ChangeNotifier {
   final UserRepository _userRepository;
   final AuthenticationRepository _authenticationRepository;
+  final TopicRepository _topicRepository;
+  final LinkedHashSet<Topic> _topics = LinkedHashSet(equals: (t1, t2) => t1.name == t2.name);
+
   final StreamController<ToastMessage> _toastStreamController = StreamController.broadcast();
   final StreamController<OnBoardingState> _onBoardingStateStreamController = StreamController.broadcast();
   OnBoardingState _state = const NotOnBoardedBoardingState();
   AppUser? _user;
-  final UnmodifiableListView<String> _topics = UnmodifiableListView(const [
-    'Akropolis',
-    'Programming',
-    'Life',
-    'Technology',
-    'Relationship',
-    'News',
-    'Cryptocurrency',
-    'Business',
-    'Politics',
-    'Startup',
-    'Design',
-    'Software Development',
-    'Building',
-    'Artificial Intelligence',
-    'Art',
-    'Blockchain',
-    'Culture',
-    'Farming',
-    'Music',
-    'Car',
-    'Kenya',
-    'DJ',
-    'Mobile Phone',
-    'Football',
-    'Graph',
-    'Productivity',
-    'Health',
-    'Psychology',
-    'Writing',
-    'Love',
-    'Science',
-  ]);
 
   OnBoardingViewModel({
     required UserRepository userRepository,
     required AuthenticationRepository authenticationRepository,
+    required TopicRepository topicRepository,
   })  : _userRepository = userRepository,
+        _topicRepository = topicRepository,
         _authenticationRepository = authenticationRepository {
     _initializeViewModel();
+    _getTopics();
   }
 
-  UnmodifiableListView<String> get topics => _topics;
+  UnmodifiableListView<Topic> get topics => UnmodifiableListView(_topics);
 
   Stream<ToastMessage> get toastStream => _toastStreamController.stream;
 
@@ -100,9 +74,8 @@ class OnBoardingViewModel extends ChangeNotifier {
 
               break;
             case Error<AppUser?>():
-
               //Not to be here without an account
-              //Fatalt error
+              //Fatal error
               _state = const NotOnBoardedBoardingState();
 
               _toastStreamController.add(
@@ -124,6 +97,18 @@ class OnBoardingViewModel extends ChangeNotifier {
     }
   }
 
+  Future<void> _getTopics() async {
+    Result<List<Topic>> topicResult = await _topicRepository.getTopics();
+    switch(topicResult) {
+
+      case Success<List<Topic>>():
+        _topics.addAll(topicResult.data);
+        notifyListeners();
+        return;
+      case Error<List<Topic>>():
+        return;
+    }
+  }
 
 
   Future<void> setTopics({
@@ -135,7 +120,6 @@ class OnBoardingViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-
       _user?.topics = topics;
 
       Result<void> setTopicsResult = await _userRepository.saveAppUser(
@@ -144,7 +128,6 @@ class OnBoardingViewModel extends ChangeNotifier {
 
       switch (setTopicsResult) {
         case Success<void>():
-
           //TODO: Notifications
           _state = const ClearedOnBoardingState();
           _toastStreamController.add(
@@ -159,7 +142,6 @@ class OnBoardingViewModel extends ChangeNotifier {
           );
           break;
       }
-
     } finally {
       _onBoardingStateStreamController.add(_state);
       notifyListeners();
