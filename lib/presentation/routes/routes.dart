@@ -1,3 +1,4 @@
+import 'package:akropolis/data/models/remote_models/remote_models.dart';
 import 'package:akropolis/domain/use_cases/post_reply_use_case.dart';
 import 'package:akropolis/presentation/features/authentication/view/forgot_password.dart';
 import 'package:akropolis/presentation/features/authentication/view/login.dart';
@@ -153,10 +154,18 @@ enum AppRoutes {
             ),
           ),
         AppRoutes.profile => ProfileScreen(
-          profileViewModel: ProfileViewModel(),
+          profileViewModel: ProfileViewModel(
+            userRepository: GetIt.I(),
+            authenticationRepository: GetIt.I(),
+            postRepository: GetIt.I(),
+          ),
         ),
     AppRoutes.editProfile => EditProfileScreen(
-          editProfileViewModel: EditProfileViewModel(),
+          editProfileViewModel: EditProfileViewModel(
+            currentUser: ModalRoute.of(context)!.settings.arguments as AppUser,
+            userRepository: GetIt.I(),
+            remoteFileStorageService: GetIt.I(),
+          ),
         ),
       };
 }

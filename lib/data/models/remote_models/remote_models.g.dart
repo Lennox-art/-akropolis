@@ -12,6 +12,7 @@ AppUser _$AppUserFromJson(Map<String, dynamic> json) => AppUser(
       username: json['username'] as String,
       email: json['email'] as String,
       profilePicture: json['profilePicture'] as String?,
+      bio: json['bio'] as String?,
       topics:
           (json['topics'] as List<dynamic>?)?.map((e) => e as String).toSet(),
     );
@@ -21,6 +22,7 @@ Map<String, dynamic> _$AppUserToJson(AppUser instance) => <String, dynamic>{
       'displayName': instance.displayName,
       'username': instance.username,
       'email': instance.email,
+      'bio': instance.bio,
       'profilePicture': instance.profilePicture,
       'topics': instance.topics?.toList(),
     };

@@ -1,4 +1,27 @@
+import 'package:akropolis/data/models/dto_models/dto_models.dart';
 import 'package:flutter/material.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'profile_models.freezed.dart';
+
+@freezed
+class ProfileState with _$ProfileState {
+  const factory ProfileState.initial() = InitialProfileState;
+  const factory ProfileState.loading() = LoadingProfileState;
+  const factory ProfileState.loaded() = LoadedProfileState;
+}
+
+@freezed
+class EditProfileState with _$EditProfileState {
+  const factory EditProfileState.loading() = LoadingEditProfileState;
+  const factory EditProfileState.loaded() = LoadedEditProfileState;
+}
+
+@freezed
+class ProfilePictureState with _$ProfilePictureState {
+  const factory ProfilePictureState.loading({ProgressModel? progress}) = LoadingProfilePictureState;
+  const factory ProfilePictureState.loaded() = LoadedProfilePictureState;
+}
 
 enum ProfileSections {
   myPosts("My Post"),

@@ -39,7 +39,6 @@ class FiniteLoader extends StatelessWidget {
   }
 }
 
-
 class CircularFiniteLoader extends StatelessWidget {
   const CircularFiniteLoader({
     required this.progress,

@@ -67,4 +67,16 @@ abstract class PostRepository {
     required String commentId,
     required String userId,
   });
+
+  Future<Result<int>> countLogicianPosts({
+    required String userId,
+  });
+
+  Future<Result<int>> countEmpathPosts({
+    required String userId,
+  });
+
+  Future<Result<int>> countUserPosts({
+    required String userId,
+  });
 }

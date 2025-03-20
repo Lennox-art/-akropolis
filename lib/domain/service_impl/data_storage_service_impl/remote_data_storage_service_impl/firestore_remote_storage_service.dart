@@ -350,4 +350,47 @@ class FirestoreRemoteStorageService extends RemoteDataStorageService {
       );
     }
   }
+
+  @override
+  Future<Result<int>> countEmpathPosts({required String userId}) async {
+    return Result.success(data: 0);
+  }
+
+  @override
+  Future<Result<int>> countLogicianPosts({required String userId}) async {
+    return Result.success(data: 0);
+  }
+
+  @override
+  Future<Result<int>> countUserPosts({required String userId}) async {
+    try {
+      AggregateQuerySnapshot userPostCountSnapshot = await userPostsCollectionRef.where('author.id', isEqualTo: userId).count().get();
+
+      int? postCount = userPostCountSnapshot.count;
+      if (postCount == null) {
+        return Result.error(
+          failure: AppFailure(
+            message: "No post count",
+            failureType: FailureType.illegalStateFailure,
+          ),
+        );
+      }
+      return Result.success(data: postCount);
+    } on FirebaseException catch (e, trace) {
+      return Result.error(
+        failure: AppFailure(
+          message: e.code,
+          trace: trace,
+          failureType: FailureType.networkServerFailure,
+        ),
+      );
+    } catch (e, trace) {
+      return Result.error(
+        failure: AppFailure(
+          message: e.toString(),
+          trace: trace,
+        ),
+      );
+    }
+  }
 }

@@ -57,6 +57,8 @@ class AppUser {
 
   final String email;
 
+  String? bio;
+
   String? profilePicture;
 
   Set<String>? topics;
@@ -67,6 +69,7 @@ class AppUser {
     required this.username,
     required this.email,
     this.profilePicture,
+    this.bio,
     required this.topics,
   });
 

@@ -48,6 +48,22 @@ String? validateUsername(String? username) {
   return null; // No errors
 }
 
+
+String? validateBio(String? bio) {
+  if (bio == null || bio.isEmpty) {
+    return "Bio cannot be empty";
+  }
+
+  if(bio.length > maxBioLength) {
+    return "Bio cannot be more than $maxBioLength characters";
+  }
+
+  if(bio.length < minBioLength) {
+    return "Bio cannot be less than $minBioLength characters";
+  }
+  return null;
+}
+
 String? validateDisplayName(String? displayName) {
   if (displayName == null || displayName.isEmpty) {
     return "Display name cannot be empty";
@@ -74,3 +90,4 @@ Future<String?> validateVideo(String? videoFilePath) async {
 
 
 int maxBioLength = 300;
+int minBioLength = 3;
