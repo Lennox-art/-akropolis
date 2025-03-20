@@ -157,15 +157,7 @@ class PostRepositoryImpl extends PostRepository {
         userId: userId,
       );
 
-  @override
-  Future<Result<int>> countEmpathPosts({required String userId}) async {
-    return _remoteDataStorageService.countEmpathPosts(userId: userId);
-  }
 
-  @override
-  Future<Result<int>> countLogicianPosts({required String userId}) async {
-    return _remoteDataStorageService.countLogicianPosts(userId: userId);
-  }
 
   @override
   Future<Result<int>> countUserPosts({required String userId}) async {

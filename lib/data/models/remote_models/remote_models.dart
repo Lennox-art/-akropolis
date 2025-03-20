@@ -63,6 +63,10 @@ class AppUser {
 
   Set<String>? topics;
 
+  int? logicianCount;
+
+  int? empathCount;
+
   AppUser({
     required this.id,
     required this.displayName,
@@ -70,6 +74,8 @@ class AppUser {
     required this.email,
     this.profilePicture,
     this.bio,
+    this.logicianCount,
+    this.empathCount,
     required this.topics,
   });
 

@@ -352,16 +352,6 @@ class FirestoreRemoteStorageService extends RemoteDataStorageService {
   }
 
   @override
-  Future<Result<int>> countEmpathPosts({required String userId}) async {
-    return Result.success(data: 0);
-  }
-
-  @override
-  Future<Result<int>> countLogicianPosts({required String userId}) async {
-    return Result.success(data: 0);
-  }
-
-  @override
   Future<Result<int>> countUserPosts({required String userId}) async {
     try {
       AggregateQuerySnapshot userPostCountSnapshot = await userPostsCollectionRef.where('author.id', isEqualTo: userId).count().get();

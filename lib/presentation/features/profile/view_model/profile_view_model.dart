@@ -17,8 +17,6 @@ class ProfileViewModel extends ChangeNotifier {
   final StreamController<ToastMessage> _toastMessageStream = StreamController.broadcast();
   ProfileState _profileState = const InitialProfileState();
   AppUser? _appUser;
-  int? _logicianCount ;
-  int? _empathCount;
   int? _postsCount;
 
   ProfileViewModel({
@@ -35,10 +33,11 @@ class ProfileViewModel extends ChangeNotifier {
 
   ProfileState get profileState => _profileState;
 
-  int? get logicianCount => _logicianCount;
+  int? get logicianCount => _appUser?.logicianCount;
 
-  int? get empathCount => _empathCount;
+  int? get empathCount => appUser?.empathCount;
 
+  //TODO: Move to appUser
   int? get postsCount => _postsCount;
 
   Future<void> initializeViewModel() async {
