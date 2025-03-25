@@ -1,4 +1,6 @@
 import 'package:akropolis/data/models/remote_models/remote_models.dart';
+import 'package:akropolis/domain/models/thread_model.dart';
+import 'package:akropolis/presentation/features/chat/model/chat_models.dart';
 import 'package:akropolis/presentation/features/threads/model/thread_state.dart';
 import 'package:akropolis/presentation/features/threads/view_model/thread_view_model.dart';
 import 'package:akropolis/presentation/routes/routes.dart';
@@ -18,6 +20,11 @@ class ThreadsScreen extends StatefulWidget {
 }
 
 class _ThreadsScreenState extends State<ThreadsScreen> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -58,8 +65,11 @@ class _ThreadsScreenState extends State<ThreadsScreen> {
                 if (index >= widget.threadViewModel.threadList.length) {
                   return const InfiniteLoader();
                 }
-                ThreadRemote threadItem = widget.threadViewModel.threadList[index];
-                return ThreadTile(thread: threadItem);
+                Thread threadItem = widget.threadViewModel.threadList[index];
+                return ThreadTile(
+                  thread: threadItem,
+                  currentUserId: widget.threadViewModel.currentUserId,
+                );
               },
             ),
           );
@@ -72,64 +82,51 @@ class _ThreadsScreenState extends State<ThreadsScreen> {
 class ThreadTile extends StatelessWidget {
   const ThreadTile({
     required this.thread,
+    required this.currentUserId,
     super.key,
   });
 
-  final ThreadRemote thread;
+  final Thread thread;
+  final String currentUserId;
 
   @override
   Widget build(BuildContext context) {
+    AppUser otherUser = thread.participant1.id == currentUserId ? thread.participant2 : thread.participant1;
     ThemeData theme = Theme.of(context);
     return ListTile(
       onTap: () {
-        // Navigator.of(context).pushNamed(
-        //   AppRoutes.chat.path,
-        //   arguments: thread,
-        // );
+        Navigator.of(context).pushNamed(
+          AppRoutes.chat.path,
+          arguments: ChatDto(thread, currentUserId),
+        );
       },
 
-      // leading: thread.otherDevice.profilePictureResult.map(
-      //   success: (s) {
-      //     MediaFileData? profileData = s.data;
-      //     if (profileData == null) {
-      //       return CircleAvatar(
-      //         radius: 30,
-      //         child: Icon(
-      //           Icons.edit,
-      //         ),
-      //       );
-      //     }
-      //
-      //     return CircleAvatar(
-      //       backgroundImage: FileImage(profileData.file),
-      //     );
-      //   },
-      //   error: (s) {
-      //     return CircleAvatar(
-      //       child: Icon(Icons.devices),
-      //     );
-      //   },
-      // ),
-      title: Text(thread.participant1),
-      // title: Text(thread.otherDevice.device.nickname),
+      leading: Builder(
+        builder: (context) {
+          String? imageUrl = otherUser.profilePicture;
+          if (imageUrl == null) {
+            return const CircleAvatar(
+              child: Icon(Icons.person),
+            );
+          }
 
-      // subtitle: Align(
-      //   alignment: Alignment.centerLeft,
-      //   child: thread.latestMessageResult.map(
-      //     success: (s) {
-      //       MessageLocal? message = s.data;
-      //       if (message == null) return null;
-      //       return switch (message.mediaType) {
-      //         MediaType.text => Text(message.content),
-      //         MediaType.image => Icon(Icons.insert_photo_outlined),
-      //         MediaType.video => Icon(Icons.video_collection_outlined),
-      //       };
-      //     },
-      //     error: (e) {
-      //       return Text(e.failure.message, style: TextStyle(color:theme.colorScheme.error ),);
-      //     },
-      //   ),
-      // ),
+          return CircleAvatar(
+            backgroundImage: NetworkImage(imageUrl),
+          );
+        },
+      ),
+      trailing: Visibility(
+        visible: !thread.threadRemote.accepted,
+        child: CircleAvatar(
+          backgroundColor: Colors.white,
+        ),
+      ),
+      title: Text(otherUser.displayName),
+      subtitle: const Align(
+        alignment: Alignment.centerLeft,
+        child: Icon(Icons.video_collection_outlined),
+      ),
+
       // trailing: Flex(
       //   direction: Axis.vertical,
       //   mainAxisAlignment: MainAxisAlignment.center,

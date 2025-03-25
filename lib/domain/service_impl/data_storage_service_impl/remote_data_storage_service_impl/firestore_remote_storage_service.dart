@@ -535,4 +535,44 @@ class FirestoreRemoteStorageService extends RemoteDataStorageService {
       );
     }
   }
+
+  @override
+  Future<Result<int>> countMessagesInThread({
+    required String threadId,
+  }) async {
+    try {
+      AggregateQuerySnapshot countSnapShot = await messagesCollectionRef(threadId: threadId).count().get();
+      int count = countSnapShot.count ?? 0;
+      return Success(data: count);
+    } catch (e, trace) {
+      return Result.error(
+        failure: AppFailure(
+          message: e.toString(),
+          trace: trace,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Result<ThreadRemote?>> fetchThreadWithForParticipants({
+    required String participant1,
+    required String participant2,
+  }) async {
+    try {
+      var q1 = threadCollectionRef.where('participant1', isEqualTo: participant1).where('participant2', isEqualTo: participant2).limit(1);
+      var q2 = threadCollectionRef.where('participant2', isEqualTo: participant2).where('participant2', isEqualTo: participant1).limit(1);
+
+      var result = await Future.wait([q1.get(), q2.get()]);
+      ThreadRemote? remoteThread = result.expand((r) => r.docs.map((d) => d.data() as ThreadRemote)).firstOrNull;
+      return Success(data: remoteThread);
+    } catch (e, trace) {
+      return Result.error(
+        failure: AppFailure(
+          message: e.toString(),
+          trace: trace,
+        ),
+      );
+    }
+  }
 }

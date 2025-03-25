@@ -46,12 +46,34 @@ class SendMessageUseCase {
     }
 
     User user = (currentUser as Success<User>).data;
-    Result<ThreadRemote?> threadRemoteResult = threadId == null
-        ? await _messageRepository.createAThread(
+    late Result<ThreadRemote?> threadRemoteResult;
+
+    if (threadId != null) {
+      threadRemoteResult = await _messageRepository.fetchAThread(threadId: threadId);
+    } else {
+      Result<ThreadRemote?> existingThread = await _messageRepository.fetchThreadWithForParticipants(
+        participant1: user.uid,
+        participant2: sendToUserId,
+      );
+
+      switch (existingThread) {
+        case Success<ThreadRemote?>():
+          ThreadRemote? existingRemoteThread = existingThread.data;
+          if (existingRemoteThread != null) {
+            threadRemoteResult = existingThread;
+            break;
+          }
+
+          threadRemoteResult = await _messageRepository.createAThread(
             participant1: user.uid,
             participant2: sendToUserId,
-          )
-        : await _messageRepository.fetchAThread(threadId: threadId);
+          );
+          break;
+
+        case Error<ThreadRemote?>():
+          return Result.error(failure: existingThread.failure);
+      }
+    }
 
     switch (threadRemoteResult) {
       case Success<ThreadRemote?>():
@@ -66,13 +88,21 @@ class SendMessageUseCase {
           );
         }
         if (!thread.accepted) {
-          return Result.error(
-            failure: AppFailure(
-              message: "Conversation pending",
-              trace: threadRemoteResult,
-              failureType: FailureType.illegalStateFailure,
-            ),
-          );
+          Result<int> messageCountResult = await _messageRepository.countMessagesInThread(threadId: thread.id);
+          switch (messageCountResult) {
+            case Success<int>():
+              if (messageCountResult.data > 0) {
+                return Result.error(
+                  failure: AppFailure(
+                    message: "Conversation pending",
+                    trace: threadRemoteResult,
+                    failureType: FailureType.illegalStateFailure,
+                  ),
+                );
+              }
+            case Error<int>():
+              return Result.error(failure: messageCountResult.failure);
+          }
         }
 
         final Result<LocalFileCache> uploadThumbnailResult = await _remoteFileStorageService.uploadBlob(

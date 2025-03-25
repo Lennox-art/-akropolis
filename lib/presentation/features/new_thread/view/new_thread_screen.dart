@@ -74,7 +74,7 @@ class _NewThreadScreenState extends State<NewThreadScreen> {
                       onTap: () async {
                         Duration? videoDuration = await showDurationPickerDialog(
                           context,
-                          maxDuration: maxVideoDuration,
+                          maxDuration: const Duration(seconds: 30),
                         );
 
                         if (videoDuration == null || !context.mounted) return;

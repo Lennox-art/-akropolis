@@ -17,6 +17,10 @@ class UserRepositoryImpl extends UserRepository {
     required String id,
   }) async {
     try {
+      if(userCache.containsKey(id)) {
+        return Success(data: userCache[id]!);
+      }
+
       Result<AppUser?> findUserResult = await _remoteDataStorageService.findUserById(
         id: id,
       );

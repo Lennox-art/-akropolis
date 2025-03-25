@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:akropolis/data/models/dto_models/dto_models.dart';
 import 'package:akropolis/domain/gen/assets.gen.dart';
 import 'package:akropolis/domain/use_cases/fetch_post_comments_use_case.dart';
+import 'package:akropolis/domain/use_cases/fetch_threads_use_case.dart';
 import 'package:akropolis/presentation/features/create_post/view_model/create_post_view_model.dart';
 
 import 'package:akropolis/presentation/features/home/models/home_models.dart';
@@ -101,6 +102,11 @@ class _HomePageState extends State<HomePage> {
                         BottomNavigationTabs.post => const SizedBox.shrink(),
                         BottomNavigationTabs.chat => ThreadsScreen(
                             threadViewModel: ThreadViewModel(
+                              fetchThreadsUseCase: FetchThreadsUseCase(
+                                messageRepository: GetIt.I(),
+                                userRepository: GetIt.I(),
+                                authenticationRepository: GetIt.I(),
+                              ),
                               messageRepository: GetIt.I(),
                               authenticationRepository: GetIt.I(),
                             ),

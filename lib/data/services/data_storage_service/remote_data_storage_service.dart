@@ -106,6 +106,15 @@ abstract class RemoteDataStorageService {
     required String threadId,
   });
 
+  Future<Result<ThreadRemote?>> fetchThreadWithForParticipants({
+    required String participant1,
+    required String participant2,
+  });
+
+  Future<Result<int>> countMessagesInThread({
+    required String threadId,
+  });
+
   Future<Result<List<ThreadRemote>>> fetchMyThreads({
     required int pageSize,
     required String userId,

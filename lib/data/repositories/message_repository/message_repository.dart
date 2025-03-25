@@ -17,6 +17,15 @@ abstract class MessageRepository {
     required String participant2,
   });
 
+  Future<Result<ThreadRemote?>> fetchThreadWithForParticipants({
+    required String participant1,
+    required String participant2,
+  });
+
+  Future<Result<int>> countMessagesInThread({
+    required String threadId,
+  });
+
   Future<Result<List<MessageRemote>>> fetchThreadMessages({
     required int pageSize,
     required String threadId,
@@ -26,5 +35,10 @@ abstract class MessageRepository {
   Future<Result<MessageRemote>> sendMessage({
     required String threadId,
     required MessageRemote message,
+  });
+
+
+  Stream<MessageRemote> watchThread({
+    required String threadId,
   });
 }

@@ -10,7 +10,8 @@
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
 		331C808B294A63AB00263BE5 /* RunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 331C807B294A618700263BE5 /* RunnerTests.swift */; };
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
-		47B2DC2D8B28620B805D3FE1 /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2814152F80AEDCB362A7B324 /* Pods_Runner.framework */; };
+		661A51692D930AE6000EAEF4 /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2814152F80AEDCB362A7B324 /* Pods_Runner.framework */; };
+		661A516A2D930AE6000EAEF4 /* Pods_Runner.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 2814152F80AEDCB362A7B324 /* Pods_Runner.framework */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
 		8643553881E883DD2F9ACB1E /* Pods_RunnerTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4EC0E4E3B4B102C706046CD0 /* Pods_RunnerTests.framework */; };
 		8A2D5D38ACBEC98C9EF6621F /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 555B48703B6DC7385C8A52B2 /* GoogleService-Info.plist */; };
@@ -36,6 +37,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				661A516A2D930AE6000EAEF4 /* Pods_Runner.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -82,7 +84,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				47B2DC2D8B28620B805D3FE1 /* Pods_Runner.framework in Frameworks */,
+				661A51692D930AE6000EAEF4 /* Pods_Runner.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -107,7 +109,6 @@
 				D55068DD521B14C1B63599D9 /* Pods-RunnerTests.release.xcconfig */,
 				8A35C6486EA57E93D470EA32 /* Pods-RunnerTests.profile.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -495,7 +496,7 @@
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -679,7 +680,7 @@
 				DEVELOPMENT_TEAM = 8LW99FKUY3;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -703,7 +704,7 @@
 				DEVELOPMENT_TEAM = 8LW99FKUY3;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

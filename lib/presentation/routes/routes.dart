@@ -1,4 +1,6 @@
 import 'package:akropolis/data/models/remote_models/remote_models.dart';
+import 'package:akropolis/domain/models/thread_model.dart';
+import 'package:akropolis/domain/use_cases/live_chat_use_case.dart';
 import 'package:akropolis/domain/use_cases/post_reply_use_case.dart';
 import 'package:akropolis/domain/use_cases/send_message_use_case.dart';
 import 'package:akropolis/presentation/features/authentication/view/forgot_password.dart';
@@ -8,6 +10,9 @@ import 'package:akropolis/presentation/features/authentication/view/partial_sign
 import 'package:akropolis/presentation/features/authentication/view/sign_in.dart';
 import 'package:akropolis/presentation/features/authentication/view/sign_up.dart';
 import 'package:akropolis/presentation/features/authentication/view_model/authentication_view_model.dart';
+import 'package:akropolis/presentation/features/chat/model/chat_models.dart';
+import 'package:akropolis/presentation/features/chat/view/chat_screen.dart';
+import 'package:akropolis/presentation/features/chat/view_model/chat_view_model.dart';
 import 'package:akropolis/presentation/features/create_post/views/create_post_page.dart';
 import 'package:akropolis/presentation/features/home/view/home_page.dart';
 import 'package:akropolis/presentation/features/home/view_model/home_view_model.dart';
@@ -59,7 +64,8 @@ enum AppRoutes {
   editProfile("/editProfile"),
   editTopics("/editTopics"),
   newThreadScreen("/newThreadScreen"),
-  newVideoMessage("/newVideoMessage");
+  newVideoMessage("/newVideoMessage"),
+  chat("/chat");
 
   final String path;
 
@@ -194,6 +200,23 @@ enum AppRoutes {
                 localDataStorageService: GetIt.I(),
               ),
               newVideoMessageData: ModalRoute.of(context)!.settings.arguments as NewVideoMessageData,
+            ),
+          ),
+        AppRoutes.chat => ChatScreen(
+            chatViewModel: ChatViewModel(
+              chatDto: ModalRoute.of(context)!.settings.arguments as ChatDto,
+              sendMessageUseCase: SendMessageUseCase(
+                messageRepository: GetIt.I(),
+                authenticationRepository: GetIt.I(),
+                remoteFileStorageService: GetIt.I(),
+                localFileStorageService: GetIt.I(),
+                localDataStorageService: GetIt.I(),
+              ),
+              liveChatUseCase: LiveChatUseCase(
+                thread:  (ModalRoute.of(context)!.settings.arguments as ChatDto).thread,
+                messageRepository:  GetIt.I(),
+                loggingService:  GetIt.I(),
+              ),
             ),
           ),
       };
