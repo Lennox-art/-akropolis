@@ -1,5 +1,6 @@
 import 'package:akropolis/data/models/remote_models/remote_models.dart';
 import 'package:akropolis/domain/use_cases/post_reply_use_case.dart';
+import 'package:akropolis/domain/use_cases/send_message_use_case.dart';
 import 'package:akropolis/presentation/features/authentication/view/forgot_password.dart';
 import 'package:akropolis/presentation/features/authentication/view/login.dart';
 import 'package:akropolis/presentation/features/authentication/view/new_password.dart';
@@ -10,6 +11,11 @@ import 'package:akropolis/presentation/features/authentication/view_model/authen
 import 'package:akropolis/presentation/features/create_post/views/create_post_page.dart';
 import 'package:akropolis/presentation/features/home/view/home_page.dart';
 import 'package:akropolis/presentation/features/home/view_model/home_view_model.dart';
+import 'package:akropolis/presentation/features/new_thread/model/new_thread_model.dart';
+import 'package:akropolis/presentation/features/new_thread/view/new_thread_screen.dart';
+import 'package:akropolis/presentation/features/new_thread/view/new_video_message.dart';
+import 'package:akropolis/presentation/features/new_thread/view_model/new_thread_view_model.dart';
+import 'package:akropolis/presentation/features/new_thread/view_model/new_video_message_view_model.dart';
 import 'package:akropolis/presentation/features/news_feed/models/models.dart';
 import 'package:akropolis/presentation/features/news_feed/view/news_detailed_view.dart';
 import 'package:akropolis/presentation/features/news_feed/view/post_comment_detailed_view.dart';
@@ -51,7 +57,9 @@ enum AppRoutes {
   postReplyScreen("/postReplyScreen"),
   newsCommentDetailsPage("/newsCommentDetailsPage"),
   editProfile("/editProfile"),
-  editTopics("/editTopics");
+  editTopics("/editTopics"),
+  newThreadScreen("/newThreadScreen"),
+  newVideoMessage("/newVideoMessage");
 
   final String path;
 
@@ -157,21 +165,37 @@ enum AppRoutes {
               fetchPostCommentsUseCase: GetIt.I(),
             ),
           ),
-
-    AppRoutes.editProfile => EditProfileScreen(
-          editProfileViewModel: EditProfileViewModel(
-            currentUser: ModalRoute.of(context)!.settings.arguments as AppUser,
-            userRepository: GetIt.I(),
-            remoteFileStorageService: GetIt.I(),
+        AppRoutes.editProfile => EditProfileScreen(
+            editProfileViewModel: EditProfileViewModel(
+              currentUser: ModalRoute.of(context)!.settings.arguments as AppUser,
+              userRepository: GetIt.I(),
+              remoteFileStorageService: GetIt.I(),
+            ),
           ),
-        ),
-    AppRoutes.editTopics => EditTopicsScreen(
-          topicsViewModel: TopicsViewModel(
-            userRepository: GetIt.I(),
-            authenticationRepository: GetIt.I(),
-            topicRepository: GetIt.I(),
+        AppRoutes.editTopics => EditTopicsScreen(
+            topicsViewModel: TopicsViewModel(
+              userRepository: GetIt.I(),
+              authenticationRepository: GetIt.I(),
+              topicRepository: GetIt.I(),
+            ),
           ),
-        ),
+        AppRoutes.newThreadScreen => NewThreadScreen(
+            newThreadViewModel: NewThreadViewModel(
+              userRepository: GetIt.I(),
+            ),
+          ),
+        AppRoutes.newVideoMessage => NewVideoMessageScreen(
+            newVideoMessageViewModel: NewVideoMessageViewModel(
+              sendMessageUseCase: SendMessageUseCase(
+                messageRepository: GetIt.I(),
+                authenticationRepository: GetIt.I(),
+                remoteFileStorageService: GetIt.I(),
+                localFileStorageService: GetIt.I(),
+                localDataStorageService: GetIt.I(),
+              ),
+              newVideoMessageData: ModalRoute.of(context)!.settings.arguments as NewVideoMessageData,
+            ),
+          ),
       };
 }
 

@@ -52,4 +52,18 @@ class UserRepositoryImpl extends UserRepository {
       );
     }
   }
+
+  @override
+  Future<Result<List<AppUser>>> searchByDisplayName({required String query}) async {
+    try {
+      return await _remoteDataStorageService.searchUserByDisplayName(displayName: query);
+    } catch (e, trace) {
+      return Result.error(
+        failure: AppFailure(
+          message: e.toString(),
+          trace: trace,
+        ),
+      );
+    }
+  }
 }

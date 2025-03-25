@@ -10,6 +10,11 @@ abstract class RemoteDataStorageService {
   /// Function:
   /// Returns:
   /// Possible Failures:
+  Future<Result<List<AppUser>>> searchUserByDisplayName({required String displayName});
+
+  /// Function:
+  /// Returns:
+  /// Possible Failures:
   Future<Result<AppUser>> setUser({required AppUser user});
 
   /// Function:
@@ -89,7 +94,32 @@ abstract class RemoteDataStorageService {
 
   Future<Result<int>> countUserPosts({required String userId});
 
-
   /// Fetch comments
   Future<Result<List<Topic>>> fetchTopics();
+
+  ///Messages
+  Future<Result<ThreadRemote>> createAThread({
+    required ThreadRemote thread,
+  });
+
+  Future<Result<ThreadRemote?>> fetchAThreads({
+    required String threadId,
+  });
+
+  Future<Result<List<ThreadRemote>>> fetchMyThreads({
+    required int pageSize,
+    required String userId,
+    DateTime? lastFetchedCreatedAt,
+  });
+
+  Future<Result<List<MessageRemote>>> fetchThreadMessages({
+    required int pageSize,
+    required String threadId,
+    DateTime? lastFetchedCreatedAt,
+  });
+
+  Future<Result<MessageRemote>> sendMessage({
+    required String threadId,
+    required MessageRemote message,
+  });
 }

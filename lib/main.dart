@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:akropolis/data/models/local_models/local_models.dart';
 import 'package:akropolis/data/repositories/authentication_repository/authentication_repository.dart';
+import 'package:akropolis/data/repositories/message_repository/message_repository.dart';
 import 'package:akropolis/data/repositories/post_repository/post_repository.dart';
 import 'package:akropolis/data/repositories/topics_repository/topics_repository.dart';
 import 'package:akropolis/data/repositories/user_repository/user_repository.dart';
@@ -11,6 +12,7 @@ import 'package:akropolis/data/services/data_storage_service/remote_data_storage
 import 'package:akropolis/data/services/file_storage_service/local_file_storage_service.dart';
 import 'package:akropolis/data/services/file_storage_service/remote_file_storage_service.dart';
 import 'package:akropolis/domain/repository_impl/authentication_repository_impl/authentication_repository_impl.dart';
+import 'package:akropolis/domain/repository_impl/message_repository_impl/message_repository_impl.dart';
 import 'package:akropolis/domain/repository_impl/post_respository_impl/post_repository_impl.dart';
 import 'package:akropolis/domain/repository_impl/topic_repository_impl/topic_repository_impl.dart';
 import 'package:akropolis/domain/repository_impl/user_repository_impl/user_repository_impl.dart';
@@ -114,6 +116,11 @@ Future<void> main() async {
   );
   getIt.registerSingleton(topicRepository);
 
+  MessageRepository messageRepository = MessageRepositoryImpl(
+    remoteDataStorageService: remoteDataStorageService,
+  );
+  getIt.registerSingleton(messageRepository);
+
   ///Use cases
   FetchPostCommentsUseCase fetchPostCommentsUseCase = FetchPostCommentsUseCase(
     postRepository: postRepository,
@@ -171,6 +178,7 @@ class AkropolisApplication extends StatelessWidget {
       initialRoute: AppRoutes.splashScreen.path,
       routes: {
         for (var r in AppRoutes.values) r.path: r.page,
+
       },
     );
   }

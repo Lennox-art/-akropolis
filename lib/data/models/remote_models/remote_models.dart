@@ -1,3 +1,4 @@
+import 'package:akropolis/data/models/dto_models/dto_models.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'remote_models.g.dart';
@@ -16,6 +17,7 @@ enum FirebaseAuthError {
   unknown("An unknown error occurred. Please try again.");
 
   final String description;
+
   const FirebaseAuthError(this.description);
 
   /// Convert FirebaseAuthException code to our enum
@@ -91,9 +93,7 @@ enum AuthorType {
   user,
   publisher;
 
-  static Map<String, AuthorType> authorTypeEnumMap = {
-    for (var e in values) e.name: e
-  };
+  static Map<String, AuthorType> authorTypeEnumMap = {for (var e in values) e.name: e};
 }
 
 class Author {
@@ -110,18 +110,18 @@ class Author {
   });
 
   factory Author.fromJson(Map<String, dynamic> json) => Author(
-    id: json['id'] as String,
-    name: json['name'] as String,
-    imageUrl: json['imageUrl'] as String?,
-    type: AuthorType.authorTypeEnumMap[json['type']]!,
-  );
+        id: json['id'] as String,
+        name: json['name'] as String,
+        imageUrl: json['imageUrl'] as String?,
+        type: AuthorType.authorTypeEnumMap[json['type']]!,
+      );
 
   Map<String, dynamic> toJson() => <String, dynamic>{
-    'id': id,
-    'name': name,
-    'imageUrl': imageUrl,
-    'type': type.name,
-  };
+        'id': id,
+        'name': name,
+        'imageUrl': imageUrl,
+        'type': type.name,
+      };
 }
 
 class NewsPost {
@@ -148,37 +148,35 @@ class NewsPost {
   });
 
   factory NewsPost.fromJson(Map<String, dynamic> json) => NewsPost(
-    id: json['id'] as String,
-    thumbnailUrl: json['thumbnailUrl'] as String,
-    postUrl: json['postUrl'] as String,
-    title: json['title'] as String,
-    description: json['description'] as String,
-    author: Author.fromJson(json['author'] as Map<String, dynamic>),
-    viewers:
-    (json['viewers'] as List<dynamic>).map((e) => e as String).toSet(),
-    publishedAt: DateTime.parse(json['publishedAt'] as String),
-    reaction:
-    PostReaction.fromJson(json['reaction'] as Map<String, dynamic>),
-  );
+        id: json['id'] as String,
+        thumbnailUrl: json['thumbnailUrl'] as String,
+        postUrl: json['postUrl'] as String,
+        title: json['title'] as String,
+        description: json['description'] as String,
+        author: Author.fromJson(json['author'] as Map<String, dynamic>),
+        viewers: (json['viewers'] as List<dynamic>).map((e) => e as String).toSet(),
+        publishedAt: DateTime.parse(json['publishedAt'] as String),
+        reaction: PostReaction.fromJson(json['reaction'] as Map<String, dynamic>),
+      );
 
   Map<String, dynamic> toJson() => {
-    'id': id,
-    'thumbnailUrl': thumbnailUrl,
-    'postUrl': postUrl,
-    'title': title,
-    'description': description,
-    'author': author.toJson(),
-    'publishedAt': publishedAt.toIso8601String(),
-    'viewers': viewers.toList(),
-    'reaction': reaction.toJson(),
-  };
+        'id': id,
+        'thumbnailUrl': thumbnailUrl,
+        'postUrl': postUrl,
+        'title': title,
+        'description': description,
+        'author': author.toJson(),
+        'publishedAt': publishedAt.toIso8601String(),
+        'viewers': viewers.toList(),
+        'reaction': reaction.toJson(),
+      };
 
   @override
   int get hashCode => id.hashCode;
 
   @override
   bool operator ==(Object other) {
-    if(other is! NewsPost) return false;
+    if (other is! NewsPost) return false;
     return id == other.id;
   }
 }
@@ -193,14 +191,14 @@ class PostReaction {
   });
 
   factory PostReaction.fromJson(Map<String, dynamic> json) => PostReaction(
-    log: (json['log'] as List<dynamic>).map((e) => e as String).toSet(),
-    emp: (json['emp'] as List<dynamic>).map((e) => e as String).toSet(),
-  );
+        log: (json['log'] as List<dynamic>).map((e) => e as String).toSet(),
+        emp: (json['emp'] as List<dynamic>).map((e) => e as String).toSet(),
+      );
 
   Map<String, dynamic> toJson() => <String, dynamic>{
-    'log': log.toList(),
-    'emp': emp.toList(),
-  };
+        'log': log.toList(),
+        'emp': emp.toList(),
+      };
 }
 
 class PostComment {
@@ -225,24 +223,24 @@ class PostComment {
   static const collection = 'comments';
 
   factory PostComment.fromJson(Map<String, dynamic> json) => PostComment(
-    id: json['id'] as String,
-    postId: json['postId'] as String,
-    thumbnailUrl: json['thumbnailUrl'] as String,
-    postUrl: json['postUrl'] as String,
-    author: Author.fromJson(json['author'] as Map<String, dynamic>),
-    commentedAt: DateTime.parse(json['commentedAt'] as String),
-    reaction: PostReaction.fromJson(json['reaction'] as Map<String, dynamic>),
-  );
+        id: json['id'] as String,
+        postId: json['postId'] as String,
+        thumbnailUrl: json['thumbnailUrl'] as String,
+        postUrl: json['postUrl'] as String,
+        author: Author.fromJson(json['author'] as Map<String, dynamic>),
+        commentedAt: DateTime.parse(json['commentedAt'] as String),
+        reaction: PostReaction.fromJson(json['reaction'] as Map<String, dynamic>),
+      );
 
   Map<String, dynamic> toJson() => <String, dynamic>{
-    'id': id,
-    'postId': postId,
-    'thumbnailUrl': thumbnailUrl,
-    'postUrl': postUrl,
-    'author': author.toJson(),
-    'commentedAt': commentedAt.toIso8601String(),
-    'reaction': reaction.toJson(),
-  };
+        'id': id,
+        'postId': postId,
+        'thumbnailUrl': thumbnailUrl,
+        'postUrl': postUrl,
+        'author': author.toJson(),
+        'commentedAt': commentedAt.toIso8601String(),
+        'reaction': reaction.toJson(),
+      };
 }
 
 class Topic {
@@ -253,19 +251,82 @@ class Topic {
   });
 
   factory Topic.fromJson(Map<String, dynamic> json) => Topic(
-    name: json['name'] as String,
-  );
+        name: json['name'] as String,
+      );
 
   Map<String, dynamic> toJson() => {
-    'name': name,
-  };
+        'name': name,
+      };
 
   @override
   int get hashCode => name.hashCode;
 
   @override
   bool operator ==(Object other) {
-    if(other is! Topic) return false;
+    if (other is! Topic) return false;
     return name == other.name;
+  }
+}
+
+@JsonSerializable()
+class ThreadRemote implements Comparable<ThreadRemote> {
+  final String id;
+
+  final String participant1;
+
+  final String participant2;
+
+  bool accepted;
+
+  final DateTime createdAt;
+
+  final DateTime updatedAt;
+
+  ThreadRemote({
+    required this.id,
+    required this.participant1,
+    required this.participant2,
+    this.accepted = false,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  factory ThreadRemote.fromJson(Map<String, dynamic> json) => _$ThreadRemoteFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ThreadRemoteToJson(this);
+
+  @override
+  int compareTo(ThreadRemote other) {
+    return updatedAt.compareTo(other.updatedAt);
+  }
+}
+
+@JsonSerializable()
+class MessageRemote  implements Comparable<MessageRemote> {
+  final String id;
+  final String sendByUserId;
+  final String sendToUserId;
+  final String thumbnailUrl;
+  final String videoUrl;
+  final DateTime createdAt;
+  final MediaType mediaType;
+
+  MessageRemote({
+    required this.id,
+    required this.sendByUserId,
+    required this.sendToUserId,
+    required this.thumbnailUrl,
+    required this.videoUrl,
+    required this.createdAt,
+    required this.mediaType,
+  });
+
+  factory MessageRemote.fromJson(Map<String, dynamic> json) => _$MessageRemoteFromJson(json);
+
+  Map<String, dynamic> toJson() => _$MessageRemoteToJson(this);
+
+  @override
+  int compareTo(MessageRemote other) {
+    return createdAt.compareTo(other.createdAt);
   }
 }

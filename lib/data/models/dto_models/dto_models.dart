@@ -91,3 +91,12 @@ class CacheFileResult {
   });
 
 }
+
+enum MediaType {
+  image,
+  video;
+
+  static Map<String, MediaType> mediaTypeEnumMap = {
+    for (var e in values) e.name: e
+  };
+}

@@ -90,4 +90,5 @@ class TopicsViewModel extends ChangeNotifier {
         break;
     }
   }
+
 }

@@ -1,3 +1,4 @@
+import 'package:akropolis/data/models/dto_models/dto_models.dart';
 import 'package:hive/hive.dart';
 
 part 'local_models.g.dart';
@@ -21,10 +22,7 @@ class LocalFileCache extends HiveObject {
   });
 }
 
-enum MediaType {
-  image,
-  video;
-}
+
 
 class MediaTypeAdapter extends TypeAdapter<MediaType> {
   @override

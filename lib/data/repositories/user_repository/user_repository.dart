@@ -7,4 +7,6 @@ abstract class UserRepository {
 
   Future<Result<AppUser?>> findUserById({required String id});
 
+  Future<Result<List<AppUser>>> searchByDisplayName({required String query});
+
 }

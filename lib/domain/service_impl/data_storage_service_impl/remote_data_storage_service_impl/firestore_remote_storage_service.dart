@@ -35,11 +35,21 @@ class FirestoreRemoteStorageService extends RemoteDataStorageService {
             toFirestore: (model, _) => model.toJson(),
           );
 
-  CollectionReference get topicCollectionRef =>
-      FirebaseFirestore.instance.collection("topics").withConverter<Topic>(
+  CollectionReference get topicCollectionRef => FirebaseFirestore.instance.collection("topics").withConverter<Topic>(
         fromFirestore: (snapshot, _) => Topic.fromJson(snapshot.data()!),
         toFirestore: (model, _) => model.toJson(),
       );
+
+  CollectionReference get threadCollectionRef => FirebaseFirestore.instance.collection("threads").withConverter<ThreadRemote>(
+        fromFirestore: (snapshot, _) => ThreadRemote.fromJson(snapshot.data()!),
+        toFirestore: (model, _) => model.toJson(),
+      );
+
+  CollectionReference messagesCollectionRef({required String threadId}) =>
+      threadCollectionRef.doc(threadId).collection('messages').withConverter<MessageRemote>(
+            fromFirestore: (snapshot, _) => MessageRemote.fromJson(snapshot.data()!),
+            toFirestore: (model, _) => model.toJson(),
+          );
 
   CollectionReference postCommentCollectionRef({required String collection, required String postId}) =>
       FirebaseFirestore.instance.collection(collection).doc(postId).collection(PostComment.collection).withConverter<PostComment>(
@@ -397,6 +407,125 @@ class FirestoreRemoteStorageService extends RemoteDataStorageService {
       QuerySnapshot topicSnapshot = await topicCollectionRef.get();
       List<Topic> topics = topicSnapshot.docs.map((d) => d.data() as Topic).toList();
       return Result.success(data: topics);
+    } catch (e, trace) {
+      return Result.error(
+        failure: AppFailure(
+          message: e.toString(),
+          trace: trace,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Result<List<ThreadRemote>>> fetchMyThreads({
+    required int pageSize,
+    required String userId,
+    DateTime? lastFetchedCreatedAt,
+  }) async {
+    try {
+      var q1 = threadCollectionRef.where('participant1', isEqualTo: userId).limit(pageSize).orderBy('createdAt', descending: true);
+      var q2 = threadCollectionRef.where('participant2', isEqualTo: userId).limit(pageSize).orderBy('createdAt', descending: true);
+
+      if (lastFetchedCreatedAt != null) {
+        q1.startAfter([lastFetchedCreatedAt]);
+        q1.startAfter([lastFetchedCreatedAt]);
+      }
+
+      var result = await Future.wait([q1.get(), q2.get()]);
+
+      List<ThreadRemote> threads = result.expand((r) => r.docs.map((d) => d.data() as ThreadRemote)).toList();
+      return Result.success(data: threads);
+    } catch (e, trace) {
+      return Result.error(
+        failure: AppFailure(
+          message: e.toString(),
+          trace: trace,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Result<List<MessageRemote>>> fetchThreadMessages({
+    required int pageSize,
+    required String threadId,
+    DateTime? lastFetchedCreatedAt,
+  }) async {
+    try {
+      var q1 = messagesCollectionRef(threadId: threadId).limit(pageSize).orderBy('createdAt', descending: true);
+      if (lastFetchedCreatedAt != null) {
+        q1.startAfter([lastFetchedCreatedAt]);
+      }
+      List<MessageRemote> messages = (await q1.get()).docs.map((d) => d.data() as MessageRemote).toList();
+      return Result.success(data: messages);
+    } catch (e, trace) {
+      return Result.error(
+        failure: AppFailure(
+          message: e.toString(),
+          trace: trace,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Result<MessageRemote>> sendMessage({
+    required String threadId,
+    required MessageRemote message,
+  }) async {
+    try {
+      await messagesCollectionRef(threadId: threadId).doc(message.id).set(message);
+      return Result.success(data: message);
+    } catch (e, trace) {
+      return Result.error(
+        failure: AppFailure(
+          message: e.toString(),
+          trace: trace,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Result<List<AppUser>>> searchUserByDisplayName({
+    required String displayName,
+  }) async {
+    try {
+      var qs = await userCollectionRef.orderBy('displayName').startAt([displayName]).get();
+      List<AppUser> users = qs.docs.map((d) => d.data() as AppUser).toList();
+      return Result.success(data: users);
+    } catch (e, trace) {
+      return Result.error(
+        failure: AppFailure(
+          message: e.toString(),
+          trace: trace,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Result<ThreadRemote?>> fetchAThreads({required String threadId}) async {
+    try {
+      var threadResult = await threadCollectionRef.doc(threadId).get();
+      ThreadRemote? remoteThread = threadResult.data() as ThreadRemote?;
+      return Result.success(data: remoteThread);
+    } catch (e, trace) {
+      return Result.error(
+        failure: AppFailure(
+          message: e.toString(),
+          trace: trace,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Result<ThreadRemote>> createAThread({required ThreadRemote thread}) async {
+    try {
+      await threadCollectionRef.doc(thread.id).set(thread);
+      return Result.success(data: thread);
     } catch (e, trace) {
       return Result.error(
         failure: AppFailure(

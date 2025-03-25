@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:akropolis/data/models/dto_models/dto_models.dart';
 import 'package:akropolis/data/models/local_models/local_models.dart';
 import 'package:akropolis/data/models/remote_models/remote_models.dart';
 
