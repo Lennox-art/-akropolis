@@ -16,11 +16,11 @@ import 'package:akropolis/presentation/features/chat/view_model/chat_view_model.
 import 'package:akropolis/presentation/features/create_post/views/create_post_page.dart';
 import 'package:akropolis/presentation/features/home/view/home_page.dart';
 import 'package:akropolis/presentation/features/home/view_model/home_view_model.dart';
-import 'package:akropolis/presentation/features/new_thread/model/new_thread_model.dart';
 import 'package:akropolis/presentation/features/new_thread/view/new_thread_screen.dart';
-import 'package:akropolis/presentation/features/new_thread/view/new_video_message.dart';
+import 'package:akropolis/presentation/features/new_video_message/model/new_video_message_model.dart';
+import 'package:akropolis/presentation/features/new_video_message/view/new_video_message.dart';
 import 'package:akropolis/presentation/features/new_thread/view_model/new_thread_view_model.dart';
-import 'package:akropolis/presentation/features/new_thread/view_model/new_video_message_view_model.dart';
+import 'package:akropolis/presentation/features/new_video_message/view_model/new_video_message_view_model.dart';
 import 'package:akropolis/presentation/features/news_feed/models/models.dart';
 import 'package:akropolis/presentation/features/news_feed/view/news_detailed_view.dart';
 import 'package:akropolis/presentation/features/news_feed/view/post_comment_detailed_view.dart';
@@ -33,9 +33,7 @@ import 'package:akropolis/presentation/features/on_boarding/view/select_topic.da
 import 'package:akropolis/presentation/features/on_boarding/view/welcome_screen.dart';
 import 'package:akropolis/presentation/features/on_boarding/view_model/on_boarding_view_model.dart';
 import 'package:akropolis/presentation/features/profile/view/edit_profile_screen.dart';
-import 'package:akropolis/presentation/features/profile/view/profile_screen.dart';
 import 'package:akropolis/presentation/features/profile/view_model/edit_profile_view_model.dart';
-import 'package:akropolis/presentation/features/profile/view_model/profile_view_model.dart';
 import 'package:akropolis/presentation/features/splash_screen/view/splash_screen.dart';
 import 'package:akropolis/presentation/features/splash_screen/view_model/splash_screen_view_model.dart';
 import 'package:akropolis/presentation/features/topics/view/topics_screen.dart';
@@ -205,6 +203,7 @@ enum AppRoutes {
         AppRoutes.chat => ChatScreen(
             chatViewModel: ChatViewModel(
               chatDto: ModalRoute.of(context)!.settings.arguments as ChatDto,
+              messageRepository: GetIt.I(),
               sendMessageUseCase: SendMessageUseCase(
                 messageRepository: GetIt.I(),
                 authenticationRepository: GetIt.I(),
@@ -213,9 +212,9 @@ enum AppRoutes {
                 localDataStorageService: GetIt.I(),
               ),
               liveChatUseCase: LiveChatUseCase(
-                thread:  (ModalRoute.of(context)!.settings.arguments as ChatDto).thread,
-                messageRepository:  GetIt.I(),
-                loggingService:  GetIt.I(),
+                thread: (ModalRoute.of(context)!.settings.arguments as ChatDto).thread,
+                messageRepository: GetIt.I(),
+                loggingService: GetIt.I(),
               ),
             ),
           ),

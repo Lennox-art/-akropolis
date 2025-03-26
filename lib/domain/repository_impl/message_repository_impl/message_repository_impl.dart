@@ -71,12 +71,20 @@ class MessageRepositoryImpl extends MessageRepository {
   @override
   Future<Result<ThreadRemote?>> fetchThreadWithForParticipants({required String participant1, required String participant2}) async {
     return await _remoteDataStorageService.fetchThreadWithForParticipants(participant1: participant1, participant2: participant2);
-
   }
 
   @override
   Stream<MessageRemote> watchThread({required String threadId}) {
-    //TODO: implement me
-    return Stream.empty(broadcast: true);
+    return _remoteDataStorageService.watchThread(threadId: threadId);
+  }
+
+  @override
+  Future<Result<void>> acceptThread({required String threadId}) {
+    return _remoteDataStorageService.acceptThread(threadId: threadId);
+  }
+
+  @override
+  Future<Result<void>> declineThread({required String threadId}) {
+    return _remoteDataStorageService.declineThread(threadId: threadId);
   }
 }

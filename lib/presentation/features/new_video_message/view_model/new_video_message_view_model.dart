@@ -10,7 +10,7 @@ import 'package:akropolis/domain/use_cases/post_reply_use_case.dart';
 import 'package:akropolis/domain/use_cases/send_message_use_case.dart';
 import 'package:akropolis/domain/utils/functions.dart';
 import 'package:akropolis/presentation/features/create_post/models/create_post_models.dart';
-import 'package:akropolis/presentation/features/new_thread/model/new_thread_model.dart';
+import 'package:akropolis/presentation/features/new_video_message/model/new_video_message_model.dart';
 import 'package:akropolis/presentation/features/news_feed/models/models.dart';
 import 'package:akropolis/presentation/features/news_feed/models/reply_post_state.dart';
 import 'package:akropolis/presentation/ui/components/toast/toast.dart';
@@ -25,12 +25,14 @@ class NewVideoMessageViewModel extends ChangeNotifier {
   Uint8List? _selectedThumbnail;
   List<Uint8List>? _videoThumbnails;
   final AppUser _sendToAppUser;
+  final String? _threadId;
 
   NewVideoMessageViewModel({
     required NewVideoMessageData newVideoMessageData,
     required SendMessageUseCase sendMessageUseCase,
   })  : _sendMessageUseCase = sendMessageUseCase,
         _sendToAppUser = newVideoMessageData.user,
+        _threadId = newVideoMessageData.threadId,
         _videoData = newVideoMessageData.video {
     setVideo(file: _videoData);
   }
@@ -161,6 +163,7 @@ class NewVideoMessageViewModel extends ChangeNotifier {
 
     try {
       Result<void> newPostResult = await _sendMessageUseCase.sendMessage(
+        threadId: _threadId,
         thumbnailData: _selectedThumbnail!,
         videoData: await _videoData.readAsBytes(),
         sendToUserId: _sendToAppUser.id,

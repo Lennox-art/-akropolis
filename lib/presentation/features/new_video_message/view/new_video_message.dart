@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:akropolis/main.dart';
 import 'package:akropolis/presentation/features/create_post/models/create_post_models.dart';
-import 'package:akropolis/presentation/features/new_thread/view_model/new_video_message_view_model.dart';
+import 'package:akropolis/presentation/features/new_video_message/view_model/new_video_message_view_model.dart';
 import 'package:akropolis/presentation/features/news_feed/models/reply_post_state.dart';
 import 'package:akropolis/presentation/features/news_feed/view_models/reply_post_view_model.dart';
 import 'package:akropolis/presentation/features/video_editing/view/video_editing.dart';

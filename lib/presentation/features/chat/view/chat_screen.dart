@@ -1,12 +1,18 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:akropolis/data/models/remote_models/remote_models.dart';
 import 'package:akropolis/data/utils/date_format.dart';
+import 'package:akropolis/main.dart';
 import 'package:akropolis/presentation/features/chat/model/chat_models.dart';
 import 'package:akropolis/presentation/features/chat/view_model/chat_view_model.dart';
+import 'package:akropolis/presentation/features/new_video_message/model/new_video_message_model.dart';
+import 'package:akropolis/presentation/routes/routes.dart';
+import 'package:akropolis/presentation/ui/components/duration_picker.dart';
 import 'package:akropolis/presentation/ui/components/loader.dart';
 import 'package:akropolis/presentation/ui/components/toast/toast.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({required this.chatViewModel, super.key});
@@ -41,102 +47,189 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    ThemeData theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.chatViewModel.otherUser.displayName),
       ),
-      body: Flex(
-        direction: Axis.vertical,
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Expanded(
-            flex: 2,
-            child: GestureDetector(
-              onTap: () {
-                FocusScope.of(context).unfocus();
-              },
-              child: ListenableBuilder(
-                listenable: widget.chatViewModel,
-                builder: (context, __) {
-                  return NotificationListener<ScrollNotification>(
-                    onNotification: (scrollInfo) {
-                      bool isLoading = widget.chatViewModel.chatItemsState is ChatLoadingState;
-                      bool isAtEndOfList = scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent;
-                      if (!isLoading && isAtEndOfList) {
-                        widget.chatViewModel.fetchMessages();
-                      }
-
-                      return true;
+      body: ListenableBuilder(
+          listenable: widget.chatViewModel,
+          builder: (_, __) {
+            return Flex(
+              direction: Axis.vertical,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: GestureDetector(
+                    onTap: () {
+                      FocusScope.of(context).unfocus();
                     },
-                    child: ListView.builder(
-                      reverse: true,
-                      itemCount: widget.chatViewModel.messageList.length + (widget.chatViewModel.chatItemsState is ChatLoadingState ? 1 : 0),
-                      itemBuilder: (context, index) {
-                        if (index >= widget.chatViewModel.messageList.length) {
-                          return const InfiniteLoader();
-                        }
-                        MessageRemote chatItem = widget.chatViewModel.messageList[index];
-                        // widget.chatViewModel.setMessageAsRead(chatItem);
-                        bool isMyMessage = chatItem.sendToUserId == widget.chatViewModel.currentUserId;
+                    child: ListenableBuilder(
+                      listenable: widget.chatViewModel,
+                      builder: (context, __) {
+                        return NotificationListener<ScrollNotification>(
+                          onNotification: (scrollInfo) {
+                            bool isLoading = widget.chatViewModel.chatItemsState is ChatLoadingState;
+                            bool isAtEndOfList = scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent;
+                            if (!isLoading && isAtEndOfList) {
+                              widget.chatViewModel.fetchMessages();
+                            }
 
-                        return ChatItemImageWidget(isMyMessage: isMyMessage, messageModel: chatItem);
+                            return true;
+                          },
+                          child: ListView.builder(
+                            reverse: true,
+                            itemCount: widget.chatViewModel.messageList.length + (widget.chatViewModel.chatItemsState is ChatLoadingState ? 1 : 0),
+                            itemBuilder: (context, index) {
+                              if (index >= widget.chatViewModel.messageList.length) {
+                                return const InfiniteLoader();
+                              }
+                              MessageRemote chatItem = widget.chatViewModel.messageList[index];
+                              bool isMyMessage = chatItem.sendToUserId != widget.chatViewModel.currentUserId;
+
+                              return ChatItemImageWidget(isMyMessage: isMyMessage, messageModel: chatItem);
+                            },
+                          ),
+                        );
                       },
                     ),
-                  );
-                },
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: widget.chatViewModel.chatState.map(
-              loaded: (l) {
-                return Visibility(
-                  visible: widget.chatViewModel.thread.threadRemote.accepted,
-                  replacement: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text("${widget.chatViewModel.otherUser.displayName} wants to chat with you"),
-                      Flex(
-                        direction: Axis.horizontal,
-                        children: [
-                          Flexible(
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: ElevatedButton(
-                                onPressed: () {},
-                                child: Text("Decline"),
-                              ),
-                            ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: widget.chatViewModel.chatState.map(
+                      initial: (_) => Text(". . ."),
+                      requested: (_) {
+                        return Visibility(
+                          visible: !widget.chatViewModel.amIInitiator,
+                          replacement: Text(
+                            "Waiting for ${widget.chatViewModel.thread.participant2.displayName} to accept",
+                            style: theme.textTheme.bodySmall,
+                            textAlign: TextAlign.center,
                           ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text("${widget.chatViewModel.thread.participant1.displayName} wants to chat with you"),
+                              Flex(
+                                direction: Axis.horizontal,
+                                children: [
+                                  Flexible(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: ElevatedButton(
+                                        onPressed: widget.chatViewModel.declineMessageRequest,
+                                        child: Text("Decline"),
+                                      ),
+                                    ),
+                                  ),
+                                  Flexible(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: ElevatedButton(
+                                        onPressed: widget.chatViewModel.acceptMessageRequest,
+                                        child: Text("Accept"),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                      loaded: (l) {
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Padding(
+                              padding:  EdgeInsets.symmetric(horizontal: 8.0),
+                              child: GestureDetector(
+                                onTap: () async {
 
-                          Flexible(
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: ElevatedButton(
-                                onPressed: () {},
-                                child: Text("Accept"),
+                                  XFile? videoData = await getIt<ImagePicker>().pickVideo(
+                                    source: ImageSource.gallery,
+                                    maxDuration: const Duration(seconds: 30),
+                                  );
+                                  if (videoData == null || !context.mounted) return;
+
+                                  if (!context.mounted) return;
+
+                                  Navigator.of(context).pushNamed(
+                                    AppRoutes.newVideoMessage.path,
+                                    arguments: NewVideoMessageData(
+                                      widget.chatViewModel.thread.threadRemote.id,
+                                      File(videoData.path),
+                                      widget.chatViewModel.otherUser,
+                                    ),
+                                  );
+                                },
+                                child: Container(
+                                  width: 80,
+                                  height: 40,
+                                  decoration: BoxDecoration(
+                                    border: Border.all(color: theme.colorScheme.primary, width: 0.8,),
+                                    borderRadius: const BorderRadius.all(Radius.circular(8))
+                                  ),
+                                  child:  Icon(Icons.photo_library_outlined, color: theme.colorScheme.primary,),
+                                ),
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  child: CircleAvatar(
-                    child: IconButton(
-                      onPressed: () async {},
-                      icon: const Icon(Icons.attach_file),
-                    ),
-                  ),
-                );
-              },
-              loading: (_) => InfiniteLoader(),
-            ),
-          ),
-        ],
-      ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                              child: GestureDetector(
+                                onTap: () async {
+                                  Duration? videoDuration = await showDurationPickerDialog(
+                                    context,
+                                    maxDuration: const Duration(seconds: 30),
+                                  );
+
+                                  if (videoDuration == null || !context.mounted) return;
+
+                                  XFile? videoData = await getIt<ImagePicker>().pickVideo(
+                                    source: ImageSource.camera,
+                                    preferredCameraDevice: CameraDevice.rear,
+                                    maxDuration: videoDuration,
+                                  );
+                                  if (videoData == null || !context.mounted) return;
+
+                                  if (!context.mounted) return;
+
+                                  Navigator.of(context).pushNamed(
+                                    AppRoutes.newVideoMessage.path,
+                                    arguments: NewVideoMessageData(
+                                      widget.chatViewModel.thread.threadRemote.id,
+                                      File(videoData.path),
+                                      widget.chatViewModel.otherUser,
+                                    ),
+                                  );
+                                },
+                                child: Container(
+                                  width: 80,
+                                  height: 40,
+                                  decoration: BoxDecoration(
+                                      color: theme.colorScheme.primary,
+                                      borderRadius: const BorderRadius.all(Radius.circular(8))
+                                  ),
+                                  child: const Icon(Icons.camera_alt_outlined),
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                      loading: (_) => const InfiniteLoader(),
+                      declined: (_) {
+                        return const Text("Chat has been declined");
+                      }),
+                ),
+              ],
+            );
+          }),
     );
   }
 }

@@ -327,6 +327,6 @@ class MessageRemote  implements Comparable<MessageRemote> {
 
   @override
   int compareTo(MessageRemote other) {
-    return createdAt.compareTo(other.createdAt);
+    return -createdAt.compareTo(other.createdAt);
   }
 }

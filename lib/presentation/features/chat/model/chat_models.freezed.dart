@@ -18,18 +18,27 @@ final _privateConstructorUsedError = UnsupportedError(
 mixin _$ChatState {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
+    required TResult Function() initial,
+    required TResult Function() requested,
+    required TResult Function() declined,
     required TResult Function() loaded,
     required TResult Function() loading,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? initial,
+    TResult? Function()? requested,
+    TResult? Function()? declined,
     TResult? Function()? loaded,
     TResult? Function()? loading,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? initial,
+    TResult Function()? requested,
+    TResult Function()? declined,
     TResult Function()? loaded,
     TResult Function()? loading,
     required TResult orElse(),
@@ -37,18 +46,27 @@ mixin _$ChatState {
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
+    required TResult Function(ChatInitialState value) initial,
+    required TResult Function(ChatRequestedState value) requested,
+    required TResult Function(ChatDeclinedState value) declined,
     required TResult Function(ChatLoadedState value) loaded,
     required TResult Function(ChatLoadingState value) loading,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(ChatInitialState value)? initial,
+    TResult? Function(ChatRequestedState value)? requested,
+    TResult? Function(ChatDeclinedState value)? declined,
     TResult? Function(ChatLoadedState value)? loaded,
     TResult? Function(ChatLoadingState value)? loading,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
+    TResult Function(ChatInitialState value)? initial,
+    TResult Function(ChatRequestedState value)? requested,
+    TResult Function(ChatDeclinedState value)? declined,
     TResult Function(ChatLoadedState value)? loaded,
     TResult Function(ChatLoadingState value)? loading,
     required TResult orElse(),
@@ -74,6 +92,375 @@ class _$ChatStateCopyWithImpl<$Res, $Val extends ChatState>
 
   /// Create a copy of ChatState
   /// with the given fields replaced by the non-null parameter values.
+}
+
+/// @nodoc
+abstract class _$$ChatInitialStateImplCopyWith<$Res> {
+  factory _$$ChatInitialStateImplCopyWith(_$ChatInitialStateImpl value,
+          $Res Function(_$ChatInitialStateImpl) then) =
+      __$$ChatInitialStateImplCopyWithImpl<$Res>;
+}
+
+/// @nodoc
+class __$$ChatInitialStateImplCopyWithImpl<$Res>
+    extends _$ChatStateCopyWithImpl<$Res, _$ChatInitialStateImpl>
+    implements _$$ChatInitialStateImplCopyWith<$Res> {
+  __$$ChatInitialStateImplCopyWithImpl(_$ChatInitialStateImpl _value,
+      $Res Function(_$ChatInitialStateImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of ChatState
+  /// with the given fields replaced by the non-null parameter values.
+}
+
+/// @nodoc
+
+class _$ChatInitialStateImpl implements ChatInitialState {
+  const _$ChatInitialStateImpl();
+
+  @override
+  String toString() {
+    return 'ChatState.initial()';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is _$ChatInitialStateImpl);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() initial,
+    required TResult Function() requested,
+    required TResult Function() declined,
+    required TResult Function() loaded,
+    required TResult Function() loading,
+  }) {
+    return initial();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? initial,
+    TResult? Function()? requested,
+    TResult? Function()? declined,
+    TResult? Function()? loaded,
+    TResult? Function()? loading,
+  }) {
+    return initial?.call();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? initial,
+    TResult Function()? requested,
+    TResult Function()? declined,
+    TResult Function()? loaded,
+    TResult Function()? loading,
+    required TResult orElse(),
+  }) {
+    if (initial != null) {
+      return initial();
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(ChatInitialState value) initial,
+    required TResult Function(ChatRequestedState value) requested,
+    required TResult Function(ChatDeclinedState value) declined,
+    required TResult Function(ChatLoadedState value) loaded,
+    required TResult Function(ChatLoadingState value) loading,
+  }) {
+    return initial(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(ChatInitialState value)? initial,
+    TResult? Function(ChatRequestedState value)? requested,
+    TResult? Function(ChatDeclinedState value)? declined,
+    TResult? Function(ChatLoadedState value)? loaded,
+    TResult? Function(ChatLoadingState value)? loading,
+  }) {
+    return initial?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(ChatInitialState value)? initial,
+    TResult Function(ChatRequestedState value)? requested,
+    TResult Function(ChatDeclinedState value)? declined,
+    TResult Function(ChatLoadedState value)? loaded,
+    TResult Function(ChatLoadingState value)? loading,
+    required TResult orElse(),
+  }) {
+    if (initial != null) {
+      return initial(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class ChatInitialState implements ChatState {
+  const factory ChatInitialState() = _$ChatInitialStateImpl;
+}
+
+/// @nodoc
+abstract class _$$ChatRequestedStateImplCopyWith<$Res> {
+  factory _$$ChatRequestedStateImplCopyWith(_$ChatRequestedStateImpl value,
+          $Res Function(_$ChatRequestedStateImpl) then) =
+      __$$ChatRequestedStateImplCopyWithImpl<$Res>;
+}
+
+/// @nodoc
+class __$$ChatRequestedStateImplCopyWithImpl<$Res>
+    extends _$ChatStateCopyWithImpl<$Res, _$ChatRequestedStateImpl>
+    implements _$$ChatRequestedStateImplCopyWith<$Res> {
+  __$$ChatRequestedStateImplCopyWithImpl(_$ChatRequestedStateImpl _value,
+      $Res Function(_$ChatRequestedStateImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of ChatState
+  /// with the given fields replaced by the non-null parameter values.
+}
+
+/// @nodoc
+
+class _$ChatRequestedStateImpl implements ChatRequestedState {
+  const _$ChatRequestedStateImpl();
+
+  @override
+  String toString() {
+    return 'ChatState.requested()';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is _$ChatRequestedStateImpl);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() initial,
+    required TResult Function() requested,
+    required TResult Function() declined,
+    required TResult Function() loaded,
+    required TResult Function() loading,
+  }) {
+    return requested();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? initial,
+    TResult? Function()? requested,
+    TResult? Function()? declined,
+    TResult? Function()? loaded,
+    TResult? Function()? loading,
+  }) {
+    return requested?.call();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? initial,
+    TResult Function()? requested,
+    TResult Function()? declined,
+    TResult Function()? loaded,
+    TResult Function()? loading,
+    required TResult orElse(),
+  }) {
+    if (requested != null) {
+      return requested();
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(ChatInitialState value) initial,
+    required TResult Function(ChatRequestedState value) requested,
+    required TResult Function(ChatDeclinedState value) declined,
+    required TResult Function(ChatLoadedState value) loaded,
+    required TResult Function(ChatLoadingState value) loading,
+  }) {
+    return requested(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(ChatInitialState value)? initial,
+    TResult? Function(ChatRequestedState value)? requested,
+    TResult? Function(ChatDeclinedState value)? declined,
+    TResult? Function(ChatLoadedState value)? loaded,
+    TResult? Function(ChatLoadingState value)? loading,
+  }) {
+    return requested?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(ChatInitialState value)? initial,
+    TResult Function(ChatRequestedState value)? requested,
+    TResult Function(ChatDeclinedState value)? declined,
+    TResult Function(ChatLoadedState value)? loaded,
+    TResult Function(ChatLoadingState value)? loading,
+    required TResult orElse(),
+  }) {
+    if (requested != null) {
+      return requested(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class ChatRequestedState implements ChatState {
+  const factory ChatRequestedState() = _$ChatRequestedStateImpl;
+}
+
+/// @nodoc
+abstract class _$$ChatDeclinedStateImplCopyWith<$Res> {
+  factory _$$ChatDeclinedStateImplCopyWith(_$ChatDeclinedStateImpl value,
+          $Res Function(_$ChatDeclinedStateImpl) then) =
+      __$$ChatDeclinedStateImplCopyWithImpl<$Res>;
+}
+
+/// @nodoc
+class __$$ChatDeclinedStateImplCopyWithImpl<$Res>
+    extends _$ChatStateCopyWithImpl<$Res, _$ChatDeclinedStateImpl>
+    implements _$$ChatDeclinedStateImplCopyWith<$Res> {
+  __$$ChatDeclinedStateImplCopyWithImpl(_$ChatDeclinedStateImpl _value,
+      $Res Function(_$ChatDeclinedStateImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of ChatState
+  /// with the given fields replaced by the non-null parameter values.
+}
+
+/// @nodoc
+
+class _$ChatDeclinedStateImpl implements ChatDeclinedState {
+  const _$ChatDeclinedStateImpl();
+
+  @override
+  String toString() {
+    return 'ChatState.declined()';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is _$ChatDeclinedStateImpl);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() initial,
+    required TResult Function() requested,
+    required TResult Function() declined,
+    required TResult Function() loaded,
+    required TResult Function() loading,
+  }) {
+    return declined();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? initial,
+    TResult? Function()? requested,
+    TResult? Function()? declined,
+    TResult? Function()? loaded,
+    TResult? Function()? loading,
+  }) {
+    return declined?.call();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? initial,
+    TResult Function()? requested,
+    TResult Function()? declined,
+    TResult Function()? loaded,
+    TResult Function()? loading,
+    required TResult orElse(),
+  }) {
+    if (declined != null) {
+      return declined();
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(ChatInitialState value) initial,
+    required TResult Function(ChatRequestedState value) requested,
+    required TResult Function(ChatDeclinedState value) declined,
+    required TResult Function(ChatLoadedState value) loaded,
+    required TResult Function(ChatLoadingState value) loading,
+  }) {
+    return declined(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(ChatInitialState value)? initial,
+    TResult? Function(ChatRequestedState value)? requested,
+    TResult? Function(ChatDeclinedState value)? declined,
+    TResult? Function(ChatLoadedState value)? loaded,
+    TResult? Function(ChatLoadingState value)? loading,
+  }) {
+    return declined?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(ChatInitialState value)? initial,
+    TResult Function(ChatRequestedState value)? requested,
+    TResult Function(ChatDeclinedState value)? declined,
+    TResult Function(ChatLoadedState value)? loaded,
+    TResult Function(ChatLoadingState value)? loading,
+    required TResult orElse(),
+  }) {
+    if (declined != null) {
+      return declined(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class ChatDeclinedState implements ChatState {
+  const factory ChatDeclinedState() = _$ChatDeclinedStateImpl;
 }
 
 /// @nodoc
@@ -117,6 +504,9 @@ class _$ChatLoadedStateImpl implements ChatLoadedState {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
+    required TResult Function() initial,
+    required TResult Function() requested,
+    required TResult Function() declined,
     required TResult Function() loaded,
     required TResult Function() loading,
   }) {
@@ -126,6 +516,9 @@ class _$ChatLoadedStateImpl implements ChatLoadedState {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? initial,
+    TResult? Function()? requested,
+    TResult? Function()? declined,
     TResult? Function()? loaded,
     TResult? Function()? loading,
   }) {
@@ -135,6 +528,9 @@ class _$ChatLoadedStateImpl implements ChatLoadedState {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? initial,
+    TResult Function()? requested,
+    TResult Function()? declined,
     TResult Function()? loaded,
     TResult Function()? loading,
     required TResult orElse(),
@@ -148,6 +544,9 @@ class _$ChatLoadedStateImpl implements ChatLoadedState {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
+    required TResult Function(ChatInitialState value) initial,
+    required TResult Function(ChatRequestedState value) requested,
+    required TResult Function(ChatDeclinedState value) declined,
     required TResult Function(ChatLoadedState value) loaded,
     required TResult Function(ChatLoadingState value) loading,
   }) {
@@ -157,6 +556,9 @@ class _$ChatLoadedStateImpl implements ChatLoadedState {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(ChatInitialState value)? initial,
+    TResult? Function(ChatRequestedState value)? requested,
+    TResult? Function(ChatDeclinedState value)? declined,
     TResult? Function(ChatLoadedState value)? loaded,
     TResult? Function(ChatLoadingState value)? loading,
   }) {
@@ -166,6 +568,9 @@ class _$ChatLoadedStateImpl implements ChatLoadedState {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
+    TResult Function(ChatInitialState value)? initial,
+    TResult Function(ChatRequestedState value)? requested,
+    TResult Function(ChatDeclinedState value)? declined,
     TResult Function(ChatLoadedState value)? loaded,
     TResult Function(ChatLoadingState value)? loading,
     required TResult orElse(),
@@ -222,6 +627,9 @@ class _$ChatLoadingStateImpl implements ChatLoadingState {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
+    required TResult Function() initial,
+    required TResult Function() requested,
+    required TResult Function() declined,
     required TResult Function() loaded,
     required TResult Function() loading,
   }) {
@@ -231,6 +639,9 @@ class _$ChatLoadingStateImpl implements ChatLoadingState {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? initial,
+    TResult? Function()? requested,
+    TResult? Function()? declined,
     TResult? Function()? loaded,
     TResult? Function()? loading,
   }) {
@@ -240,6 +651,9 @@ class _$ChatLoadingStateImpl implements ChatLoadingState {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? initial,
+    TResult Function()? requested,
+    TResult Function()? declined,
     TResult Function()? loaded,
     TResult Function()? loading,
     required TResult orElse(),
@@ -253,6 +667,9 @@ class _$ChatLoadingStateImpl implements ChatLoadingState {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
+    required TResult Function(ChatInitialState value) initial,
+    required TResult Function(ChatRequestedState value) requested,
+    required TResult Function(ChatDeclinedState value) declined,
     required TResult Function(ChatLoadedState value) loaded,
     required TResult Function(ChatLoadingState value) loading,
   }) {
@@ -262,6 +679,9 @@ class _$ChatLoadingStateImpl implements ChatLoadingState {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(ChatInitialState value)? initial,
+    TResult? Function(ChatRequestedState value)? requested,
+    TResult? Function(ChatDeclinedState value)? declined,
     TResult? Function(ChatLoadedState value)? loaded,
     TResult? Function(ChatLoadingState value)? loading,
   }) {
@@ -271,6 +691,9 @@ class _$ChatLoadingStateImpl implements ChatLoadingState {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
+    TResult Function(ChatInitialState value)? initial,
+    TResult Function(ChatRequestedState value)? requested,
+    TResult Function(ChatDeclinedState value)? declined,
     TResult Function(ChatLoadedState value)? loaded,
     TResult Function(ChatLoadingState value)? loading,
     required TResult orElse(),

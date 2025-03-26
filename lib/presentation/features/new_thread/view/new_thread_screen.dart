@@ -2,10 +2,9 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:akropolis/data/models/remote_models/remote_models.dart';
-import 'package:akropolis/data/utils/constants.dart';
 import 'package:akropolis/main.dart';
-import 'package:akropolis/presentation/features/new_thread/model/new_thread_model.dart';
 import 'package:akropolis/presentation/features/new_thread/view_model/new_thread_view_model.dart';
+import 'package:akropolis/presentation/features/new_video_message/model/new_video_message_model.dart';
 import 'package:akropolis/presentation/routes/routes.dart';
 import 'package:akropolis/presentation/ui/components/duration_picker.dart';
 import 'package:flutter/material.dart';
@@ -91,6 +90,7 @@ class _NewThreadScreenState extends State<NewThreadScreen> {
                         Navigator.of(context).pushNamed(
                           AppRoutes.newVideoMessage.path,
                           arguments: NewVideoMessageData(
+                            null,
                             File(videoData.path),
                             appUser,
                           ),

@@ -575,4 +575,86 @@ class FirestoreRemoteStorageService extends RemoteDataStorageService {
       );
     }
   }
+
+  @override
+  Future<Result<void>> acceptThread({required String threadId}) async {
+    try {
+      ThreadRemote? remoteThread  = (await threadCollectionRef.doc(threadId).get()).data() as ThreadRemote?;
+      if(remoteThread == null) {
+        return Result.error(
+          failure: AppFailure(
+            message: "Thread doesn't exist",
+            failureType: FailureType.illegalStateFailure,
+          ),
+        );
+      }
+
+      if(remoteThread.accepted) {
+        return Result.error(
+          failure: AppFailure(
+            message: "Thread already accepted",
+            failureType: FailureType.illegalStateFailure,
+          ),
+        );
+      }
+
+      await threadCollectionRef.doc(threadId).update({'accepted' : true});
+
+      return const Success(data: null);
+    } catch (e, trace) {
+      return Result.error(
+        failure: AppFailure(
+          message: e.toString(),
+          trace: trace,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Result<void>> declineThread({required String threadId}) async {
+    try {
+      ThreadRemote? remoteThread  = (await threadCollectionRef.doc(threadId).get()).data() as ThreadRemote?;
+      if(remoteThread == null) {
+        return Result.error(
+          failure: AppFailure(
+            message: "Thread doesn't exist",
+            failureType: FailureType.illegalStateFailure,
+          ),
+        );
+      }
+
+      if(remoteThread.accepted) {
+        return Result.error(
+          failure: AppFailure(
+            message: "Thread already accepted",
+            failureType: FailureType.illegalStateFailure,
+          ),
+        );
+      }
+
+      await threadCollectionRef.doc(threadId).delete();
+
+      return const Success(data: null);
+    } catch (e, trace) {
+      return Result.error(
+        failure: AppFailure(
+          message: e.toString(),
+          trace: trace,
+        ),
+      );
+    }
+  }
+
+  @override
+  Stream<MessageRemote> watchThread({required String threadId}) {
+   return messagesCollectionRef(threadId: threadId)
+       .orderBy("createdAt", descending: true)
+       .snapshots(includeMetadataChanges: false)
+       .asyncExpand(
+         (querySnapshot) => Stream.fromIterable(
+       querySnapshot.docs.map((doc) => doc.data() as MessageRemote),
+     ),
+   );
+  }
 }

@@ -111,7 +111,19 @@ abstract class RemoteDataStorageService {
     required String participant2,
   });
 
+  Stream<MessageRemote> watchThread({
+    required String threadId,
+  });
+
   Future<Result<int>> countMessagesInThread({
+    required String threadId,
+  });
+
+  Future<Result<void>> acceptThread({
+    required String threadId,
+  });
+
+  Future<Result<void>> declineThread({
     required String threadId,
   });
 

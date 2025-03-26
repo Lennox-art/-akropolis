@@ -7,7 +7,7 @@ import 'package:akropolis/presentation/features/create_post/models/create_post_m
 import 'package:exception_base/exception_base.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-part 'new_thread_model.freezed.dart';
+part 'new_video_message_model.freezed.dart';
 
 @freezed
 class NewVideoMessageState with _$NewVideoMessageState {
@@ -25,10 +25,10 @@ class NewVideoMessageState with _$NewVideoMessageState {
   }) = EdittingVideoNewVideoMessageState;
 }
 
-
 class NewVideoMessageData {
+  final String? threadId;
   final File video;
   final AppUser user;
 
-  NewVideoMessageData(this.video, this.user);
+  NewVideoMessageData(this.threadId, this.video, this.user);
 }

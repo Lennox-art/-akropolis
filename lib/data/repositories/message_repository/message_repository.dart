@@ -37,6 +37,14 @@ abstract class MessageRepository {
     required MessageRemote message,
   });
 
+  Future<Result<void>> declineThread({
+    required String threadId,
+  });
+
+  Future<Result<void>> acceptThread({
+    required String threadId,
+  });
+
 
   Stream<MessageRemote> watchThread({
     required String threadId,
