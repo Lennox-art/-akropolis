@@ -218,6 +218,7 @@ class _PostCommentDetailViewPageState extends State<PostCommentDetailViewPage> {
                   Expanded(
                     flex: widget.postCommentDetailViewModel.distribution.logFlex,
                     child: Container(
+
                       padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 12),
                       decoration: const BoxDecoration(
                         color: primaryColor,
@@ -226,7 +227,7 @@ class _PostCommentDetailViewPageState extends State<PostCommentDetailViewPage> {
                         ),
                       ),
                       child: Text(
-                        "${widget.postCommentDetailViewModel.distribution.logPercent} % (${widget.postCommentDetailViewModel.distribution.logCount})",
+                        "${widget.postCommentDetailViewModel.distribution.logPercent.toStringAsFixed(0)} % (${widget.postCommentDetailViewModel.distribution.logCount})",
                         style: theme.textTheme.bodySmall,
                       ),
                     ),
@@ -245,7 +246,7 @@ class _PostCommentDetailViewPageState extends State<PostCommentDetailViewPage> {
                         ),
                       ),
                       child: Text(
-                        "${widget.postCommentDetailViewModel.distribution.empPercent} % (${widget.postCommentDetailViewModel.distribution.empCount})",
+                        "${widget.postCommentDetailViewModel.distribution.empPercent.toStringAsFixed(0)} % (${widget.postCommentDetailViewModel.distribution.empCount})",
                         style: theme.textTheme.bodySmall,
                       ),
                     ),

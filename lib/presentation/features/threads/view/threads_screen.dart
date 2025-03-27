@@ -5,6 +5,7 @@ import 'package:akropolis/presentation/features/threads/model/thread_state.dart'
 import 'package:akropolis/presentation/features/threads/view_model/thread_view_model.dart';
 import 'package:akropolis/presentation/routes/routes.dart';
 import 'package:akropolis/presentation/ui/components/loader.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 class ThreadsScreen extends StatefulWidget {
@@ -111,7 +112,7 @@ class ThreadTile extends StatelessWidget {
           }
 
           return CircleAvatar(
-            backgroundImage: NetworkImage(imageUrl),
+            backgroundImage: CachedNetworkImageProvider(imageUrl),
           );
         },
       ),

@@ -39,6 +39,7 @@ class NewsDetailedViewPage extends StatefulWidget {
 }
 
 class _NewsDetailedViewPageState extends State<NewsDetailedViewPage> {
+
   late final NewsPost newsPost = widget.newsDetailPostViewModel.newsPost.newsPost;
   late final NewsChannel newsChannel = widget.newsDetailPostViewModel.newsPost.newsChannel;
   late final AppUser currentUser = widget.newsDetailPostViewModel.currentUser;
@@ -85,7 +86,7 @@ class _NewsDetailedViewPageState extends State<NewsDetailedViewPage> {
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback(
       (_) {
-
+        widget.newsDetailPostViewModel.downloadThumbnail();
       },
     );
     pagingController.addPageRequestListener((p) {
@@ -105,7 +106,6 @@ class _NewsDetailedViewPageState extends State<NewsDetailedViewPage> {
 
   @override
   Widget build(BuildContext context) {
-    widget.newsDetailPostViewModel.downloadThumbnail();
     final ThemeData theme = Theme.of(context);
 
     return Scaffold(
@@ -332,7 +332,8 @@ class _NewsDetailedViewPageState extends State<NewsDetailedViewPage> {
             builder: (_, __) {
               return Flex(
                 direction: Axis.horizontal,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Expanded(
@@ -346,7 +347,7 @@ class _NewsDetailedViewPageState extends State<NewsDetailedViewPage> {
                         ),
                       ),
                       child: Text(
-                        "${widget.newsDetailPostViewModel.distribution.logPercent} % (${widget.newsDetailPostViewModel.distribution.logCount})",
+                        "${widget.newsDetailPostViewModel.distribution.logPercent.toStringAsFixed(0)} % (${widget.newsDetailPostViewModel.distribution.logCount})",
                         style: theme.textTheme.bodySmall,
                       ),
                     ),
@@ -365,7 +366,7 @@ class _NewsDetailedViewPageState extends State<NewsDetailedViewPage> {
                         ),
                       ),
                       child: Text(
-                        "${widget.newsDetailPostViewModel.distribution.empPercent} % (${widget.newsDetailPostViewModel.distribution.empCount})",
+                        "${widget.newsDetailPostViewModel.distribution.empPercent.toStringAsFixed(0)} % (${widget.newsDetailPostViewModel.distribution.empCount})",
                         style: theme.textTheme.bodySmall,
                       ),
                     ),
@@ -489,4 +490,5 @@ class _NewsDetailedViewPageState extends State<NewsDetailedViewPage> {
       ),
     );
   }
+
 }

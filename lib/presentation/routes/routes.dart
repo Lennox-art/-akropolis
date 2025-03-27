@@ -1,5 +1,6 @@
 import 'package:akropolis/data/models/remote_models/remote_models.dart';
 import 'package:akropolis/domain/models/thread_model.dart';
+import 'package:akropolis/domain/use_cases/get_media_use_case.dart';
 import 'package:akropolis/domain/use_cases/live_chat_use_case.dart';
 import 'package:akropolis/domain/use_cases/post_reply_use_case.dart';
 import 'package:akropolis/domain/use_cases/send_message_use_case.dart';
@@ -11,7 +12,9 @@ import 'package:akropolis/presentation/features/authentication/view/sign_in.dart
 import 'package:akropolis/presentation/features/authentication/view/sign_up.dart';
 import 'package:akropolis/presentation/features/authentication/view_model/authentication_view_model.dart';
 import 'package:akropolis/presentation/features/chat/model/chat_models.dart';
+import 'package:akropolis/presentation/features/chat/view/chat_message_screen.dart';
 import 'package:akropolis/presentation/features/chat/view/chat_screen.dart';
+import 'package:akropolis/presentation/features/chat/view_model/chat_message_view_model.dart';
 import 'package:akropolis/presentation/features/chat/view_model/chat_view_model.dart';
 import 'package:akropolis/presentation/features/create_post/views/create_post_page.dart';
 import 'package:akropolis/presentation/features/home/view/home_page.dart';
@@ -63,7 +66,8 @@ enum AppRoutes {
   editTopics("/editTopics"),
   newThreadScreen("/newThreadScreen"),
   newVideoMessage("/newVideoMessage"),
-  chat("/chat");
+  chat("/chat"),
+  chatMessage("/chatMessage");
 
   final String path;
 
@@ -216,6 +220,12 @@ enum AppRoutes {
                 messageRepository: GetIt.I(),
                 loggingService: GetIt.I(),
               ),
+            ),
+          ),
+        AppRoutes.chatMessage => ChatMessageScreen(
+            chatMessageViewModel: ChatMessageViewModel(
+              messageRemote: ModalRoute.of(context)!.settings.arguments as MessageRemote,
+              getMediaUseCase: GetIt.I(),
             ),
           ),
       };

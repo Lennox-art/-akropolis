@@ -25,6 +25,7 @@ class FirebaseCloudStorageRemoteStorageServiceImpl extends RemoteFileStorageServ
     Function(ProgressModel progress)? onProgress,
   }) async {
     try {
+
       _log.debug("FirebaseCloudStorageRemoteStorageServiceImpl : uploadBlob(blob=${blob.blob.length}, mediaType=${blob.mediaType})");
 
       Sha1 sha1 = await compute<Uint8List, Sha1>(computeSha1Hash, blob.blob);

@@ -7,6 +7,7 @@ import 'package:exception_base/exception_base.dart';
 import 'package:logging_service/logging_service.dart';
 
 class FirestoreRemoteStorageService extends RemoteDataStorageService {
+
   final CollectionReference userCollectionRef = FirebaseFirestore.instance.collection(AppUser.collection).withConverter<AppUser>(
         fromFirestore: (snapshot, _) => AppUser.fromJson(snapshot.data()!),
         toFirestore: (model, _) => model.toJson(),
@@ -476,6 +477,7 @@ class FirestoreRemoteStorageService extends RemoteDataStorageService {
   }) async {
     try {
       await messagesCollectionRef(threadId: threadId).doc(message.id).set(message);
+      await threadCollectionRef.doc(threadId).update({'updatedAt' : DateTime.now()});
       return Result.success(data: message);
     } catch (e, trace) {
       return Result.error(
