@@ -14,7 +14,7 @@ const Color logicianColor = primaryColor;
 TextTheme get textTheme {
   return const TextTheme(
     titleLarge: TextStyle(
-      fontFamily: 'Jersey10',
+      fontFamily: 'Inter',
       fontSize: 66,
       color: secondaryColor,
       fontWeight: FontWeight.w400,
@@ -26,7 +26,7 @@ TextTheme get textTheme {
       decorationColor: Colors.black,
     ),
     titleMedium: TextStyle(
-      fontFamily: 'Jersey10',
+      fontFamily: 'Inter',
       fontSize: 44,
       fontWeight: FontWeight.w400,
       height: 1.0,
@@ -36,7 +36,7 @@ TextTheme get textTheme {
       decorationColor: Colors.black,
     ),
     titleSmall: TextStyle(
-      fontFamily: 'Jersey10',
+      fontFamily: 'Inter',
       fontSize: 32,
       fontWeight: FontWeight.w400,
       height: 1.0,
@@ -177,9 +177,12 @@ ButtonStyle get textButtonStyle {
 }
 
 AppBarTheme get appBarTheme {
-  return const AppBarTheme(
+  return AppBarTheme(
     backgroundColor: Colors.transparent,
     elevation: 0,
+    titleTextStyle: textTheme.titleSmall?.copyWith(
+      fontSize: 18,
+    ),
     toolbarHeight: 60,
   );
 }

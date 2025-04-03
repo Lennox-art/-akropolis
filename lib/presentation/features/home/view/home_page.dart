@@ -107,6 +107,7 @@ class _HomePageState extends State<HomePage> {
                                 userRepository: GetIt.I(),
                                 authenticationRepository: GetIt.I(),
                               ),
+                              userRepository: GetIt.I(),
                               messageRepository: GetIt.I(),
                               authenticationRepository: GetIt.I(),
                             ),

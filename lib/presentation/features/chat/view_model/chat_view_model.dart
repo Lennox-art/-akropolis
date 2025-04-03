@@ -49,6 +49,8 @@ class ChatViewModel extends ChangeNotifier {
 
   AppUser get otherUser => _thread.participant1.id == _currentUserId ? _thread.participant2 : thread.participant1;
 
+  AppUser get meUser => _thread.participant1.id == _currentUserId ? _thread.participant1 : thread.participant2;
+
   ChatState get chatState => _chatState;
 
   ChatState get chatItemsState => _chatItemsState;

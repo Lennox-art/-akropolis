@@ -52,6 +52,44 @@ class _ChatScreenState extends State<ChatScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.chatViewModel.otherUser.displayName),
+        actions: [
+          MenuAnchor(
+            builder: (_, controller, __) {
+              return IconButton(
+                onPressed: () {
+                  if (controller.isOpen) {
+                    controller.close();
+                    return;
+                  }
+                  controller.open();
+                },
+                icon: const Icon(Icons.more_vert),
+                tooltip: 'Post options',
+              );
+            },
+            menuChildren: ChatMenu.values
+                .map(
+                  (menu) => MenuItemButton(
+                onPressed: () {
+                  switch(menu) {
+
+                    case ChatMenu.chatSettings:
+                      Navigator.of(context).pushNamed(
+                          AppRoutes.chatMessageSettings.path,
+                          arguments: widget.chatViewModel.meUser,
+                      );
+                      return;
+                  }
+                },
+                child: Text(
+                  menu.title,
+                  style: const TextStyle(color: Colors.white),
+                ),
+              ),
+            )
+                .toList(),
+          )
+        ],
       ),
       body: ListenableBuilder(
         listenable: widget.chatViewModel,

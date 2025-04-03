@@ -16,6 +16,8 @@ import 'package:akropolis/presentation/features/chat/view/chat_message_screen.da
 import 'package:akropolis/presentation/features/chat/view/chat_screen.dart';
 import 'package:akropolis/presentation/features/chat/view_model/chat_message_view_model.dart';
 import 'package:akropolis/presentation/features/chat/view_model/chat_view_model.dart';
+import 'package:akropolis/presentation/features/chat_settings/view/chat_settings_screen.dart';
+import 'package:akropolis/presentation/features/chat_settings/view_model/chat_settings_view_model.dart';
 import 'package:akropolis/presentation/features/create_post/views/create_post_page.dart';
 import 'package:akropolis/presentation/features/home/view/home_page.dart';
 import 'package:akropolis/presentation/features/home/view_model/home_view_model.dart';
@@ -67,7 +69,8 @@ enum AppRoutes {
   newThreadScreen("/newThreadScreen"),
   newVideoMessage("/newVideoMessage"),
   chat("/chat"),
-  chatMessage("/chatMessage");
+  chatMessage("/chatMessage"),
+  chatMessageSettings("/chatMessageSettings");
 
   final String path;
 
@@ -226,6 +229,11 @@ enum AppRoutes {
             chatMessageViewModel: ChatMessageViewModel(
               messageRemote: ModalRoute.of(context)!.settings.arguments as MessageRemote,
               getMediaUseCase: GetIt.I(),
+            ),
+          ),
+        AppRoutes.chatMessageSettings => ChatSettingsScreen(
+            chatSettingsViewModel: ChatSettingsViewModel(
+              user: ModalRoute.of(context)!.settings.arguments as AppUser,
             ),
           ),
       };

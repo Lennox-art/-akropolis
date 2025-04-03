@@ -18,3 +18,12 @@ class ChatDto {
 
   ChatDto(this.thread, this.currentUserId);
 }
+
+
+enum ChatMenu {
+  chatSettings("Chat settings");
+
+  const ChatMenu(this.title);
+
+  final String title;
+}

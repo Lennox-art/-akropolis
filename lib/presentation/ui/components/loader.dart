@@ -12,11 +12,11 @@ class InfiniteLoader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      /*child: LoadingAnimationWidget.staggeredDotsWave(
+      child: LoadingAnimationWidget.staggeredDotsWave(
         color: primaryColor,
         size: size,
-      ),*/
-      child: Text("..."),
+      ),
+      /*child: Text("..."),*/
     );
   }
 }

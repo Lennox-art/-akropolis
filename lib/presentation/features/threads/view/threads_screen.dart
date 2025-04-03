@@ -1,4 +1,5 @@
 import 'package:akropolis/data/models/remote_models/remote_models.dart';
+import 'package:akropolis/domain/gen/assets.gen.dart';
 import 'package:akropolis/domain/models/thread_model.dart';
 import 'package:akropolis/presentation/features/chat/model/chat_models.dart';
 import 'package:akropolis/presentation/features/threads/model/thread_state.dart';
@@ -21,6 +22,11 @@ class ThreadsScreen extends StatefulWidget {
 }
 
 class _ThreadsScreenState extends State<ThreadsScreen> {
+
+
+
+  double get _radius => 38;
+
   @override
   void initState() {
     super.initState();
@@ -28,6 +34,7 @@ class _ThreadsScreenState extends State<ThreadsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    ThemeData theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text("Chat"),
@@ -36,42 +43,130 @@ class _ThreadsScreenState extends State<ThreadsScreen> {
             onPressed: () {},
             icon: const Icon(Icons.search),
           ),
-          IconButton(
-            onPressed: () {
-              Navigator.of(context).pushNamed(AppRoutes.newThreadScreen.path);
-            },
-            icon: Icon(Icons.add),
+
+          Padding(
+            padding: const EdgeInsets.only(right: 10.0),
+            child: CircleAvatar(
+              backgroundColor: Colors.green,
+              child: IconButton(
+                onPressed: () {
+                  Navigator.of(context).pushNamed(AppRoutes.newThreadScreen.path);
+                },
+                icon: Icon(Icons.add),
+              ),
+            ),
           ),
         ],
       ),
+
       body: ListenableBuilder(
         listenable: widget.threadViewModel,
         builder: (_, __) {
-          return NotificationListener<ScrollNotification>(
-            onNotification: (scrollInfo) {
-              bool isLoading = widget.threadViewModel.threadState is ThreadsLoadingState;
-              bool isAtEndOfList = scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent;
+          return Visibility(
+            visible: widget.threadViewModel.threadList.isNotEmpty,
+            replacement: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
 
-              print("isLoading $isLoading : isAtEndOfList $isAtEndOfList");
+                Padding(
+                  padding: const EdgeInsets.only(right: 25.0),
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Builder(
+                        builder: (context) {
+                         String? profilePic = widget.threadViewModel.currentUser?.profilePicture;
+                         if(profilePic == null) {
+                           return  CircleAvatar(
+                             radius: _radius,
+                             child: Assets.profilePic.svg(),
+                           );
+                         }
 
-              if (!isLoading && isAtEndOfList) {
-                widget.threadViewModel.loadMoreItems();
-              }
+                         return CircleAvatar(
+                           radius: _radius,
+                           backgroundImage: NetworkImage(profilePic),
+                         );
+                        },
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(left: 50),
+                        child: CircleAvatar(
+                          radius: _radius,
+                          child: Assets.profilePic.svg(),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10.0),
+                  child: Text(
+                    widget.threadViewModel.currentUser?.displayName ?? '',
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.titleSmall,
+                  ),
+                ),
+                Text(
+                  "This could be the beginning of\n something good",
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontSize: 16,
+                  ),
+                ),
+              ],
+            ),
+            child: Flex(
+              direction: Axis.vertical,
+              children: [
+                Expanded(
+                  child: NotificationListener<ScrollNotification>(
+                    onNotification: (scrollInfo) {
+                      bool isLoading = widget.threadViewModel.threadState is ThreadsLoadingState;
+                      bool isAtEndOfList = scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent;
 
-              return true;
-            },
-            child: ListView.builder(
-              itemCount: widget.threadViewModel.threadList.length + (widget.threadViewModel.threadState is ThreadsLoadingState ? 1 : 0),
-              itemBuilder: (context, index) {
-                if (index >= widget.threadViewModel.threadList.length) {
-                  return const InfiniteLoader();
-                }
-                Thread threadItem = widget.threadViewModel.threadList[index];
-                return ThreadTile(
-                  thread: threadItem,
-                  currentUserId: widget.threadViewModel.currentUserId,
-                );
-              },
+                      print("isLoading $isLoading : isAtEndOfList $isAtEndOfList");
+
+                      if (!isLoading && isAtEndOfList) {
+                        widget.threadViewModel.loadMoreItems();
+                      }
+
+                      return true;
+                    },
+                    child: ListView.builder(
+                      itemCount: widget.threadViewModel.threadList.length + (widget.threadViewModel.threadState is ThreadsLoadingState ? 1 : 0),
+                      itemBuilder: (context, index) {
+                        if (index >= widget.threadViewModel.threadList.length) {
+                          return const InfiniteLoader();
+                        }
+                        Thread threadItem = widget.threadViewModel.threadList[index];
+                        return ThreadTile(
+                          thread: threadItem,
+                          currentUserId: widget.threadViewModel.currentUserId,
+                        );
+                      },
+                    ),
+                  ),
+                ),
+                Flexible(
+                  child: ListView(
+                    shrinkWrap: true,
+                    children: [
+                      Text("Connects"),
+                      ...widget.threadViewModel.connectList.map(
+                        (e) => ListTile(
+                          leading: CircleAvatar(
+                            backgroundImage: NetworkImage(e.imageUrl),
+                          ),
+                          title: Text(e.name),
+                          subtitle: Text(e.message),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           );
         },
