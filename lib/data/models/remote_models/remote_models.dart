@@ -1,4 +1,5 @@
 import 'package:akropolis/data/models/dto_models/dto_models.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'remote_models.g.dart';

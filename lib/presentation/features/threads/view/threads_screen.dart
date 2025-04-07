@@ -214,7 +214,8 @@ class ThreadTile extends StatelessWidget {
       trailing: Visibility(
         visible: !thread.threadRemote.accepted,
         child: CircleAvatar(
-          backgroundColor: Colors.white,
+          backgroundColor: Colors.blue,
+          radius: 5,
         ),
       ),
       title: Text(otherUser.displayName),

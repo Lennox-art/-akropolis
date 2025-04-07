@@ -187,6 +187,7 @@ AppBarTheme get appBarTheme {
   );
 }
 
+
 InputDecorationTheme get inputDecorationTheme {
   return InputDecorationTheme(
     filled: true,
@@ -219,15 +220,13 @@ InputDecorationTheme get inputDecorationTheme {
       borderRadius: BorderRadius.all(
         Radius.circular(10),
       ),
-      borderSide:
-          BorderSide(color: primaryColor, width: 1.5), // // No visible border
+      borderSide: BorderSide(color: primaryColor, width: 1.5), // // No visible border
     ),
     errorBorder: const OutlineInputBorder(
       borderRadius: BorderRadius.all(
         Radius.circular(10),
       ),
-      borderSide:
-          BorderSide(color: errorColor, width: 1.5), // No visible border
+      borderSide: BorderSide(color: errorColor, width: 1.5), // No visible border
     ),
   );
 }
@@ -300,7 +299,7 @@ CardTheme get cardTheme {
 
 SliderThemeData get sliderTheme {
   return SliderThemeData(
-  showValueIndicator: ShowValueIndicator.always,
+    showValueIndicator: ShowValueIndicator.always,
   );
 }
 

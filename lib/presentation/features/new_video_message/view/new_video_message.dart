@@ -25,7 +25,6 @@ class NewVideoMessageScreen extends StatefulWidget {
 }
 
 class _NewVideoMessageScreenState extends State<NewVideoMessageScreen> {
-
   NewVideoMessageViewModel get newVideoMessageViewModel => widget.newVideoMessageViewModel;
   late final StreamSubscription<ToastMessage> toastSubscription;
 
@@ -53,7 +52,27 @@ class _NewVideoMessageScreenState extends State<NewVideoMessageScreen> {
         builder: (_, __) {
           return newVideoMessageViewModel.newVideoState.map(
             loading: (_) => const InfiniteLoader(),
-            idlePostState: (_) => Center(child: const Text("Idle")),
+            idlePostState: (_) => Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 4.0),
+                  child: Text(
+                    "Message sent",
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(30),
+                  child: ElevatedButton(
+                    onPressed: Navigator.of(context).pop,
+                    child: const Text("Back to chat"),
+                  ),
+                ),
+              ],
+            ),
             errorState: (e) => Text(e.failure.message),
             editingVideo: (l) {
               return Flex(
@@ -80,13 +99,12 @@ class _NewVideoMessageScreenState extends State<NewVideoMessageScreen> {
                                     startTime: start,
                                     endTime: end,
                                   );
-
                                 },
                               ),
                             VideoEditingTools.thumbnailPicker => ThumbnailVideoWidget(
                                 selectedThumbnail: l.selectedThumbnail,
                                 videoThumbnails: l.videoThumbnails,
-                                onSelect:newVideoMessageViewModel.modifyThumbnail,
+                                onSelect: newVideoMessageViewModel.modifyThumbnail,
                               ),
                           },
                         ),
@@ -95,22 +113,23 @@ class _NewVideoMessageScreenState extends State<NewVideoMessageScreen> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: VideoEditingTools.values
-                                .map((t) => Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                IconButton(
-                                  onPressed: () {
-                                    widget.newVideoMessageViewModel.changeCurrentTool(t);
-                                  },
-                                  icon: Icon(t.iconData),
-                                  color: t == l.currentTool ? primaryColor : Colors.white70,
-                                ),
-                                Text(t.title),
-                              ],
-                            ),
-                            )
+                                .map(
+                                  (t) => Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      IconButton(
+                                        onPressed: () {
+                                          widget.newVideoMessageViewModel.changeCurrentTool(t);
+                                        },
+                                        icon: Icon(t.iconData),
+                                        color: t == l.currentTool ? primaryColor : Colors.white70,
+                                      ),
+                                      Text(t.title),
+                                    ],
+                                  ),
+                                )
                                 .toList(),
                           ),
                         ),
@@ -133,5 +152,4 @@ class _NewVideoMessageScreenState extends State<NewVideoMessageScreen> {
       ),
     );
   }
-
 }

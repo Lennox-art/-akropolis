@@ -50,12 +50,14 @@ class _NewThreadScreenState extends State<NewThreadScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: Text("New message"),
+      ),
       body: Flex(
         direction: Axis.vertical,
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 2.0),
+            padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
             child: SearchBar(
               onChanged: _onSearchChanged,
             ),
@@ -84,7 +86,7 @@ class _NewThreadScreenState extends State<NewThreadScreen> {
                           maxDuration: videoDuration,
                         );
                         if (videoData == null || !context.mounted) return;
-
+ 
                         if (!context.mounted) return;
 
                         Navigator.of(context).pushNamed(
