@@ -55,9 +55,11 @@ class ProgressModel {
 
   double get percent => (sent * 100) / total;
 
+
   @override
   String toString() => "$sent / $total = $percent %";
 }
+
 
 class MediaData {
   final File file;

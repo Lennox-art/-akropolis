@@ -21,6 +21,7 @@ mixin _$NewVideoMessageState {
     required TResult Function(ProgressModel? progress) loading,
     required TResult Function(AppFailure failure) errorState,
     required TResult Function() idlePostState,
+    required TResult Function() successState,
     required TResult Function(File video, Uint8List selectedThumbnail,
             List<Uint8List> videoThumbnails, VideoEditingTools currentTool)
         editingVideo,
@@ -31,6 +32,7 @@ mixin _$NewVideoMessageState {
     TResult? Function(ProgressModel? progress)? loading,
     TResult? Function(AppFailure failure)? errorState,
     TResult? Function()? idlePostState,
+    TResult? Function()? successState,
     TResult? Function(File video, Uint8List selectedThumbnail,
             List<Uint8List> videoThumbnails, VideoEditingTools currentTool)?
         editingVideo,
@@ -41,6 +43,7 @@ mixin _$NewVideoMessageState {
     TResult Function(ProgressModel? progress)? loading,
     TResult Function(AppFailure failure)? errorState,
     TResult Function()? idlePostState,
+    TResult Function()? successState,
     TResult Function(File video, Uint8List selectedThumbnail,
             List<Uint8List> videoThumbnails, VideoEditingTools currentTool)?
         editingVideo,
@@ -52,6 +55,7 @@ mixin _$NewVideoMessageState {
     required TResult Function(LoadingNewVideoMessageState value) loading,
     required TResult Function(ErrorNewVideoMessageState value) errorState,
     required TResult Function(IdleNewVideoMessageState value) idlePostState,
+    required TResult Function(SuccessNewVideoMessageState value) successState,
     required TResult Function(EdittingVideoNewVideoMessageState value)
         editingVideo,
   }) =>
@@ -61,6 +65,7 @@ mixin _$NewVideoMessageState {
     TResult? Function(LoadingNewVideoMessageState value)? loading,
     TResult? Function(ErrorNewVideoMessageState value)? errorState,
     TResult? Function(IdleNewVideoMessageState value)? idlePostState,
+    TResult? Function(SuccessNewVideoMessageState value)? successState,
     TResult? Function(EdittingVideoNewVideoMessageState value)? editingVideo,
   }) =>
       throw _privateConstructorUsedError;
@@ -69,6 +74,7 @@ mixin _$NewVideoMessageState {
     TResult Function(LoadingNewVideoMessageState value)? loading,
     TResult Function(ErrorNewVideoMessageState value)? errorState,
     TResult Function(IdleNewVideoMessageState value)? idlePostState,
+    TResult Function(SuccessNewVideoMessageState value)? successState,
     TResult Function(EdittingVideoNewVideoMessageState value)? editingVideo,
     required TResult orElse(),
   }) =>
@@ -173,6 +179,7 @@ class _$LoadingNewVideoMessageStateImpl implements LoadingNewVideoMessageState {
     required TResult Function(ProgressModel? progress) loading,
     required TResult Function(AppFailure failure) errorState,
     required TResult Function() idlePostState,
+    required TResult Function() successState,
     required TResult Function(File video, Uint8List selectedThumbnail,
             List<Uint8List> videoThumbnails, VideoEditingTools currentTool)
         editingVideo,
@@ -186,6 +193,7 @@ class _$LoadingNewVideoMessageStateImpl implements LoadingNewVideoMessageState {
     TResult? Function(ProgressModel? progress)? loading,
     TResult? Function(AppFailure failure)? errorState,
     TResult? Function()? idlePostState,
+    TResult? Function()? successState,
     TResult? Function(File video, Uint8List selectedThumbnail,
             List<Uint8List> videoThumbnails, VideoEditingTools currentTool)?
         editingVideo,
@@ -199,6 +207,7 @@ class _$LoadingNewVideoMessageStateImpl implements LoadingNewVideoMessageState {
     TResult Function(ProgressModel? progress)? loading,
     TResult Function(AppFailure failure)? errorState,
     TResult Function()? idlePostState,
+    TResult Function()? successState,
     TResult Function(File video, Uint8List selectedThumbnail,
             List<Uint8List> videoThumbnails, VideoEditingTools currentTool)?
         editingVideo,
@@ -216,6 +225,7 @@ class _$LoadingNewVideoMessageStateImpl implements LoadingNewVideoMessageState {
     required TResult Function(LoadingNewVideoMessageState value) loading,
     required TResult Function(ErrorNewVideoMessageState value) errorState,
     required TResult Function(IdleNewVideoMessageState value) idlePostState,
+    required TResult Function(SuccessNewVideoMessageState value) successState,
     required TResult Function(EdittingVideoNewVideoMessageState value)
         editingVideo,
   }) {
@@ -228,6 +238,7 @@ class _$LoadingNewVideoMessageStateImpl implements LoadingNewVideoMessageState {
     TResult? Function(LoadingNewVideoMessageState value)? loading,
     TResult? Function(ErrorNewVideoMessageState value)? errorState,
     TResult? Function(IdleNewVideoMessageState value)? idlePostState,
+    TResult? Function(SuccessNewVideoMessageState value)? successState,
     TResult? Function(EdittingVideoNewVideoMessageState value)? editingVideo,
   }) {
     return loading?.call(this);
@@ -239,6 +250,7 @@ class _$LoadingNewVideoMessageStateImpl implements LoadingNewVideoMessageState {
     TResult Function(LoadingNewVideoMessageState value)? loading,
     TResult Function(ErrorNewVideoMessageState value)? errorState,
     TResult Function(IdleNewVideoMessageState value)? idlePostState,
+    TResult Function(SuccessNewVideoMessageState value)? successState,
     TResult Function(EdittingVideoNewVideoMessageState value)? editingVideo,
     required TResult orElse(),
   }) {
@@ -337,6 +349,7 @@ class _$ErrorNewVideoMessageStateImpl implements ErrorNewVideoMessageState {
     required TResult Function(ProgressModel? progress) loading,
     required TResult Function(AppFailure failure) errorState,
     required TResult Function() idlePostState,
+    required TResult Function() successState,
     required TResult Function(File video, Uint8List selectedThumbnail,
             List<Uint8List> videoThumbnails, VideoEditingTools currentTool)
         editingVideo,
@@ -350,6 +363,7 @@ class _$ErrorNewVideoMessageStateImpl implements ErrorNewVideoMessageState {
     TResult? Function(ProgressModel? progress)? loading,
     TResult? Function(AppFailure failure)? errorState,
     TResult? Function()? idlePostState,
+    TResult? Function()? successState,
     TResult? Function(File video, Uint8List selectedThumbnail,
             List<Uint8List> videoThumbnails, VideoEditingTools currentTool)?
         editingVideo,
@@ -363,6 +377,7 @@ class _$ErrorNewVideoMessageStateImpl implements ErrorNewVideoMessageState {
     TResult Function(ProgressModel? progress)? loading,
     TResult Function(AppFailure failure)? errorState,
     TResult Function()? idlePostState,
+    TResult Function()? successState,
     TResult Function(File video, Uint8List selectedThumbnail,
             List<Uint8List> videoThumbnails, VideoEditingTools currentTool)?
         editingVideo,
@@ -380,6 +395,7 @@ class _$ErrorNewVideoMessageStateImpl implements ErrorNewVideoMessageState {
     required TResult Function(LoadingNewVideoMessageState value) loading,
     required TResult Function(ErrorNewVideoMessageState value) errorState,
     required TResult Function(IdleNewVideoMessageState value) idlePostState,
+    required TResult Function(SuccessNewVideoMessageState value) successState,
     required TResult Function(EdittingVideoNewVideoMessageState value)
         editingVideo,
   }) {
@@ -392,6 +408,7 @@ class _$ErrorNewVideoMessageStateImpl implements ErrorNewVideoMessageState {
     TResult? Function(LoadingNewVideoMessageState value)? loading,
     TResult? Function(ErrorNewVideoMessageState value)? errorState,
     TResult? Function(IdleNewVideoMessageState value)? idlePostState,
+    TResult? Function(SuccessNewVideoMessageState value)? successState,
     TResult? Function(EdittingVideoNewVideoMessageState value)? editingVideo,
   }) {
     return errorState?.call(this);
@@ -403,6 +420,7 @@ class _$ErrorNewVideoMessageStateImpl implements ErrorNewVideoMessageState {
     TResult Function(LoadingNewVideoMessageState value)? loading,
     TResult Function(ErrorNewVideoMessageState value)? errorState,
     TResult Function(IdleNewVideoMessageState value)? idlePostState,
+    TResult Function(SuccessNewVideoMessageState value)? successState,
     TResult Function(EdittingVideoNewVideoMessageState value)? editingVideo,
     required TResult orElse(),
   }) {
@@ -474,6 +492,7 @@ class _$IdleNewVideoMessageStateImpl implements IdleNewVideoMessageState {
     required TResult Function(ProgressModel? progress) loading,
     required TResult Function(AppFailure failure) errorState,
     required TResult Function() idlePostState,
+    required TResult Function() successState,
     required TResult Function(File video, Uint8List selectedThumbnail,
             List<Uint8List> videoThumbnails, VideoEditingTools currentTool)
         editingVideo,
@@ -487,6 +506,7 @@ class _$IdleNewVideoMessageStateImpl implements IdleNewVideoMessageState {
     TResult? Function(ProgressModel? progress)? loading,
     TResult? Function(AppFailure failure)? errorState,
     TResult? Function()? idlePostState,
+    TResult? Function()? successState,
     TResult? Function(File video, Uint8List selectedThumbnail,
             List<Uint8List> videoThumbnails, VideoEditingTools currentTool)?
         editingVideo,
@@ -500,6 +520,7 @@ class _$IdleNewVideoMessageStateImpl implements IdleNewVideoMessageState {
     TResult Function(ProgressModel? progress)? loading,
     TResult Function(AppFailure failure)? errorState,
     TResult Function()? idlePostState,
+    TResult Function()? successState,
     TResult Function(File video, Uint8List selectedThumbnail,
             List<Uint8List> videoThumbnails, VideoEditingTools currentTool)?
         editingVideo,
@@ -517,6 +538,7 @@ class _$IdleNewVideoMessageStateImpl implements IdleNewVideoMessageState {
     required TResult Function(LoadingNewVideoMessageState value) loading,
     required TResult Function(ErrorNewVideoMessageState value) errorState,
     required TResult Function(IdleNewVideoMessageState value) idlePostState,
+    required TResult Function(SuccessNewVideoMessageState value) successState,
     required TResult Function(EdittingVideoNewVideoMessageState value)
         editingVideo,
   }) {
@@ -529,6 +551,7 @@ class _$IdleNewVideoMessageStateImpl implements IdleNewVideoMessageState {
     TResult? Function(LoadingNewVideoMessageState value)? loading,
     TResult? Function(ErrorNewVideoMessageState value)? errorState,
     TResult? Function(IdleNewVideoMessageState value)? idlePostState,
+    TResult? Function(SuccessNewVideoMessageState value)? successState,
     TResult? Function(EdittingVideoNewVideoMessageState value)? editingVideo,
   }) {
     return idlePostState?.call(this);
@@ -540,6 +563,7 @@ class _$IdleNewVideoMessageStateImpl implements IdleNewVideoMessageState {
     TResult Function(LoadingNewVideoMessageState value)? loading,
     TResult Function(ErrorNewVideoMessageState value)? errorState,
     TResult Function(IdleNewVideoMessageState value)? idlePostState,
+    TResult Function(SuccessNewVideoMessageState value)? successState,
     TResult Function(EdittingVideoNewVideoMessageState value)? editingVideo,
     required TResult orElse(),
   }) {
@@ -552,6 +576,141 @@ class _$IdleNewVideoMessageStateImpl implements IdleNewVideoMessageState {
 
 abstract class IdleNewVideoMessageState implements NewVideoMessageState {
   const factory IdleNewVideoMessageState() = _$IdleNewVideoMessageStateImpl;
+}
+
+/// @nodoc
+abstract class _$$SuccessNewVideoMessageStateImplCopyWith<$Res> {
+  factory _$$SuccessNewVideoMessageStateImplCopyWith(
+          _$SuccessNewVideoMessageStateImpl value,
+          $Res Function(_$SuccessNewVideoMessageStateImpl) then) =
+      __$$SuccessNewVideoMessageStateImplCopyWithImpl<$Res>;
+}
+
+/// @nodoc
+class __$$SuccessNewVideoMessageStateImplCopyWithImpl<$Res>
+    extends _$NewVideoMessageStateCopyWithImpl<$Res,
+        _$SuccessNewVideoMessageStateImpl>
+    implements _$$SuccessNewVideoMessageStateImplCopyWith<$Res> {
+  __$$SuccessNewVideoMessageStateImplCopyWithImpl(
+      _$SuccessNewVideoMessageStateImpl _value,
+      $Res Function(_$SuccessNewVideoMessageStateImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of NewVideoMessageState
+  /// with the given fields replaced by the non-null parameter values.
+}
+
+/// @nodoc
+
+class _$SuccessNewVideoMessageStateImpl implements SuccessNewVideoMessageState {
+  const _$SuccessNewVideoMessageStateImpl();
+
+  @override
+  String toString() {
+    return 'NewVideoMessageState.successState()';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$SuccessNewVideoMessageStateImpl);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(ProgressModel? progress) loading,
+    required TResult Function(AppFailure failure) errorState,
+    required TResult Function() idlePostState,
+    required TResult Function() successState,
+    required TResult Function(File video, Uint8List selectedThumbnail,
+            List<Uint8List> videoThumbnails, VideoEditingTools currentTool)
+        editingVideo,
+  }) {
+    return successState();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(ProgressModel? progress)? loading,
+    TResult? Function(AppFailure failure)? errorState,
+    TResult? Function()? idlePostState,
+    TResult? Function()? successState,
+    TResult? Function(File video, Uint8List selectedThumbnail,
+            List<Uint8List> videoThumbnails, VideoEditingTools currentTool)?
+        editingVideo,
+  }) {
+    return successState?.call();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(ProgressModel? progress)? loading,
+    TResult Function(AppFailure failure)? errorState,
+    TResult Function()? idlePostState,
+    TResult Function()? successState,
+    TResult Function(File video, Uint8List selectedThumbnail,
+            List<Uint8List> videoThumbnails, VideoEditingTools currentTool)?
+        editingVideo,
+    required TResult orElse(),
+  }) {
+    if (successState != null) {
+      return successState();
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(LoadingNewVideoMessageState value) loading,
+    required TResult Function(ErrorNewVideoMessageState value) errorState,
+    required TResult Function(IdleNewVideoMessageState value) idlePostState,
+    required TResult Function(SuccessNewVideoMessageState value) successState,
+    required TResult Function(EdittingVideoNewVideoMessageState value)
+        editingVideo,
+  }) {
+    return successState(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(LoadingNewVideoMessageState value)? loading,
+    TResult? Function(ErrorNewVideoMessageState value)? errorState,
+    TResult? Function(IdleNewVideoMessageState value)? idlePostState,
+    TResult? Function(SuccessNewVideoMessageState value)? successState,
+    TResult? Function(EdittingVideoNewVideoMessageState value)? editingVideo,
+  }) {
+    return successState?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(LoadingNewVideoMessageState value)? loading,
+    TResult Function(ErrorNewVideoMessageState value)? errorState,
+    TResult Function(IdleNewVideoMessageState value)? idlePostState,
+    TResult Function(SuccessNewVideoMessageState value)? successState,
+    TResult Function(EdittingVideoNewVideoMessageState value)? editingVideo,
+    required TResult orElse(),
+  }) {
+    if (successState != null) {
+      return successState(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class SuccessNewVideoMessageState implements NewVideoMessageState {
+  const factory SuccessNewVideoMessageState() =
+      _$SuccessNewVideoMessageStateImpl;
 }
 
 /// @nodoc
@@ -678,6 +837,7 @@ class _$EdittingVideoNewVideoMessageStateImpl
     required TResult Function(ProgressModel? progress) loading,
     required TResult Function(AppFailure failure) errorState,
     required TResult Function() idlePostState,
+    required TResult Function() successState,
     required TResult Function(File video, Uint8List selectedThumbnail,
             List<Uint8List> videoThumbnails, VideoEditingTools currentTool)
         editingVideo,
@@ -691,6 +851,7 @@ class _$EdittingVideoNewVideoMessageStateImpl
     TResult? Function(ProgressModel? progress)? loading,
     TResult? Function(AppFailure failure)? errorState,
     TResult? Function()? idlePostState,
+    TResult? Function()? successState,
     TResult? Function(File video, Uint8List selectedThumbnail,
             List<Uint8List> videoThumbnails, VideoEditingTools currentTool)?
         editingVideo,
@@ -705,6 +866,7 @@ class _$EdittingVideoNewVideoMessageStateImpl
     TResult Function(ProgressModel? progress)? loading,
     TResult Function(AppFailure failure)? errorState,
     TResult Function()? idlePostState,
+    TResult Function()? successState,
     TResult Function(File video, Uint8List selectedThumbnail,
             List<Uint8List> videoThumbnails, VideoEditingTools currentTool)?
         editingVideo,
@@ -723,6 +885,7 @@ class _$EdittingVideoNewVideoMessageStateImpl
     required TResult Function(LoadingNewVideoMessageState value) loading,
     required TResult Function(ErrorNewVideoMessageState value) errorState,
     required TResult Function(IdleNewVideoMessageState value) idlePostState,
+    required TResult Function(SuccessNewVideoMessageState value) successState,
     required TResult Function(EdittingVideoNewVideoMessageState value)
         editingVideo,
   }) {
@@ -735,6 +898,7 @@ class _$EdittingVideoNewVideoMessageStateImpl
     TResult? Function(LoadingNewVideoMessageState value)? loading,
     TResult? Function(ErrorNewVideoMessageState value)? errorState,
     TResult? Function(IdleNewVideoMessageState value)? idlePostState,
+    TResult? Function(SuccessNewVideoMessageState value)? successState,
     TResult? Function(EdittingVideoNewVideoMessageState value)? editingVideo,
   }) {
     return editingVideo?.call(this);
@@ -746,6 +910,7 @@ class _$EdittingVideoNewVideoMessageStateImpl
     TResult Function(LoadingNewVideoMessageState value)? loading,
     TResult Function(ErrorNewVideoMessageState value)? errorState,
     TResult Function(IdleNewVideoMessageState value)? idlePostState,
+    TResult Function(SuccessNewVideoMessageState value)? successState,
     TResult Function(EdittingVideoNewVideoMessageState value)? editingVideo,
     required TResult orElse(),
   }) {

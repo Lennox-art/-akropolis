@@ -3,15 +3,11 @@ import 'dart:io' as io;
 
 import 'package:akropolis/data/models/dto_models/dto_models.dart';
 import 'package:akropolis/data/models/remote_models/remote_models.dart';
-import 'package:akropolis/data/repositories/message_repository/message_repository.dart';
 import 'package:akropolis/data/utils/validations.dart';
-import 'package:akropolis/domain/models/news_card_model.dart';
-import 'package:akropolis/domain/use_cases/post_reply_use_case.dart';
 import 'package:akropolis/domain/use_cases/send_message_use_case.dart';
 import 'package:akropolis/domain/utils/functions.dart';
 import 'package:akropolis/presentation/features/create_post/models/create_post_models.dart';
 import 'package:akropolis/presentation/features/new_video_message/model/new_video_message_model.dart';
-import 'package:akropolis/presentation/features/news_feed/models/models.dart';
 import 'package:akropolis/presentation/features/news_feed/models/reply_post_state.dart';
 import 'package:akropolis/presentation/ui/components/toast/toast.dart';
 import 'package:flutter/foundation.dart';
@@ -96,54 +92,60 @@ class NewVideoMessageViewModel extends ChangeNotifier {
   }
 
   Future<void> trimVideo({required Duration startTime, required Duration endTime}) async {
-    if (_newVideoState is! EdittingVideoReplyPostState) return;
+    if (_newVideoState is! EdittingVideoNewVideoMessageState) return;
 
-    Result<io.File> trimmedVideoResult = await trimVideoInRange(
-      TrimVideoRequest(
-        file: _videoData,
-        start: startTime,
-        end: endTime,
-      ),
-    );
+    try {
+      _newVideoState = LoadingNewVideoMessageState();
+      notifyListeners();
 
-    switch (trimmedVideoResult) {
-      case Success<io.File>():
-        Result<List<Uint8List>> thumbnailResult = await generateThumbnails(
-          GenerateThumbnailsRequest(
-            videoPath: trimmedVideoResult.data.path,
-            count: 8,
-          ),
-        );
+      Result<io.File> trimmedVideoResult = await trimVideoInRange(
+        TrimVideoRequest(
+          file: _videoData,
+          start: startTime,
+          end: endTime,
+        ),
+      );
 
-        switch (thumbnailResult) {
-          case Success<List<Uint8List>>():
-            _videoData = trimmedVideoResult.data;
-            _newVideoState = EdittingVideoNewVideoMessageState(
-              video: _videoData,
-              videoThumbnails: _videoThumbnails!,
-              selectedThumbnail: _selectedThumbnail!,
-              currentTool: _currentTool,
-            );
-            notifyListeners();
-            break;
-          case Error<List<Uint8List>>():
-            _toastMessageStream.add(
-              ToastSuccess(message: thumbnailResult.failure.message),
-            );
-            break;
-        }
+      switch (trimmedVideoResult) {
+        case Success<io.File>():
+          Result<List<Uint8List>> thumbnailResult = await generateThumbnails(
+            GenerateThumbnailsRequest(
+              videoPath: trimmedVideoResult.data.path,
+              count: 8,
+            ),
+          );
 
-        break;
-      case Error<io.File>():
-        _toastMessageStream.add(
-          ToastSuccess(message: trimmedVideoResult.failure.message),
-        );
-        break;
+          switch (thumbnailResult) {
+            case Success<List<Uint8List>>():
+              _videoData = trimmedVideoResult.data;
+              _newVideoState = EdittingVideoNewVideoMessageState(
+                video: _videoData,
+                videoThumbnails: _videoThumbnails!,
+                selectedThumbnail: _selectedThumbnail!,
+                currentTool: _currentTool,
+              );
+              break;
+            case Error<List<Uint8List>>():
+              _toastMessageStream.add(
+                ToastSuccess(message: thumbnailResult.failure.message),
+              );
+              break;
+          }
+
+          break;
+        case Error<io.File>():
+          _toastMessageStream.add(
+            ToastSuccess(message: trimmedVideoResult.failure.message),
+          );
+          break;
+      }
+    } finally {
+      notifyListeners();
     }
   }
 
   Future<void> modifyThumbnail(Uint8List thumbnail) async {
-    if (_newVideoState is! EdittingVideoReplyPostState) return;
+    if (_newVideoState is! EdittingVideoNewVideoMessageState) return;
 
     print("Modifying thumbnail");
 
@@ -175,7 +177,7 @@ class NewVideoMessageViewModel extends ChangeNotifier {
 
       switch (newPostResult) {
         case Success<void>():
-          _newVideoState = const IdleNewVideoMessageState();
+          _newVideoState = const SuccessNewVideoMessageState();
           _toastMessageStream.add(
             const ToastSuccess(title: "New Message", message: "New message sent successfully"),
           );

@@ -18,7 +18,7 @@ import 'package:akropolis/presentation/features/chat/view_model/chat_message_vie
 import 'package:akropolis/presentation/features/chat/view_model/chat_view_model.dart';
 import 'package:akropolis/presentation/features/chat_settings/view/chat_settings_screen.dart';
 import 'package:akropolis/presentation/features/chat_settings/view_model/chat_settings_view_model.dart';
-import 'package:akropolis/presentation/features/create_post/views/create_post_page.dart';
+import 'package:akropolis/presentation/features/create_post/view/create_post_page.dart';
 import 'package:akropolis/presentation/features/home/view/home_page.dart';
 import 'package:akropolis/presentation/features/home/view_model/home_view_model.dart';
 import 'package:akropolis/presentation/features/new_thread/view/new_thread_screen.dart';

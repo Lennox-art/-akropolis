@@ -11,7 +11,10 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 class NewThreadScreen extends StatefulWidget {
-  const NewThreadScreen({required this.newThreadViewModel, super.key});
+  const NewThreadScreen({
+    required this.newThreadViewModel,
+    super.key,
+  });
 
   final NewThreadViewModel newThreadViewModel;
 
@@ -51,7 +54,7 @@ class _NewThreadScreenState extends State<NewThreadScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("New message"),
+        title: const Text("New message"),
       ),
       body: Flex(
         direction: Axis.vertical,
@@ -86,7 +89,7 @@ class _NewThreadScreenState extends State<NewThreadScreen> {
                           maxDuration: videoDuration,
                         );
                         if (videoData == null || !context.mounted) return;
- 
+
                         if (!context.mounted) return;
 
                         Navigator.of(context).pushNamed(

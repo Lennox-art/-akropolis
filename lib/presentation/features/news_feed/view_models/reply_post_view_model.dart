@@ -97,47 +97,53 @@ class ReplyPostViewModel extends ChangeNotifier {
   Future<void> trimVideo({required Duration startTime, required Duration endTime}) async {
     if (_replyPostState is! EdittingVideoReplyPostState) return;
 
-    Result<io.File> trimmedVideoResult = await trimVideoInRange(
-      TrimVideoRequest(
-        file: _videoData,
-        start: startTime,
-        end: endTime,
-      ),
-    );
+    try {
+      _replyPostState = const LoadingReplyPostState();
+      notifyListeners();
 
-    switch (trimmedVideoResult) {
-      case Success<io.File>():
-        Result<List<Uint8List>> thumbnailResult = await generateThumbnails(
-          GenerateThumbnailsRequest(
-            videoPath: trimmedVideoResult.data.path,
-            count: 8,
-          ),
-        );
+      Result<io.File> trimmedVideoResult = await trimVideoInRange(
+        TrimVideoRequest(
+          file: _videoData,
+          start: startTime,
+          end: endTime,
+        ),
+      );
 
-        switch (thumbnailResult) {
-          case Success<List<Uint8List>>():
-            _videoData = trimmedVideoResult.data;
-            _replyPostState = EdittingVideoReplyPostState(
-              video: _videoData,
-              videoThumbnails: _videoThumbnails!,
-              selectedThumbnail: _selectedThumbnail!,
-              currentTool: _currentTool,
-            );
-            notifyListeners();
-            break;
-          case Error<List<Uint8List>>():
-            _toastMessageStream.add(
-              ToastSuccess(message: thumbnailResult.failure.message),
-            );
-            break;
-        }
+      switch (trimmedVideoResult) {
+        case Success<io.File>():
+          Result<List<Uint8List>> thumbnailResult = await generateThumbnails(
+            GenerateThumbnailsRequest(
+              videoPath: trimmedVideoResult.data.path,
+              count: 8,
+            ),
+          );
 
-        break;
-      case Error<io.File>():
-        _toastMessageStream.add(
-          ToastSuccess(message: trimmedVideoResult.failure.message),
-        );
-        break;
+          switch (thumbnailResult) {
+            case Success<List<Uint8List>>():
+              _videoData = trimmedVideoResult.data;
+              _replyPostState = EdittingVideoReplyPostState(
+                video: _videoData,
+                videoThumbnails: _videoThumbnails!,
+                selectedThumbnail: _selectedThumbnail!,
+                currentTool: _currentTool,
+              );
+              break;
+            case Error<List<Uint8List>>():
+              _toastMessageStream.add(
+                ToastSuccess(message: thumbnailResult.failure.message),
+              );
+              break;
+          }
+
+          break;
+        case Error<io.File>():
+          _toastMessageStream.add(
+            ToastSuccess(message: trimmedVideoResult.failure.message),
+          );
+          break;
+      }
+    } finally {
+      notifyListeners();
     }
   }
 

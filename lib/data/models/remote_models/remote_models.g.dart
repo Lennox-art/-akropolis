@@ -37,7 +37,7 @@ ThreadRemote _$ThreadRemoteFromJson(Map<String, dynamic> json) => ThreadRemote(
       participant2: json['participant2'] as String,
       accepted: json['accepted'] as bool? ?? false,
       createdAt: DateTime.parse(json['createdAt'] as String),
-      updatedAt: (json['updatedAt'] as Timestamp).toDate(),
+      updatedAt: DateTime.parse(json['updatedAt'] as String),
     );
 
 Map<String, dynamic> _$ThreadRemoteToJson(ThreadRemote instance) =>

@@ -118,59 +118,66 @@ class CreatePostViewModel extends ChangeNotifier {
   }) async {
     if (_createPostState is! EdittingVideoCreatePostState) return;
 
-    Result<io.File> trimmedVideoResult = await trimVideoInRange(
-      TrimVideoRequest(
-        file: _videoData!,
-        start: startTime,
-        end: endTime,
-      ),
-    );
+    try {
+      _createPostState = LoadingCreatePostState();
+      notifyListeners();
 
-    switch (trimmedVideoResult) {
-      case Success<io.File>():
-        Result<List<Uint8List>> thumbnailResult = await generateThumbnails(
-          GenerateThumbnailsRequest(
-            videoPath: trimmedVideoResult.data.path,
-            count: 8,
-          ),
-        );
-        switch (thumbnailResult) {
-          case Success<List<Uint8List>>():
-            _videoData = trimmedVideoResult.data;
-            _createPostState = EdittingVideoCreatePostState(
-              video: _videoData!,
-              videoThumbnails: _videoThumbnails!,
-              selectedThumbnail: _selectedThumbnail!,
-              currentTool: _currentTool,
-            );
-            notifyListeners();
-            break;
-          case Error<List<Uint8List>>():
-            _toastMessageStream.add(
-              ToastSuccess(message: thumbnailResult.failure.message),
-            );
-            break;
-        }
-        break;
-      case Error<io.File>():
-        _toastMessageStream.add(
-          ToastSuccess(message: trimmedVideoResult.failure.message),
-        );
-        break;
+      Result<io.File> trimmedVideoResult = await trimVideoInRange(
+        TrimVideoRequest(
+          file: _videoData!,
+          start: startTime,
+          end: endTime,
+        ),
+      );
+
+      switch (trimmedVideoResult) {
+        case Success<io.File>():
+          Result<List<Uint8List>> thumbnailResult = await generateThumbnails(
+            GenerateThumbnailsRequest(
+              videoPath: trimmedVideoResult.data.path,
+              count: 8,
+            ),
+          );
+          switch (thumbnailResult) {
+            case Success<List<Uint8List>>():
+              _videoData = trimmedVideoResult.data;
+              _createPostState = EdittingVideoCreatePostState(
+                video: _videoData!,
+                videoThumbnails: _videoThumbnails!,
+                selectedThumbnail: _selectedThumbnail!,
+                currentTool: _currentTool,
+              );
+              break;
+            case Error<List<Uint8List>>():
+              _toastMessageStream.add(
+                ToastSuccess(message: thumbnailResult.failure.message),
+              );
+              break;
+          }
+          break;
+        case Error<io.File>():
+          _toastMessageStream.add(
+            ToastSuccess(message: trimmedVideoResult.failure.message),
+          );
+          break;
+      }
+    } finally {
+      notifyListeners();
     }
   }
 
   Future<void> modifyThumbnail(Uint8List thumbnail) async {
     if (_createPostState is! EdittingVideoCreatePostState) return;
 
-    _selectedThumbnail = thumbnail;
-    _createPostState = EdittingVideoCreatePostState(
-      video: _videoData!,
-      selectedThumbnail: _selectedThumbnail!,
-      videoThumbnails: _videoThumbnails!,
-      currentTool: _currentTool,
-    );
-    notifyListeners();
+      _selectedThumbnail = thumbnail;
+      _createPostState = EdittingVideoCreatePostState(
+        video: _videoData!,
+        selectedThumbnail: _selectedThumbnail!,
+        videoThumbnails: _videoThumbnails!,
+        currentTool: _currentTool,
+      );
+      notifyListeners();
+
   }
 
   void finishEditing() {

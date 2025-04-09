@@ -284,24 +284,34 @@ class ProfileTaskWidget extends StatelessWidget {
         color: Colors.grey.shade900,
         borderRadius: BorderRadius.circular(12),
       ),
-      child: Column(
+      child: Flex(
+        direction: Axis.vertical,
+        mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4.0),
-            child: Icon(profileTask.icon, color: Colors.white, size: 30),
+          Flexible(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4.0),
+              child: Icon(profileTask.icon, color: Colors.white, size: 30),
+            ),
           ),
-          Text(
-            profileTask.title,
-            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          Flexible(
+            child: Text(
+              profileTask.title,
+              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            ),
           ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8.0),
-            child: Text(profileTask.subtitle, style: const TextStyle(color: Colors.grey, fontSize: 12), textAlign: TextAlign.center),
+          Flexible(
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: Text(profileTask.subtitle, style: const TextStyle(color: Colors.grey, fontSize: 12), textAlign: TextAlign.center),
+            ),
           ),
-          ElevatedButton(
-            onPressed: () => onAction(),
-            child: Text(profileTask.buttonText),
+          Flexible(
+            child: ElevatedButton(
+              onPressed: () => onAction(),
+              child: Text(profileTask.buttonText),
+            ),
           )
         ],
       ),

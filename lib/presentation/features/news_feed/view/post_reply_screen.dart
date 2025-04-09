@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:akropolis/data/models/dto_models/dto_models.dart';
 import 'package:akropolis/main.dart';
 import 'package:akropolis/presentation/features/create_post/models/create_post_models.dart';
 import 'package:akropolis/presentation/features/news_feed/models/reply_post_state.dart';
@@ -60,8 +61,28 @@ class _PostReplyScreenPageState extends State<PostReplyScreenPage> {
         listenable: replyPostViewModel,
         builder: (_, __) {
           return replyPostViewModel.replyPostState.map(
-            loading: (_) => const InfiniteLoader(),
-            idlePostState: (_) => Center(child: const Text("Idle")),
+            loading: (l) {
+              return Center(
+                child: Builder(
+                  builder: (context) {
+                    if (l.progress == null) {
+                      return const Text("Loading ...");
+                    }
+                    return Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        const Text("Uploading reply"),
+                        CircularFiniteLoader(progress: l.progress!),
+                      ],
+                    );
+                  },
+                ),
+              );
+            },
+            idlePostState: (_) => const Center(
+              child: Text("Idle"),
+            ),
             errorState: (e) => Text(e.failure.message),
             editingVideo: (l) {
               return Flex(
@@ -83,18 +104,17 @@ class _PostReplyScreenPageState extends State<PostReplyScreenPage> {
                                   required Duration end,
                                 }) {
                                   log.debug("Modifying trim video");
-      
+
                                   replyPostViewModel.trimVideo(
                                     startTime: start,
                                     endTime: end,
                                   );
-
                                 },
                               ),
                             VideoEditingTools.thumbnailPicker => ThumbnailVideoWidget(
                                 selectedThumbnail: l.selectedThumbnail,
                                 videoThumbnails: l.videoThumbnails,
-                                onSelect:replyPostViewModel.modifyThumbnail,
+                                onSelect: replyPostViewModel.modifyThumbnail,
                               ),
                           },
                         ),
@@ -103,22 +123,23 @@ class _PostReplyScreenPageState extends State<PostReplyScreenPage> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: VideoEditingTools.values
-                                .map((t) => Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                IconButton(
-                                  onPressed: () {
-                                    widget.replyPostViewModel.changeCurrentTool(t);
-                                  },
-                                  icon: Icon(t.iconData),
-                                  color: t == l.currentTool ? primaryColor : Colors.white70,
-                                ),
-                                Text(t.title),
-                              ],
-                            ),
-                            )
+                                .map(
+                                  (t) => Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      IconButton(
+                                        onPressed: () {
+                                          widget.replyPostViewModel.changeCurrentTool(t);
+                                        },
+                                        icon: Icon(t.iconData),
+                                        color: t == l.currentTool ? primaryColor : Colors.white70,
+                                      ),
+                                      Text(t.title),
+                                    ],
+                                  ),
+                                )
                                 .toList(),
                           ),
                         ),
@@ -141,5 +162,4 @@ class _PostReplyScreenPageState extends State<PostReplyScreenPage> {
       ),
     );
   }
-
 }

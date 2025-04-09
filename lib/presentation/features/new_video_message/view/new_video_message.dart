@@ -51,29 +51,39 @@ class _NewVideoMessageScreenState extends State<NewVideoMessageScreen> {
         listenable: newVideoMessageViewModel,
         builder: (_, __) {
           return newVideoMessageViewModel.newVideoState.map(
-            loading: (_) => const InfiniteLoader(),
-            idlePostState: (_) => Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 4.0),
-                  child: Text(
-                    "Message sent",
-                    textAlign: TextAlign.center,
-                  ),
+            loading: (l) {
+              return Center(
+                child: Builder(
+                  builder: (context) {
+                    if (l.progress == null) {
+                      return const Text("Loading ...");
+                    }
+                    return Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        const Text("Uploading post"),
+                        CircularFiniteLoader(progress: l.progress!),
+                      ],
+                    );
+                  },
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(30),
-                  child: ElevatedButton(
-                    onPressed: Navigator.of(context).pop,
-                    child: const Text("Back to chat"),
-                  ),
-                ),
-              ],
-            ),
+              );
+            },
+            idlePostState: (_) {
+              return const Center(
+                child: Text("..."),
+              );
+            },
             errorState: (e) => Text(e.failure.message),
+            successState: (s) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                Navigator.of(context).pop();
+              });
+              return const Center(
+                child: Text("Posted"),
+              );
+            },
             editingVideo: (l) {
               return Flex(
                 direction: Axis.vertical,

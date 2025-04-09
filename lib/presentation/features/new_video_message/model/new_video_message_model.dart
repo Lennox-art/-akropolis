@@ -16,6 +16,7 @@ class NewVideoMessageState with _$NewVideoMessageState {
   const factory NewVideoMessageState.errorState({required AppFailure failure}) = ErrorNewVideoMessageState;
 
   const factory NewVideoMessageState.idlePostState() = IdleNewVideoMessageState;
+  const factory NewVideoMessageState.successState() = SuccessNewVideoMessageState;
 
   const factory NewVideoMessageState.editingVideo({
     required File video,
