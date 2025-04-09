@@ -92,7 +92,7 @@ class _NewThreadScreenState extends State<NewThreadScreen> {
 
                         if (!context.mounted) return;
 
-                        Navigator.of(context).pushNamed(
+                        Navigator.of(context).pushReplacementNamed(
                           AppRoutes.newVideoMessage.path,
                           arguments: NewVideoMessageData(
                             null,

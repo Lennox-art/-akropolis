@@ -563,7 +563,7 @@ class FirestoreRemoteStorageService extends RemoteDataStorageService {
   }) async {
     try {
       var q1 = threadCollectionRef.where('participant1', isEqualTo: participant1).where('participant2', isEqualTo: participant2).limit(1);
-      var q2 = threadCollectionRef.where('participant2', isEqualTo: participant2).where('participant2', isEqualTo: participant1).limit(1);
+      var q2 = threadCollectionRef.where('participant1', isEqualTo: participant2).where('participant2', isEqualTo: participant1).limit(1);
 
       var result = await Future.wait([q1.get(), q2.get()]);
       ThreadRemote? remoteThread = result.expand((r) => r.docs.map((d) => d.data() as ThreadRemote)).firstOrNull;

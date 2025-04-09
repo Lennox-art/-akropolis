@@ -179,7 +179,7 @@ class NewVideoMessageViewModel extends ChangeNotifier {
         case Success<void>():
           _newVideoState = const SuccessNewVideoMessageState();
           _toastMessageStream.add(
-            const ToastSuccess(title: "New Message", message: "New message sent successfully"),
+            const ToastSuccess(title: "New Message", message: "New message posted"),
           );
           break;
 

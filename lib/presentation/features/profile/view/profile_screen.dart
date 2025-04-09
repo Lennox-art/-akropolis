@@ -259,8 +259,9 @@ class FinishProfileWidget extends StatelessWidget {
       },
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        mainAxisSpacing: 10,
-        crossAxisSpacing: 10,
+        mainAxisSpacing: 15,
+        crossAxisSpacing: 15,
+        mainAxisExtent: 200,
       ),
     );
   }

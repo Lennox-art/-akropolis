@@ -292,9 +292,23 @@ class ThreadRemote implements Comparable<ThreadRemote> {
     required this.updatedAt,
   });
 
-  factory ThreadRemote.fromJson(Map<String, dynamic> json) => _$ThreadRemoteFromJson(json);
+  factory ThreadRemote.fromJson(Map<String, dynamic> json) => ThreadRemote(
+    id: json['id'] as String,
+    participant1: json['participant1'] as String,
+    participant2: json['participant2'] as String,
+    accepted: json['accepted'] as bool? ?? false,
+    createdAt: DateTime.parse(json['createdAt']),
+    updatedAt: (json['updatedAt'] as Timestamp).toDate(),
+  );
 
-  Map<String, dynamic> toJson() => _$ThreadRemoteToJson(this);
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'participant1': participant1,
+    'participant2': participant2,
+    'accepted': accepted,
+    'createdAt': createdAt.toIso8601String(),
+    'updatedAt': Timestamp.fromDate(updatedAt),
+  };
 
   @override
   int compareTo(ThreadRemote other) {

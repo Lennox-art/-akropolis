@@ -150,20 +150,23 @@ class _ThreadsScreenState extends State<ThreadsScreen> {
                   ),
                 ),
                 Flexible(
-                  child: ListView(
-                    shrinkWrap: true,
-                    children: [
-                      Text("Connects"),
-                      ...widget.threadViewModel.connectList.map(
-                        (e) => ListTile(
-                          leading: CircleAvatar(
-                            backgroundImage: NetworkImage(e.imageUrl),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 14.0),
+                    child: ListView(
+                      shrinkWrap: true,
+                      children: [
+                        Text("Connects"),
+                        ...widget.threadViewModel.connectList.map(
+                          (e) => ListTile(
+                            leading: CircleAvatar(
+                              backgroundImage: NetworkImage(e.imageUrl),
+                            ),
+                            title: Text(e.name),
+                            subtitle: Text(e.message),
                           ),
-                          title: Text(e.name),
-                          subtitle: Text(e.message),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ],

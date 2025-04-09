@@ -62,7 +62,10 @@ class _NewVideoMessageScreenState extends State<NewVideoMessageScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        const Text("Uploading post"),
+                        const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text("Sending message"),
+                        ),
                         CircularFiniteLoader(progress: l.progress!),
                       ],
                     );
