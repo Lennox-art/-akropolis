@@ -155,7 +155,7 @@ class _ThreadsScreenState extends State<ThreadsScreen> {
                     child: ListView(
                       shrinkWrap: true,
                       children: [
-                        Text("Connects"),
+                        const Text("Connects"),
                         ...widget.threadViewModel.connectList.map(
                           (e) => ListTile(
                             leading: CircleAvatar(
