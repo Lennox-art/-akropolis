@@ -21,7 +21,7 @@ class HomeViewModel extends ChangeNotifier {
   final StreamController<HomeState> _onHomeStateStreamController = StreamController.broadcast();
 
   final List<BottomNavigationTabs> _bottomTabs = BottomNavigationTabs.values;
-  BottomNavigationTabs _currentTab = BottomNavigationTabs.newsFeed;
+  BottomNavigationTabs _currentTab = BottomNavigationTabs.search;
 
   HomeState _homeState = const InitialHomeState();
 

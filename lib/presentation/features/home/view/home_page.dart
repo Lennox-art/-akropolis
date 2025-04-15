@@ -12,6 +12,8 @@ import 'package:akropolis/presentation/features/news_feed/view/news_feed_tab.dar
 import 'package:akropolis/presentation/features/news_feed/view_models/news_feed_view_model.dart';
 import 'package:akropolis/presentation/features/profile/view/profile_screen.dart';
 import 'package:akropolis/presentation/features/profile/view_model/profile_view_model.dart';
+import 'package:akropolis/presentation/features/search/view/search_screen.dart';
+import 'package:akropolis/presentation/features/search/view_model/search_view_model.dart';
 import 'package:akropolis/presentation/features/threads/view/threads_screen.dart';
 import 'package:akropolis/presentation/features/threads/view_model/thread_view_model.dart';
 import 'package:akropolis/presentation/routes/routes.dart';
@@ -98,7 +100,11 @@ class _HomePageState extends State<HomePage> {
                               GetIt.I(),
                             ),
                           ),
-                        BottomNavigationTabs.search => const SizedBox.shrink(),
+                        BottomNavigationTabs.search => SearchScreen(
+                          searchViewModel: SearchViewModel(
+                            postRepository: GetIt.I(),
+                          ),
+                        ),
                         BottomNavigationTabs.post => const SizedBox.shrink(),
                         BottomNavigationTabs.chat => ThreadsScreen(
                             threadViewModel: ThreadViewModel(

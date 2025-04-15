@@ -23,8 +23,6 @@ class ThreadsScreen extends StatefulWidget {
 
 class _ThreadsScreenState extends State<ThreadsScreen> {
 
-
-
   double get _radius => 38;
 
   @override
@@ -58,7 +56,6 @@ class _ThreadsScreenState extends State<ThreadsScreen> {
           ),
         ],
       ),
-
       body: ListenableBuilder(
         listenable: widget.threadViewModel,
         builder: (_, __) {
