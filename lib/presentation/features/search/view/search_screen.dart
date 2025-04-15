@@ -1,8 +1,11 @@
+import 'package:akropolis/data/models/remote_models/remote_models.dart';
+import 'package:akropolis/presentation/features/search/model/search_model.dart';
 import 'package:akropolis/presentation/features/search/view_model/search_view_model.dart';
+import 'package:akropolis/presentation/ui/components/loader.dart';
 import 'package:flutter/material.dart';
 
 class SearchScreen extends StatelessWidget {
-   SearchScreen({
+  SearchScreen({
     required this.searchViewModel,
     super.key,
   });
@@ -20,7 +23,10 @@ class SearchScreen extends StatelessWidget {
       body: ListenableBuilder(
         listenable: searchViewModel,
         builder: (_, __) {
-          return ListView(
+          List<NewsPost> newsPosts = searchViewModel.searchedPosts;
+          SearchState state = searchViewModel.state;
+          return Flex(
+            direction: Axis.vertical,
             children: [
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 10),
@@ -38,7 +44,6 @@ class SearchScreen extends StatelessWidget {
                   hintText: "Search feeds",
                 ),
               ),
-
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
@@ -55,6 +60,41 @@ class SearchScreen extends StatelessWidget {
                     );
                   }).toList(),
                 ),
+              ),
+              Expanded(
+                child: switch (state) {
+                  LoadingSearchState() => const InfiniteLoader(),
+                  LoadedSearchState() => Visibility(
+                    visible: newsPosts.isNotEmpty,
+                    replacement: Center(
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            const Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: Icon(
+                                Icons.search,
+                                size: 40,
+                              ),
+                            ),
+                            Text(state.showNotFound ? "No search results Found!" : "Search for a post"),
+                          ],
+                        ),
+                      ),
+                    ),
+                    child: ListView.builder(
+                      itemCount: newsPosts.length,
+                      itemBuilder: (_, i) {
+                        NewsPost post = newsPosts[i];
+                        return ListTile(
+                          title: Text(post.title),
+                        );
+                      },
+                    ),
+                  ),
+                },
               ),
             ],
           );

@@ -6,7 +6,7 @@ part 'search_model.freezed.dart';
 sealed class SearchState with _$SearchState {
   const factory SearchState.loading() = LoadingSearchState;
 
-  const factory SearchState.loaded() = LoadedSearchState;
+  const factory SearchState.loaded({@Default(false) bool showNotFound}) = LoadedSearchState;
 }
 
 enum SearchCategory {

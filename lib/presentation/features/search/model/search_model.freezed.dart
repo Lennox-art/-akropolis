@@ -18,43 +18,37 @@ final _privateConstructorUsedError = UnsupportedError(
 mixin _$SearchState {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function() initial,
     required TResult Function() loading,
-    required TResult Function() loaded,
+    required TResult Function(bool showNotFound) loaded,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? initial,
     TResult? Function()? loading,
-    TResult? Function()? loaded,
+    TResult? Function(bool showNotFound)? loaded,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? initial,
     TResult Function()? loading,
-    TResult Function()? loaded,
+    TResult Function(bool showNotFound)? loaded,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(InitialSearchState value) initial,
     required TResult Function(LoadingSearchState value) loading,
     required TResult Function(LoadedSearchState value) loaded,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(InitialSearchState value)? initial,
     TResult? Function(LoadingSearchState value)? loading,
     TResult? Function(LoadedSearchState value)? loaded,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(InitialSearchState value)? initial,
     TResult Function(LoadingSearchState value)? loading,
     TResult Function(LoadedSearchState value)? loaded,
     required TResult orElse(),
@@ -81,117 +75,6 @@ class _$SearchStateCopyWithImpl<$Res, $Val extends SearchState>
 
   /// Create a copy of SearchState
   /// with the given fields replaced by the non-null parameter values.
-}
-
-/// @nodoc
-abstract class _$$InitialSearchStateImplCopyWith<$Res> {
-  factory _$$InitialSearchStateImplCopyWith(_$InitialSearchStateImpl value,
-          $Res Function(_$InitialSearchStateImpl) then) =
-      __$$InitialSearchStateImplCopyWithImpl<$Res>;
-}
-
-/// @nodoc
-class __$$InitialSearchStateImplCopyWithImpl<$Res>
-    extends _$SearchStateCopyWithImpl<$Res, _$InitialSearchStateImpl>
-    implements _$$InitialSearchStateImplCopyWith<$Res> {
-  __$$InitialSearchStateImplCopyWithImpl(_$InitialSearchStateImpl _value,
-      $Res Function(_$InitialSearchStateImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of SearchState
-  /// with the given fields replaced by the non-null parameter values.
-}
-
-/// @nodoc
-
-class _$InitialSearchStateImpl implements InitialSearchState {
-  const _$InitialSearchStateImpl();
-
-  @override
-  String toString() {
-    return 'SearchState.initial()';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is _$InitialSearchStateImpl);
-  }
-
-  @override
-  int get hashCode => runtimeType.hashCode;
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() initial,
-    required TResult Function() loading,
-    required TResult Function() loaded,
-  }) {
-    return initial();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? initial,
-    TResult? Function()? loading,
-    TResult? Function()? loaded,
-  }) {
-    return initial?.call();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? initial,
-    TResult Function()? loading,
-    TResult Function()? loaded,
-    required TResult orElse(),
-  }) {
-    if (initial != null) {
-      return initial();
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(InitialSearchState value) initial,
-    required TResult Function(LoadingSearchState value) loading,
-    required TResult Function(LoadedSearchState value) loaded,
-  }) {
-    return initial(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(InitialSearchState value)? initial,
-    TResult? Function(LoadingSearchState value)? loading,
-    TResult? Function(LoadedSearchState value)? loaded,
-  }) {
-    return initial?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(InitialSearchState value)? initial,
-    TResult Function(LoadingSearchState value)? loading,
-    TResult Function(LoadedSearchState value)? loaded,
-    required TResult orElse(),
-  }) {
-    if (initial != null) {
-      return initial(this);
-    }
-    return orElse();
-  }
-}
-
-abstract class InitialSearchState implements SearchState {
-  const factory InitialSearchState() = _$InitialSearchStateImpl;
 }
 
 /// @nodoc
@@ -235,9 +118,8 @@ class _$LoadingSearchStateImpl implements LoadingSearchState {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function() initial,
     required TResult Function() loading,
-    required TResult Function() loaded,
+    required TResult Function(bool showNotFound) loaded,
   }) {
     return loading();
   }
@@ -245,9 +127,8 @@ class _$LoadingSearchStateImpl implements LoadingSearchState {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? initial,
     TResult? Function()? loading,
-    TResult? Function()? loaded,
+    TResult? Function(bool showNotFound)? loaded,
   }) {
     return loading?.call();
   }
@@ -255,9 +136,8 @@ class _$LoadingSearchStateImpl implements LoadingSearchState {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? initial,
     TResult Function()? loading,
-    TResult Function()? loaded,
+    TResult Function(bool showNotFound)? loaded,
     required TResult orElse(),
   }) {
     if (loading != null) {
@@ -269,7 +149,6 @@ class _$LoadingSearchStateImpl implements LoadingSearchState {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(InitialSearchState value) initial,
     required TResult Function(LoadingSearchState value) loading,
     required TResult Function(LoadedSearchState value) loaded,
   }) {
@@ -279,7 +158,6 @@ class _$LoadingSearchStateImpl implements LoadingSearchState {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(InitialSearchState value)? initial,
     TResult? Function(LoadingSearchState value)? loading,
     TResult? Function(LoadedSearchState value)? loaded,
   }) {
@@ -289,7 +167,6 @@ class _$LoadingSearchStateImpl implements LoadingSearchState {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(InitialSearchState value)? initial,
     TResult Function(LoadingSearchState value)? loading,
     TResult Function(LoadedSearchState value)? loaded,
     required TResult orElse(),
@@ -310,6 +187,8 @@ abstract class _$$LoadedSearchStateImplCopyWith<$Res> {
   factory _$$LoadedSearchStateImplCopyWith(_$LoadedSearchStateImpl value,
           $Res Function(_$LoadedSearchStateImpl) then) =
       __$$LoadedSearchStateImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({bool showNotFound});
 }
 
 /// @nodoc
@@ -322,57 +201,82 @@ class __$$LoadedSearchStateImplCopyWithImpl<$Res>
 
   /// Create a copy of SearchState
   /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? showNotFound = null,
+  }) {
+    return _then(_$LoadedSearchStateImpl(
+      showNotFound: null == showNotFound
+          ? _value.showNotFound
+          : showNotFound // ignore: cast_nullable_to_non_nullable
+              as bool,
+    ));
+  }
 }
 
 /// @nodoc
 
 class _$LoadedSearchStateImpl implements LoadedSearchState {
-  const _$LoadedSearchStateImpl();
+  const _$LoadedSearchStateImpl({this.showNotFound = false});
+
+  @override
+  @JsonKey()
+  final bool showNotFound;
 
   @override
   String toString() {
-    return 'SearchState.loaded()';
+    return 'SearchState.loaded(showNotFound: $showNotFound)';
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is _$LoadedSearchStateImpl);
+        (other.runtimeType == runtimeType &&
+            other is _$LoadedSearchStateImpl &&
+            (identical(other.showNotFound, showNotFound) ||
+                other.showNotFound == showNotFound));
   }
 
   @override
-  int get hashCode => runtimeType.hashCode;
+  int get hashCode => Object.hash(runtimeType, showNotFound);
+
+  /// Create a copy of SearchState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$LoadedSearchStateImplCopyWith<_$LoadedSearchStateImpl> get copyWith =>
+      __$$LoadedSearchStateImplCopyWithImpl<_$LoadedSearchStateImpl>(
+          this, _$identity);
 
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function() initial,
     required TResult Function() loading,
-    required TResult Function() loaded,
+    required TResult Function(bool showNotFound) loaded,
   }) {
-    return loaded();
+    return loaded(showNotFound);
   }
 
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? initial,
     TResult? Function()? loading,
-    TResult? Function()? loaded,
+    TResult? Function(bool showNotFound)? loaded,
   }) {
-    return loaded?.call();
+    return loaded?.call(showNotFound);
   }
 
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? initial,
     TResult Function()? loading,
-    TResult Function()? loaded,
+    TResult Function(bool showNotFound)? loaded,
     required TResult orElse(),
   }) {
     if (loaded != null) {
-      return loaded();
+      return loaded(showNotFound);
     }
     return orElse();
   }
@@ -380,7 +284,6 @@ class _$LoadedSearchStateImpl implements LoadedSearchState {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(InitialSearchState value) initial,
     required TResult Function(LoadingSearchState value) loading,
     required TResult Function(LoadedSearchState value) loaded,
   }) {
@@ -390,7 +293,6 @@ class _$LoadedSearchStateImpl implements LoadedSearchState {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(InitialSearchState value)? initial,
     TResult? Function(LoadingSearchState value)? loading,
     TResult? Function(LoadedSearchState value)? loaded,
   }) {
@@ -400,7 +302,6 @@ class _$LoadedSearchStateImpl implements LoadedSearchState {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(InitialSearchState value)? initial,
     TResult Function(LoadingSearchState value)? loading,
     TResult Function(LoadedSearchState value)? loaded,
     required TResult orElse(),
@@ -413,5 +314,14 @@ class _$LoadedSearchStateImpl implements LoadedSearchState {
 }
 
 abstract class LoadedSearchState implements SearchState {
-  const factory LoadedSearchState() = _$LoadedSearchStateImpl;
+  const factory LoadedSearchState({final bool showNotFound}) =
+      _$LoadedSearchStateImpl;
+
+  bool get showNotFound;
+
+  /// Create a copy of SearchState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$LoadedSearchStateImplCopyWith<_$LoadedSearchStateImpl> get copyWith =>
+      throw _privateConstructorUsedError;
 }
