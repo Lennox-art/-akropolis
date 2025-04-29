@@ -42,15 +42,18 @@ abstract class RemoteDataStorageService {
   /// Possible Failures:
   Future<Result<List<NewsPost>>> fetchUserPostsNews({required int pageSize, required List<String> keywords});
 
+
   /// Function:
   /// Returns:
   /// Possible Failures:
   Future<Result<List<NewsPost>>> fetchWorldNews({required int pageSize, String? country, required List<String> keywords});
 
+
   /// Function:
   /// Returns:
   /// Possible Failures:
   Future<Result<List<PostComment>>> fetchPostComments({required int pageSize, required String collection, required String postId});
+
 
   /// Function:
   /// Returns:

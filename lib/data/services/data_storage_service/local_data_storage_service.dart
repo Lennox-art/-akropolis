@@ -18,4 +18,26 @@ abstract class LocalDataStorageService {
     required String url,
   });
 
+  /// Function: [fetchNotifications], fetches [LocalNotification] associated with paging data
+  /// Returns: [Result.success], if data has been found
+  /// Possible Failures: [FailureType.databaseFailure]
+  Future<Result<List<LocalNotification>>> fetchNotifications({
+    required int page,
+    required int pageSize,
+  });
+
+  /// Function: [saveLocalNotification], saves [LocalNotification] associated by a unique notification id [LocalNotification.id]
+  /// Returns: [Result.success], if [notification] has been saved
+  /// Possible Failures: [FailureType.databaseFailure]
+  Future<Result<LocalNotification>> saveLocalNotification({
+    required LocalNotification notification,
+  });
+
+  /// Function: [deleteLocalNotification], deleted [LocalNotification] associated by a unique notification id [LocalNotification.id]
+  /// Returns: [Result.success], if [notification] has been deleted
+  /// Possible Failures: [FailureType.databaseFailure]
+  Future<Result<void>> deleteLocalNotification({
+    required int notificationId,
+  });
+
 }

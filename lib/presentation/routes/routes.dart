@@ -33,6 +33,8 @@ import 'package:akropolis/presentation/features/news_feed/view/post_reply_screen
 import 'package:akropolis/presentation/features/news_feed/view_models/news_detail_post_view_model.dart';
 import 'package:akropolis/presentation/features/news_feed/view_models/post_comment_detail_post_view_model.dart';
 import 'package:akropolis/presentation/features/news_feed/view_models/reply_post_view_model.dart';
+import 'package:akropolis/presentation/features/notifications/view/notifications_screen.dart';
+import 'package:akropolis/presentation/features/notifications/view_model/notifications_view_model.dart';
 import 'package:akropolis/presentation/features/on_boarding/view/select_default_preferences.dart';
 import 'package:akropolis/presentation/features/on_boarding/view/select_topic.dart';
 import 'package:akropolis/presentation/features/on_boarding/view/welcome_screen.dart';
@@ -70,7 +72,8 @@ enum AppRoutes {
   newVideoMessage("/newVideoMessage"),
   chat("/chat"),
   chatMessage("/chatMessage"),
-  chatMessageSettings("/chatMessageSettings");
+  chatMessageSettings("/chatMessageSettings"),
+  notifications("/notifications");
 
   final String path;
 
@@ -234,6 +237,11 @@ enum AppRoutes {
         AppRoutes.chatMessageSettings => ChatSettingsScreen(
             chatSettingsViewModel: ChatSettingsViewModel(
               user: ModalRoute.of(context)!.settings.arguments as AppUser,
+            ),
+          ),
+        AppRoutes.notifications => NotificationsScreen(
+            notificationsViewModel: NotificationsViewModel(
+              notificationRepository: GetIt.I(),
             ),
           ),
       };

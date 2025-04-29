@@ -45,3 +45,58 @@ class LocalFileCacheAdapter extends TypeAdapter<LocalFileCache> {
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
+
+class LocalNotificationAdapter extends TypeAdapter<LocalNotification> {
+  @override
+  final int typeId = 29;
+
+  @override
+  LocalNotification read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return LocalNotification(
+      id: fields[0] as int,
+      title: fields[1] as String,
+      subTitle: fields[2] as String,
+      body: fields[3] as String,
+      payload: fields[4] as String?,
+      groupKey: fields[5] as String,
+      channel: fields[6] as NotificationChannel,
+      addedAt: fields[7] as DateTime,
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, LocalNotification obj) {
+    writer
+      ..writeByte(8)
+      ..writeByte(0)
+      ..write(obj.id)
+      ..writeByte(1)
+      ..write(obj.title)
+      ..writeByte(2)
+      ..write(obj.subTitle)
+      ..writeByte(3)
+      ..write(obj.body)
+      ..writeByte(4)
+      ..write(obj.payload)
+      ..writeByte(5)
+      ..write(obj.groupKey)
+      ..writeByte(6)
+      ..write(obj.channel)
+      ..writeByte(7)
+      ..write(obj.addedAt);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is LocalNotificationAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}

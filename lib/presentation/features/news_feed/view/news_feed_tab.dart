@@ -106,20 +106,21 @@ class _NewsFeedTabState extends State<NewsFeedTab> {
                   listenable: widget.homeViewModel,
                   builder: (_, __) {
                     return widget.homeViewModel.homeState.map(
-                      initial: (_) => Assets.profilePic.svg(),
-                      error: (e) => Text(e.failure.message),
-                      loading: (_) => const InfiniteLoader(),
-                      ready: (r) {
-                        String? profilePicture = r.appUser.profilePicture;
-                        if (profilePicture == null) {
-                          return Assets.profilePic.svg();
-                        }
+                          initial: (_) => Assets.profilePic.svg(),
+                          error: (e) => Text(e.failure.message),
+                          loading: (_) => const InfiniteLoader(),
+                          ready: (r) {
+                            String? profilePicture = r.appUser.profilePicture;
+                            if (profilePicture == null) {
+                              return Assets.profilePic.svg();
+                            }
 
-                        return CircleAvatar(
-                          backgroundImage: CachedNetworkImageProvider(profilePicture),
-                        );
-                      },
-                    ) ?? const SizedBox.shrink();
+                            return CircleAvatar(
+                              backgroundImage: CachedNetworkImageProvider(profilePicture),
+                            );
+                          },
+                        ) ??
+                        const SizedBox.shrink();
                   },
                 ),
               ),
@@ -129,12 +130,22 @@ class _NewsFeedTabState extends State<NewsFeedTab> {
                     widget.homeViewModel.logout();
                     Navigator.of(context).pushNamedAndRemoveUntil(
                       AppRoutes.login.path,
-                          (_) => false,
+                      (_) => false,
                     );
                   },
                   icon: const Icon(
                     Icons.logout_outlined,
                     color: Colors.red,
+                  ),
+                ),
+                IconButton(
+                  onPressed: () {
+                    Navigator.of(context).pushNamed(
+                      AppRoutes.notifications.path,
+                    );
+                  },
+                  icon: const Icon(
+                    Icons.notifications_outlined,
                   ),
                 ),
               ],
@@ -184,7 +195,7 @@ class _NewsFeedTabState extends State<NewsFeedTab> {
                         ),
                       ),
                       ...widget.newsFeedViewModel.stories.map(
-                            (i) => Padding(
+                        (i) => Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
@@ -226,108 +237,108 @@ class _NewsFeedTabState extends State<NewsFeedTab> {
                   itemBuilder: (context, itemIndex, realIndex) {
                     return switch (itemIndex) {
                       0 => Card(
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Flex(
-                            direction: Axis.horizontal,
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              Expanded(
-                                flex: 3,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text("Emblems"),
-                                    Text(
-                                      "0/38",
-                                      style: theme.textTheme.headlineSmall?.copyWith(
-                                        fontSize: 20,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Flex(
+                              direction: Axis.horizontal,
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Expanded(
+                                  flex: 3,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      const Text("Emblems"),
+                                      Text(
+                                        "0/38",
+                                        style: theme.textTheme.headlineSmall?.copyWith(
+                                          fontSize: 20,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Align(
+                                    alignment: Alignment.bottomRight,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(bottom: 12.0),
+                                      child: Assets.present.svg(
+                                        width: 30,
+                                        height: 30,
                                       ),
                                     ),
-                                  ],
-                                ),
-                              ),
-                              Expanded(
-                                child: Align(
-                                  alignment: Alignment.bottomRight,
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(bottom: 12.0),
-                                    child: Assets.present.svg(
-                                      width: 30,
-                                      height: 30,
-                                    ),
                                   ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
-                      ),
                       1 => Card(
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Flex(
-                            direction: Axis.horizontal,
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              const Expanded(
-                                flex: 3,
-                                child: Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Text(
-                                    "See what's trending today",
-                                    style: TextStyle(
-                                      height: 1.54,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Flex(
+                              direction: Axis.horizontal,
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                const Expanded(
+                                  flex: 3,
+                                  child: Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                      "See what's trending today",
+                                      style: TextStyle(
+                                        height: 1.54,
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                              Expanded(
-                                child: Align(
-                                  alignment: Alignment.bottomRight,
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(bottom: 12.0),
-                                    child: Assets.flame.svg(
-                                      width: 30,
-                                      height: 30,
+                                Expanded(
+                                  child: Align(
+                                    alignment: Alignment.bottomRight,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(bottom: 12.0),
+                                      child: Assets.flame.svg(
+                                        width: 30,
+                                        height: 30,
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
-                      ),
                       2 => Card(
-                        child: Padding(
-                          padding: const EdgeInsets.only(
-                            left: 8.0,
-                            right: 8.0,
-                            top: 18.0,
-                            bottom: 18.0,
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                "Today View Count",
-                                textAlign: TextAlign.start,
-                              ),
-                              Text(
-                                "1.1K views",
-                                textAlign: TextAlign.start,
-                                style: theme.textTheme.headlineSmall?.copyWith(
-                                  fontSize: 20,
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                              left: 8.0,
+                              right: 8.0,
+                              top: 18.0,
+                              bottom: 18.0,
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  "Today View Count",
+                                  textAlign: TextAlign.start,
                                 ),
-                              ),
-                            ],
+                                Text(
+                                  "1.1K views",
+                                  textAlign: TextAlign.start,
+                                  style: theme.textTheme.headlineSmall?.copyWith(
+                                    fontSize: 20,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
                       _ => const SizedBox.shrink(),
                     };
                   },
@@ -391,9 +402,9 @@ class _NewsFeedTabState extends State<NewsFeedTab> {
                   tabs: widget.newsFeedViewModel.allTabs
                       .map(
                         (t) => Tab(
-                      text: "${t.title} ${t == NewsFeedTabEnum.local ? "(${deviceCountry ?? ''})" : ""}",
-                    ),
-                  )
+                          text: "${t.title} ${t == NewsFeedTabEnum.local ? "(${deviceCountry ?? ''})" : ""}",
+                        ),
+                      )
                       .toList(),
                 ),
               ),
@@ -404,34 +415,33 @@ class _NewsFeedTabState extends State<NewsFeedTab> {
           children: widget.newsFeedViewModel.allTabs
               .map(
                 (t) => switch (t) {
-              NewsFeedTabEnum.forYou => ForYouContent(
-                forYouViewModel: forYouViewModel,
-                currentUser: widget.currentUser,
-                fetchPostCommentsUseCase: widget.newsFeedViewModel.fetchPostCommentsUseCase,
-              ),
-              NewsFeedTabEnum.worldNews => WorldNewsContent(
-                worldNewsViewModel: worldNewsViewModel,
-                currentUser: widget.currentUser,
-                fetchPostCommentsUseCase: widget.newsFeedViewModel.fetchPostCommentsUseCase,
-              ),
-              NewsFeedTabEnum.headlines => HeadlinesContent(
-                headlinesViewModel: headlinesViewModel,
-                currentUser: widget.currentUser,
-                fetchPostCommentsUseCase: widget.newsFeedViewModel.fetchPostCommentsUseCase,
-              ),
-              NewsFeedTabEnum.local => LocalNewsContent(
-                localNewsViewModel: localNewsViewModel,
-                currentUser: widget.currentUser,
-                fetchPostCommentsUseCase: widget.newsFeedViewModel.fetchPostCommentsUseCase,
-              ),
-            },
-          )
+                  NewsFeedTabEnum.forYou => ForYouContent(
+                      forYouViewModel: forYouViewModel,
+                      currentUser: widget.currentUser,
+                      fetchPostCommentsUseCase: widget.newsFeedViewModel.fetchPostCommentsUseCase,
+                    ),
+                  NewsFeedTabEnum.worldNews => WorldNewsContent(
+                      worldNewsViewModel: worldNewsViewModel,
+                      currentUser: widget.currentUser,
+                      fetchPostCommentsUseCase: widget.newsFeedViewModel.fetchPostCommentsUseCase,
+                    ),
+                  NewsFeedTabEnum.headlines => HeadlinesContent(
+                      headlinesViewModel: headlinesViewModel,
+                      currentUser: widget.currentUser,
+                      fetchPostCommentsUseCase: widget.newsFeedViewModel.fetchPostCommentsUseCase,
+                    ),
+                  NewsFeedTabEnum.local => LocalNewsContent(
+                      localNewsViewModel: localNewsViewModel,
+                      currentUser: widget.currentUser,
+                      fetchPostCommentsUseCase: widget.newsFeedViewModel.fetchPostCommentsUseCase,
+                    ),
+                },
+              )
               .toList(),
         ),
       ),
     );
   }
-
 }
 
 // Custom Delegate for SliverPersistentHeader

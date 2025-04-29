@@ -345,3 +345,61 @@ class MessageRemote  implements Comparable<MessageRemote> {
     return -createdAt.compareTo(other.createdAt);
   }
 }
+
+@JsonSerializable(createToJson: true)
+class FirebaseApiNotification {
+
+  @JsonKey(name: 'notification_id')
+  final String notificationId;
+
+  final String title;
+
+  @JsonKey(name: 'subtitle')
+  final String? subtitle;
+
+  @JsonKey(name: 'message')
+  final String? message;
+
+  @JsonKey(name: 'group_key')
+  final String? groupKey;
+
+  @JsonKey(name: 'notification_data')
+  final String notificationData;
+
+  @JsonKey(name: 'custom_data')
+  final String customData;
+
+  FirebaseApiNotification({
+    required this.notificationId,
+    required this.title,
+    this.subtitle,
+    this.message,
+    this.groupKey,
+    required this.notificationData,
+    required this.customData,
+  });
+
+  factory FirebaseApiNotification.fromJson(Map<String, dynamic> json) {
+    return FirebaseApiNotification(
+      notificationId: json['notification_id'] as String,
+      title: json['title'] as String,
+      subtitle: json['subtitle'] as String?,
+      message: json['message'] as String?,
+      groupKey: json['group_key'] as String?,
+      notificationData: json['notification_data'] as String,
+      customData: json['custom_data'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'notification_id': notificationId,
+      'title': title,
+      'subtitle': subtitle,
+      'message': message,
+      'group_key': groupKey,
+      'notification_data': notificationData,
+      'custom_data': customData,
+    };
+  }
+}

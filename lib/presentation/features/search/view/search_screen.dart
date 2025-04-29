@@ -65,35 +65,37 @@ class SearchScreen extends StatelessWidget {
                 child: switch (state) {
                   LoadingSearchState() => const InfiniteLoader(),
                   LoadedSearchState() => Visibility(
-                    visible: newsPosts.isNotEmpty,
-                    replacement: Center(
-                      child: Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            const Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: Icon(
-                                Icons.search,
-                                size: 40,
+                      visible: newsPosts.isNotEmpty,
+                      replacement: Center(
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              const Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: Icon(
+                                  Icons.search,
+                                  size: 40,
+                                ),
                               ),
-                            ),
-                            Text(state.showNotFound ? "No search results Found!" : "Search for a post"),
-                          ],
+                              Text(
+                                state.showNotFound ? "No search results Found!" : "Search for a post",
+                              ),
+                            ],
+                          ),
                         ),
                       ),
+                      child: ListView.builder(
+                        itemCount: newsPosts.length,
+                        itemBuilder: (_, i) {
+                          NewsPost post = newsPosts[i];
+                          return ListTile(
+                            title: Text(post.title),
+                          );
+                        },
+                      ),
                     ),
-                    child: ListView.builder(
-                      itemCount: newsPosts.length,
-                      itemBuilder: (_, i) {
-                        NewsPost post = newsPosts[i];
-                        return ListTile(
-                          title: Text(post.title),
-                        );
-                      },
-                    ),
-                  ),
                 },
               ),
             ],

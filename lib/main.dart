@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:akropolis/data/models/local_models/local_models.dart';
 import 'package:akropolis/data/repositories/authentication_repository/authentication_repository.dart';
 import 'package:akropolis/data/repositories/message_repository/message_repository.dart';
+import 'package:akropolis/data/repositories/notification_repository/notification_repository.dart';
 import 'package:akropolis/data/repositories/post_repository/post_repository.dart';
 import 'package:akropolis/data/repositories/topics_repository/topics_repository.dart';
 import 'package:akropolis/data/repositories/user_repository/user_repository.dart';
@@ -11,13 +12,16 @@ import 'package:akropolis/data/services/data_storage_service/local_data_storage_
 import 'package:akropolis/data/services/data_storage_service/remote_data_storage_service.dart';
 import 'package:akropolis/data/services/file_storage_service/local_file_storage_service.dart';
 import 'package:akropolis/data/services/file_storage_service/remote_file_storage_service.dart';
+import 'package:akropolis/data/services/notification_service/app_notification_service.dart';
 import 'package:akropolis/domain/repository_impl/authentication_repository_impl/authentication_repository_impl.dart';
 import 'package:akropolis/domain/repository_impl/message_repository_impl/message_repository_impl.dart';
+import 'package:akropolis/domain/repository_impl/notification_repository_impl/notification_repository_impl.dart';
 import 'package:akropolis/domain/repository_impl/post_respository_impl/post_repository_impl.dart';
 import 'package:akropolis/domain/repository_impl/topic_repository_impl/topic_repository_impl.dart';
 import 'package:akropolis/domain/repository_impl/user_repository_impl/user_repository_impl.dart';
 import 'package:akropolis/domain/service_impl/data_storage_service_impl/remote_data_storage_service_impl/firestore_remote_storage_service.dart';
 import 'package:akropolis/domain/service_impl/file_storage_service_impl/local_file_storage_service_impl/local_file_system_local_storage_service_impl.dart';
+import 'package:akropolis/domain/service_impl/notification_service_impl/local_app_notification_service_impl.dart';
 import 'package:akropolis/domain/use_cases/create_user_post_use_case.dart';
 import 'package:akropolis/domain/use_cases/fetch_post_comments_use_case.dart';
 import 'package:akropolis/domain/use_cases/get_media_use_case.dart';
@@ -27,7 +31,9 @@ import 'package:akropolis/presentation/features/news_feed/view_models/news_card_
 import 'package:akropolis/presentation/routes/routes.dart';
 import 'package:akropolis/presentation/ui/themes.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive/hive.dart';
@@ -47,6 +53,7 @@ final LoggingService log = getIt<LoggingService>();
 final ImagePicker picker = getIt<ImagePicker>();
 late final Directory temporaryDirectory;
 final String? deviceCountry = PlatformDispatcher.instance.locale.countryCode;
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 Future<void> main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
@@ -121,6 +128,26 @@ Future<void> main() async {
   );
   getIt.registerSingleton(messageRepository);
 
+
+  AppNotificationService localAppNotificationService = FlutterLocalNotificationServiceImpl(
+    notificationsPlugin: FlutterLocalNotificationsPlugin(),
+    settings: InitializationSettings(
+      android: AndroidInitializationSettings("@mipmap/ic_launcher"),
+      iOS:  DarwinInitializationSettings(
+        onDidReceiveLocalNotification: (id, title, body, payload) {
+          print("Local Notification received $id");
+        },
+      ),
+    ),
+  );
+
+  NotificationRepository notificationRepository = NotificationRepositoryImpl(
+    localAppNotificationService: localAppNotificationService,
+    localDataStorageService: localDataStorageService,
+    targetPlatform: defaultTargetPlatform,
+  );
+  getIt.registerSingleton(notificationRepository);
+
   ///Use cases
   FetchPostCommentsUseCase fetchPostCommentsUseCase = FetchPostCommentsUseCase(
     postRepository: postRepository,
@@ -173,12 +200,12 @@ class AkropolisApplication extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: navigatorKey,
       theme: lightTheme,
       debugShowCheckedModeBanner: false,
       initialRoute: AppRoutes.splashScreen.path,
       routes: {
         for (var r in AppRoutes.values) r.path: r.page,
-
       },
     );
   }
