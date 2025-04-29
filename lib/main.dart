@@ -128,21 +128,18 @@ Future<void> main() async {
   );
   getIt.registerSingleton(messageRepository);
 
-
-  AppNotificationService localAppNotificationService = FlutterLocalNotificationServiceImpl(
-    notificationsPlugin: FlutterLocalNotificationsPlugin(),
-    settings: InitializationSettings(
-      android: AndroidInitializationSettings("@mipmap/ic_launcher"),
-      iOS:  DarwinInitializationSettings(
-        onDidReceiveLocalNotification: (id, title, body, payload) {
-          print("Local Notification received $id");
-        },
+  NotificationRepository notificationRepository = NotificationRepositoryImpl(
+    localAppNotificationService: FlutterLocalNotificationServiceImpl(
+      notificationsPlugin: FlutterLocalNotificationsPlugin(),
+      settings: InitializationSettings(
+        android: const AndroidInitializationSettings("@mipmap/ic_launcher"),
+        iOS:  DarwinInitializationSettings(
+          onDidReceiveLocalNotification: (id, title, body, payload) {
+            print("Local Notification received $id");
+          },
+        ),
       ),
     ),
-  );
-
-  NotificationRepository notificationRepository = NotificationRepositoryImpl(
-    localAppNotificationService: localAppNotificationService,
     localDataStorageService: localDataStorageService,
     targetPlatform: defaultTargetPlatform,
   );
