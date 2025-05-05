@@ -125,7 +125,7 @@ class Author {
       };
 }
 
-class UserStory implements Comparable<UserStory>{
+class UserStory implements Comparable<UserStory> {
   final String id;
   final String thumbnailUrl;
   final String postUrl;
@@ -145,22 +145,22 @@ class UserStory implements Comparable<UserStory>{
   static String get collection => 'user_stories';
 
   factory UserStory.fromJson(Map<String, dynamic> json) => UserStory(
-    id: json['id'] as String,
-    thumbnailUrl: json['thumbnailUrl'] as String,
-    postUrl: json['postUrl'] as String,
-    author: Author.fromJson(json['author'] as Map<String, dynamic>),
-    viewers: (json['viewers'] as List<dynamic>).map((e) => e as String).toSet(),
-    createdAt: DateTime.parse(json['createdAt'] as String),
-  );
+        id: json['id'] as String,
+        thumbnailUrl: json['thumbnailUrl'] as String,
+        postUrl: json['postUrl'] as String,
+        author: Author.fromJson(json['author'] as Map<String, dynamic>),
+        viewers: (json['viewers'] as List<dynamic>).map((e) => e as String).toSet(),
+        createdAt: DateTime.parse(json['createdAt'] as String),
+      );
 
   Map<String, dynamic> toJson() => {
-    'id': id,
-    'thumbnailUrl': thumbnailUrl,
-    'postUrl': postUrl,
-    'author': author.toJson(),
-    'createdAt': createdAt.toIso8601String(),
-    'viewers': viewers.toList(),
-  };
+        'id': id,
+        'thumbnailUrl': thumbnailUrl,
+        'postUrl': postUrl,
+        'author': author.toJson(),
+        'createdAt': createdAt.toIso8601String(),
+        'viewers': viewers.toList(),
+      };
 
   @override
   int get hashCode => id.hashCode;
@@ -452,5 +452,28 @@ class FirebaseApiNotification {
       'notification_data': notificationData,
       'custom_data': customData,
     };
+  }
+}
+
+@JsonSerializable(createToJson: true)
+class Bookmark implements Comparable<Bookmark> {
+  final String id;
+  final DateTime createdAt;
+
+  Bookmark({required this.id, required this.createdAt});
+
+  factory Bookmark.fromJson(Map<String, dynamic> json) => Bookmark(
+        id: json['id'] as String,
+        createdAt: (json['createdAt'] as Timestamp).toDate(),
+      );
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'createdAt': Timestamp.fromDate(createdAt),
+      };
+
+  @override
+  int compareTo(Bookmark other) {
+    return createdAt.compareTo(other.createdAt);
   }
 }

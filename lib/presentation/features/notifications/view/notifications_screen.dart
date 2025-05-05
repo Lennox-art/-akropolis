@@ -50,7 +50,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           return Visibility(
             visible: notificationMap.isNotEmpty,
             replacement: const Center(
-              child: Text("You do not have notification yet"),
+              child: Text("You do not have notifications yet"),
             ),
             child: NotificationListener<ScrollNotification>(
               onNotification: (scrollInfo) {

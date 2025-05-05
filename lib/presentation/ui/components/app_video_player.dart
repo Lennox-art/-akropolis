@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:akropolis/data/utils/duration_style.dart';
+import 'package:akropolis/presentation/ui/components/loader.dart';
 import 'package:flutter/material.dart';
 
 import 'package:video_player/video_player.dart';
@@ -80,7 +81,7 @@ class _CachedVideoPlayerState extends State<CachedVideoPlayer> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(child: InfiniteLoader());
     }
 
     if (_chewieController == null || _videoController == null) {

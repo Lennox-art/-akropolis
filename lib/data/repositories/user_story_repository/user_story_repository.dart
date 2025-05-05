@@ -2,7 +2,7 @@ import 'package:akropolis/data/models/dto_models/dto_models.dart';
 import 'package:akropolis/data/models/remote_models/remote_models.dart';
 
 abstract class UserStoryRepository {
-  Future<Result<void>> addToViewers({required String userId, required String postId});
+  Future<Result<void>> addToViewers({required String userId, required String storyId});
 
   Future<Result<UserStory>> createUserStory({required UserStory userStory});
 

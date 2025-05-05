@@ -61,6 +61,7 @@ class _NewVideoMessageScreenState extends State<NewVideoMessageScreen> {
                     return Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.max,
                       children: [
                         const Padding(
                           padding: EdgeInsets.all(8.0),

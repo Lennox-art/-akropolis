@@ -235,10 +235,14 @@ class CreatePostViewModel extends ChangeNotifier {
     }
   }
 
-  void reset() {
-    _videoData = null;
+  void reset({bool saveDraft = false}) {
+    if(!saveDraft) {
+      _videoData = null;
+    }
+
     _selectedThumbnail = null;
     _videoThumbnails = null;
     _createPostState = const PickingVideoCreatePostState();
+    notifyListeners();
   }
 }

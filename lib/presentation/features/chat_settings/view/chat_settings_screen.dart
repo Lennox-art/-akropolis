@@ -14,7 +14,7 @@ class ChatSettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Chat settings"),
+        title: const Text("Chat settings"),
         centerTitle: true,
       ),
       body: ListenableBuilder(
@@ -22,52 +22,62 @@ class ChatSettingsScreen extends StatelessWidget {
         builder: (_, __) {
           AppUser user = chatSettingsViewModel.user;
 
-          return Column(
-            children: [
-              ListTile(
-                leading: Builder(builder: (context) {
-                  String? profilePic = chatSettingsViewModel.user.profilePicture;
-                  if (profilePic == null) {
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                ListTile(
+                  leading: Builder(builder: (context) {
+                    String? profilePic = chatSettingsViewModel.user.profilePicture;
+                    if (profilePic == null) {
+                      return CircleAvatar(
+                        child: Icon(Icons.person),
+                      );
+                    }
                     return CircleAvatar(
-                      child: Icon(Icons.person),
+                      backgroundImage: NetworkImage(profilePic),
                     );
-                  }
-                  return CircleAvatar(
-                    backgroundImage: NetworkImage(profilePic),
-                  );
-                }),
-                title: Text(user.displayName),
-                trailing: ElevatedButton(
-                  style: ButtonStyle(
-                    fixedSize: WidgetStatePropertyAll(Size(100, 40)),
-                    backgroundColor: WidgetStatePropertyAll(Colors.red)
+                  }),
+                  title: Text(user.displayName),
+                  trailing: ElevatedButton(
+                    style: const ButtonStyle(
+                      fixedSize: WidgetStatePropertyAll(Size(100, 40)),
+                      backgroundColor: WidgetStatePropertyAll(Colors.red)
+                    ),
+                    onPressed: () {
+                      //TODO: Implement block
+
+                    },
+                    child: const Text("Block"),
                   ),
-                  onPressed: () {
-                    //TODO: Implement block
-                  },
-                  child: const Text("Block"),
                 ),
-              ),
-              Text(
-                "If you block someone, all the conversations they are part of will be removed",
-              ),
-              Card(
-                child: CheckboxListTile(
-                  value: true,
-                  title: Text("Notification"),
-                  subtitle: Text("Turned On"),
-                  onChanged: (v) {
-                    if(v == null) return;
-                  },
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 8.0),
+                  child: Text(
+                    "If you block someone, all the conversations they are part of will be removed",
+                  ),
                 ),
-              ),
-              Text(
-                "Report this conversation",
-                style: TextStyle(
-                  color: Colors.red,
+                Card(
+                  child: SwitchListTile(
+                    value: true,
+                    title: Text("Notification"),
+                    subtitle: Text("Turned On"),
+                    onChanged: (v) {
+                    },
+                  ),
                 ),
-              ),
-            ],
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 8.0),
+                  child: Text(
+                    "Report this conversation",
+                    style: TextStyle(
+                      color: Colors.red,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           );
         },
       ),

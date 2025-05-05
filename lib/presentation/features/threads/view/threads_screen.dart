@@ -45,12 +45,13 @@ class _ThreadsScreenState extends State<ThreadsScreen> {
           Padding(
             padding: const EdgeInsets.only(right: 10.0),
             child: CircleAvatar(
+              radius: 15,
               backgroundColor: Colors.green,
               child: IconButton(
                 onPressed: () {
                   Navigator.of(context).pushNamed(AppRoutes.newThreadScreen.path);
                 },
-                icon: Icon(Icons.add),
+                icon: Icon(Icons.add, size: 14,),
               ),
             ),
           ),

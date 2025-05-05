@@ -376,7 +376,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                     ListTile(
                       leading: TextButton(
                         onPressed: () {
-
+                          widget.createPostViewModel.reset(saveDraft: true);
                         },
                         child: const Text(
                           "Cancel",

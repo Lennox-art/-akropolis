@@ -212,11 +212,15 @@ class CreateUserPostViewModel extends ChangeNotifier {
     }
   }
 
-  void reset() {
+  void reset({bool saveDraft = true}) {
 
-    _videoData = null;
+    if(!saveDraft) {
+      _videoData = null;
+    }
+
     _selectedThumbnail = null;
     _videoThumbnails = null;
     _createPostState = const PickingVideoCreateUserStoryPostState();
+    notifyListeners();
   }
 }

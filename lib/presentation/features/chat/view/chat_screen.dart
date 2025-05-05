@@ -76,7 +76,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     case ChatMenu.chatSettings:
                       Navigator.of(context).pushNamed(
                           AppRoutes.chatMessageSettings.path,
-                          arguments: widget.chatViewModel.meUser,
+                          arguments: widget.chatViewModel.otherUser,
                       );
                       return;
                   }

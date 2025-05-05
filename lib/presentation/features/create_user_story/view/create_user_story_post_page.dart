@@ -210,7 +210,7 @@ class _CreateUserPostPageState extends State<CreateUserPostPage> {
                           ],
                         ),
                         Padding(
-                          padding: const EdgeInsets.only(left:12.0),
+                          padding: const EdgeInsets.only(left:12.0, top: 3.0),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -328,7 +328,6 @@ class _CreateUserPostPageState extends State<CreateUserPostPage> {
                       leading: TextButton(
                         onPressed: () {
                           widget.createUserPostViewModel.reset();
-                          Navigator.of(context).pop();
                         },
                         child: const Text(
                           "Cancel",

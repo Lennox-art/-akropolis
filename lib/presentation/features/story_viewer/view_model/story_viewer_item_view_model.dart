@@ -11,6 +11,7 @@ class StoryViewerItemViewModel extends ChangeNotifier {
   final AppUser _currentUser;
   final GetMediaUseCase _getMediaUseCase;
   int _currentIndex = 0;
+  MediaDownloadState _profilePicState = const InitialMediaState();
   MediaDownloadState _thumbnailState = const InitialMediaState();
   MediaDownloadState _videoState = const InitialMediaState();
 
@@ -36,6 +37,18 @@ class StoryViewerItemViewModel extends ChangeNotifier {
     downloadData();
   }
 
+  void goToPreviousStory() {
+    if (isFirstIndex) return;
+    print("Index is $_currentIndex next is ${_currentIndex - 1}");
+    _currentIndex--;
+
+    _thumbnailState = const InitialMediaState();
+    _videoState = const InitialMediaState();
+    downloadData();
+  }
+
+  bool get isFirstIndex => _currentIndex == 0;
+
   bool get isLastIndex => _currentIndex == (_stories.length - 1);
 
   int get currentIndex => _currentIndex;
@@ -46,10 +59,12 @@ class StoryViewerItemViewModel extends ChangeNotifier {
 
   MediaDownloadState get thumbnailState => _thumbnailState;
 
+  MediaDownloadState get profilePicState => _profilePicState;
+
   MediaDownloadState get videoState => _videoState;
 
   Future<void> downloadData() async {
-    await Future.wait([_downloadThumbnail(), _downloadVideo(), _addToViewers()]);
+    await Future.wait([_downloadProfilePicture(), _downloadThumbnail(), _downloadVideo(), _addToViewers()]);
   }
 
   Future<void> _downloadThumbnail() async {
@@ -80,6 +95,46 @@ class StoryViewerItemViewModel extends ChangeNotifier {
 
         case Error<MapEntry<String, MediaData>>():
           _thumbnailState = ErrorDownloadMediaState(failure: thumbnailResult.failure);
+          break;
+      }
+    } finally {
+      notifyListeners();
+    }
+  }
+
+  Future<void> _downloadProfilePicture() async {
+    print("Downloading dp ${_currentUser.profilePicture}");
+    if (_profilePicState is! ErrorDownloadMediaState && _profilePicState is! InitialMediaState) return;
+    String? profilePicUrl = currentStory.author.imageUrl;
+    if (profilePicUrl == null) return;
+
+    try {
+      _profilePicState = const DownloadingMediaState();
+      notifyListeners();
+
+      Result<MapEntry<String, MediaData>> profilePicResult = await _getMediaUseCase.getMediaFromUrl(
+        profilePicUrl,
+        onProgress: (p) {
+          _profilePicState = DownloadingMediaState(
+            progress: ProgressModel(
+              sent: p.sent,
+              total: p.total,
+            ),
+          );
+          notifyListeners();
+        },
+      );
+
+      print("${profilePicResult} dp result");
+
+      switch (profilePicResult) {
+        case Success<MapEntry<String, MediaData>>():
+          _profilePicState = DownloadedMediaState(media: profilePicResult.data.value);
+          print("_vm dp downloaded for ${_currentUser.id}");
+          break;
+
+        case Error<MapEntry<String, MediaData>>():
+          _profilePicState = ErrorDownloadMediaState(failure: profilePicResult.failure);
           break;
       }
     } finally {
@@ -125,7 +180,7 @@ class StoryViewerItemViewModel extends ChangeNotifier {
   Future<void> _addToViewers() async {
     if (currentStory.viewers.contains(_currentUser.id)) return;
 
-    _userStoryRepository.addToViewers(userId: _currentUser.id, postId: currentStory.id);
+    _userStoryRepository.addToViewers(userId: _currentUser.id, storyId: currentStory.id);
 
     try {
       _videoState = const DownloadingMediaState();

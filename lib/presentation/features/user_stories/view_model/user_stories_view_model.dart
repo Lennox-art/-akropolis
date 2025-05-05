@@ -32,7 +32,6 @@ class UserStoriesViewModel extends ChangeNotifier {
     LinkedHashMap<String, List<UserStory>> linkedHashMap = LinkedHashMap(
       equals: (a, b) => a == b,
     );
-    print('${_userStoriesSet.length} other stories');
     linkedHashMap.addAll(groupBy(_userStoriesSet, (s) => s.author.id));
     return linkedHashMap;
   }
@@ -85,7 +84,6 @@ class UserStoriesViewModel extends ChangeNotifier {
         lastFetchedCreatedAt: _userStoriesSet.lastOrNull?.createdAt,
       );
 
-      print("Other stories result ${userStoryResult}");
 
       switch (userStoryResult) {
         case Success<List<UserStory>>():
@@ -93,7 +91,7 @@ class UserStoriesViewModel extends ChangeNotifier {
           break;
         case Error<List<UserStory>>():
           _toastStream.add(ToastError(message: userStoryResult.failure.message));
-         break;
+          break;
       }
     } finally {
       _userStoryState = const LoadedUserStoryState();
@@ -101,4 +99,10 @@ class UserStoriesViewModel extends ChangeNotifier {
     }
   }
 
+  Future<void> refresh() async {
+    _userStoriesSet.clear();
+    _myUserStoriesSet.clear();
+    loadMyUserStories();
+    loadUserStories();
+  }
 }

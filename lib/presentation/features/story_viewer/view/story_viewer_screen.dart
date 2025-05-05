@@ -71,8 +71,18 @@ class _StoryViewerScreenState extends State<StoryViewerScreen> {
                       return;
                     }
 
-                    //loadMoreItems();
                     pageController.nextPage(
+                      duration: const Duration(milliseconds: 250),
+                      curve: Curves.easeInOutQuad,
+                    );
+                  },
+                  onPreviousUser: () {
+                    bool isFirstPage = i == 0;
+                    if (isFirstPage) {
+                      return;
+                    }
+
+                    pageController.previousPage(
                       duration: const Duration(milliseconds: 250),
                       curve: Curves.easeInOutQuad,
                     );
@@ -91,10 +101,12 @@ class StoryItemView extends StatelessWidget {
   const StoryItemView({
     required this.storyViewerItemViewModel,
     required this.onNextUser,
+    required this.onPreviousUser,
     super.key,
   });
 
   final Function() onNextUser;
+  final Function() onPreviousUser;
   final StoryViewerItemViewModel storyViewerItemViewModel;
 
   void onNext() {
@@ -108,33 +120,36 @@ class StoryItemView extends StatelessWidget {
     storyViewerItemViewModel.goToNextStory();
   }
 
+  void onPrevious() {
+    if (storyViewerItemViewModel.isFirstIndex) {
+      print("First video for user");
+      onPreviousUser();
+      return;
+    }
+
+    print("Previous video for user");
+    storyViewerItemViewModel.goToPreviousStory();
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
       listenable: storyViewerItemViewModel,
       builder: (_, __) {
         UserStory story = storyViewerItemViewModel.currentStory;
-
         return Flex(
           direction: Axis.vertical,
           children: [
-            ListTile(
-              leading: IconButton(
-                onPressed: Navigator.of(context).pop,
-                icon: const Icon(
-                  Icons.chevron_left,
-                ),
-              ),
-              trailing: Text(story.viewers.length.toString(),),
-              title: Text(story.author.name.capitalize),
-              subtitle: Flex(
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Flex(
                 direction: Axis.horizontal,
                 children: List.generate(
                   storyViewerItemViewModel.noOfItems,
                   (i) {
                     return Expanded(
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 2.0),
+                        padding: const EdgeInsets.symmetric(horizontal: 5.0),
                         child: Container(
                           height: 5,
                           decoration: BoxDecoration(
@@ -148,96 +163,178 @@ class StoryItemView extends StatelessWidget {
                 ).toList(),
               ),
             ),
-            Expanded(
-              child: GestureDetector(
-                onTap: () => storyViewerItemViewModel.goToNextStory(),
-                child: storyViewerItemViewModel.thumbnailState.map(
-                  initial: (_) => IconButton(
-                    onPressed: storyViewerItemViewModel.downloadData,
-                    icon: const Icon(Icons.touch_app),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Flex(
+                direction: Axis.horizontal,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                        child: CircleAvatar(
+                          child: storyViewerItemViewModel.profilePicState.map(
+                            initial: (_) => const Icon(Icons.person),
+                            downloadingMedia: (p) {
+                              ProgressModel? progress = p.progress;
+                              if (progress == null) return const InfiniteLoader();
+                              return CircularFiniteLoader(progress: progress);
+                            },
+                            downloadedMedia: (d) {
+                              return CircleAvatar(
+                                radius: 18,
+                                backgroundImage: FileImage(d.media.file),
+                              );
+                            },
+                            errorDownloadingMedia: (_) => const Icon(Icons.broken_image_outlined),
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: Text(story.author.name.capitalize),
+                      ),
+                    ],
                   ),
-                  downloadingMedia: (d) {
-                    ProgressModel? progress = d.progress;
-                    if (progress == null) {
-                      return const InfiniteLoader();
-                    }
-
-                    return CircularFiniteLoader(progress: progress);
-                  },
-                  downloadedMedia: (d) {
-                    return storyViewerItemViewModel.videoState.map(
-                      initial: (_) {
-                        return Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            Image.file(
-                              d.media.file,
-                              fit: BoxFit.fill,
-                            ),
-                            IconButton(
-                              onPressed: storyViewerItemViewModel.downloadData,
-                              icon: const Icon(Icons.refresh),
-                            ),
-                          ],
-                        );
-                      },
-                      downloadingMedia: (d) {
-                        ProgressModel? progress = d.progress;
-                        if (progress == null) {
-                          return const InfiniteLoader();
-                        }
-
-                        return CircularFiniteLoader(progress: progress);
-                      },
-                      downloadedMedia: (d) {
-                        return CachedVideoPlayer(
-                          key: UniqueKey(),
-                          file: d.media.file,
-                          autoPlay: true,
-                          onComplete: () {
-                            print("Video has been complete ${storyViewerItemViewModel.currentIndex}");
-                            onNext();
-                          },
-                          showControls: false,
-                        );
-                      },
-                      errorDownloadingMedia: (e) {
-                        return Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Text(
-                              e.failure.message,
-                              style: const TextStyle(color: errorColor),
-                            ),
-                            IconButton(
-                              onPressed: storyViewerItemViewModel.downloadData,
-                              icon: const Icon(Icons.refresh),
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                  },
-                  errorDownloadingMedia: (e) {
-                    return Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
-                          e.failure.message,
-                          style: const TextStyle(color: errorColor),
-                        ),
-                        IconButton(
-                          onPressed: storyViewerItemViewModel.downloadData,
-                          icon: const Icon(Icons.refresh),
-                        ),
-                      ],
-                    );
-                  },
-                ),
+                  TextButton(
+                    onPressed: Navigator.of(context).pop,
+                    child: const Text(
+                      'X',
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Colors.white,
+                      ),
+                    ),
+                  )
+                ],
               ),
             ),
+            Expanded(
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Flex(
+                    direction: Axis.vertical,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: storyViewerItemViewModel.thumbnailState.map(
+                          initial: (_) => IconButton(
+                            onPressed: storyViewerItemViewModel.downloadData,
+                            icon: const Icon(Icons.touch_app),
+                          ),
+                          downloadingMedia: (d) {
+                            ProgressModel? progress = d.progress;
+                            if (progress == null) {
+                              return const InfiniteLoader();
+                            }
+
+                            return CircularFiniteLoader(progress: progress);
+                          },
+                          downloadedMedia: (d) {
+                            return storyViewerItemViewModel.videoState.map(
+                              initial: (_) {
+                                return Stack(
+                                  alignment: Alignment.center,
+                                  children: [
+                                    Image.file(
+                                      d.media.file,
+                                      fit: BoxFit.fill,
+                                    ),
+                                    IconButton(
+                                      onPressed: storyViewerItemViewModel.downloadData,
+                                      icon: const Icon(Icons.refresh),
+                                    ),
+                                  ],
+                                );
+                              },
+                              downloadingMedia: (d) {
+                                ProgressModel? progress = d.progress;
+                                if (progress == null) {
+                                  return const InfiniteLoader();
+                                }
+
+                                return CircularFiniteLoader(progress: progress);
+                              },
+                              downloadedMedia: (d) {
+                                return CachedVideoPlayer(
+                                  key: UniqueKey(),
+                                  file: d.media.file,
+                                  autoPlay: true,
+                                  onComplete: () {
+                                    print("Video has been complete ${storyViewerItemViewModel.currentIndex}");
+                                    onNext();
+                                  },
+                                  showControls: false,
+                                );
+                              },
+                              errorDownloadingMedia: (e) {
+                                return Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      e.failure.message,
+                                      style: const TextStyle(color: errorColor),
+                                    ),
+                                    IconButton(
+                                      onPressed: storyViewerItemViewModel.downloadData,
+                                      icon: const Icon(Icons.refresh),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                          errorDownloadingMedia: (e) {
+                            return Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text(
+                                  e.failure.message,
+                                  style: const TextStyle(color: errorColor),
+                                ),
+                                IconButton(
+                                  onPressed: storyViewerItemViewModel.downloadData,
+                                  icon: const Icon(Icons.refresh),
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                      )
+                    ],
+                  ),
+                  Flex(
+                    direction: Axis.horizontal,
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: onPrevious,
+                        ),
+                      ),
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: onNext,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            Text(
+              story.viewers.length.toString(),
+              textAlign: TextAlign.center,
+            )
           ],
         );
       },

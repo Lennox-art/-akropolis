@@ -12,6 +12,8 @@ import 'package:akropolis/presentation/features/authentication/view/partial_sign
 import 'package:akropolis/presentation/features/authentication/view/sign_in.dart';
 import 'package:akropolis/presentation/features/authentication/view/sign_up.dart';
 import 'package:akropolis/presentation/features/authentication/view_model/authentication_view_model.dart';
+import 'package:akropolis/presentation/features/blocked/view/blocked_screen.dart';
+import 'package:akropolis/presentation/features/bookmarked/view/bookmarked_screen.dart';
 import 'package:akropolis/presentation/features/chat/model/chat_models.dart';
 import 'package:akropolis/presentation/features/chat/view/chat_message_screen.dart';
 import 'package:akropolis/presentation/features/chat/view/chat_screen.dart';
@@ -44,6 +46,8 @@ import 'package:akropolis/presentation/features/on_boarding/view/welcome_screen.
 import 'package:akropolis/presentation/features/on_boarding/view_model/on_boarding_view_model.dart';
 import 'package:akropolis/presentation/features/profile/view/edit_profile_screen.dart';
 import 'package:akropolis/presentation/features/profile/view_model/edit_profile_view_model.dart';
+import 'package:akropolis/presentation/features/settings/view/notification_screen.dart';
+import 'package:akropolis/presentation/features/settings/view/post_and_replies_notification.dart';
 import 'package:akropolis/presentation/features/settings/view/settings_screen.dart';
 import 'package:akropolis/presentation/features/settings/view_model/settings_view_model.dart';
 import 'package:akropolis/presentation/features/splash_screen/view/splash_screen.dart';
@@ -53,6 +57,7 @@ import 'package:akropolis/presentation/features/story_viewer/view/story_viewer_s
 import 'package:akropolis/presentation/features/story_viewer/view_model/story_viewer_view_model.dart';
 import 'package:akropolis/presentation/features/topics/view/topics_screen.dart';
 import 'package:akropolis/presentation/features/topics/view_model/topics_view_model.dart';
+import 'package:akropolis/presentation/features/watch_later/view/watch_later_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
@@ -84,7 +89,12 @@ enum AppRoutes {
   notifications("/notifications"),
   createUserPostPage("/createUserPostPage"),
   storyViewer("/storyViewer"),
-  settings("/settings");
+  settings("/settings"),
+  notificationSettings("/notificationSettings"),
+  prNotificationSettings("/postReplyNotificationSettings"),
+  bookmarks("/bookmarks"),
+  watchLater("/watchLater"),
+  blocked("/blocked");
 
   final String path;
 
@@ -270,7 +280,10 @@ enum AppRoutes {
               authenticationRepository: GetIt.I(),
             ),
           ),
+        AppRoutes.notificationSettings => const NotificationScreen(),
+        AppRoutes.prNotificationSettings => const PostAndReplyNotificationScreen(),
+        AppRoutes.bookmarks => const BookmarkedScreen(),
+        AppRoutes.watchLater => const WatchLaterScreen(),
+        AppRoutes.blocked => const BlockedScreen(),
       };
 }
-
-//NewsPostDto newsPostDto = ModalRoute.of(context)!.settings.arguments as NewsPostDto

@@ -62,6 +62,10 @@ class _NewThreadScreenState extends State<NewThreadScreen> {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
             child: SearchBar(
+              constraints: const BoxConstraints(
+                maxHeight: 100,
+                minHeight: 40,
+              ),
               onChanged: _onSearchChanged,
             ),
           ),

@@ -38,9 +38,11 @@ class UserStoryRepositoryImpl extends UserStoryRepository {
   }
 
   @override
-  Future<Result<void>> addToViewers({required String userId, required String postId}) {
-    // TODO: implement addToViewers
-    throw UnimplementedError();
+  Future<Result<void>> addToViewers({required String userId, required String storyId}) async {
+    return await _remoteDataStorageService.addToUserStoryViewers(
+      userId: userId,
+      storyId: storyId,
+    );
   }
 
 }

@@ -128,6 +128,7 @@ class PostReplyUseCase {
         author: Author(
           id: user.uid,
           name: appUser.displayName,
+          imageUrl: appUser.profilePicture,
           type: AuthorType.user,
         ),
         commentedAt: DateTime.now(),

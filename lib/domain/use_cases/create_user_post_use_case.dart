@@ -123,6 +123,7 @@ class CreateUserPostUseCase {
         author: Author(
           id: appUser.id,
           name: appUser.displayName,
+          imageUrl: appUser.profilePicture,
           type: AuthorType.user,
         ),
         viewers: {},

@@ -20,6 +20,7 @@ dependencies:
   firebase_storage:
   google_sign_in:
   get_it:
+  percent_indicator: ^4.2.5
   network_service:
     git:
       url: https://bruc3balo:glpat-45CSRAxm48QD31nbADxz@gitlab.com/flutter_starter/network_service.git

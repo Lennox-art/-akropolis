@@ -130,6 +130,7 @@ class _HomePageState extends State<HomePage> {
                 child: ListenableBuilder(
                   listenable: widget.createPostViewModel,
                   builder: (_, __) {
+
                     return widget.createPostViewModel.createPostState.mapOrNull(
                           loading: (l) {
                             ProgressModel? progressModel = l.progress;
