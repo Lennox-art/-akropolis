@@ -16,6 +16,8 @@ import 'package:akropolis/presentation/features/news_feed/view_models/headlines_
 import 'package:akropolis/presentation/features/news_feed/view_models/local_news_view_model.dart';
 import 'package:akropolis/presentation/features/news_feed/view_models/news_feed_view_model.dart';
 import 'package:akropolis/presentation/features/news_feed/view_models/world_news_view_model.dart';
+import 'package:akropolis/presentation/features/user_stories/view/user_stories_screen.dart';
+import 'package:akropolis/presentation/features/user_stories/view_model/user_stories_view_model.dart';
 import 'package:akropolis/presentation/routes/routes.dart';
 import 'package:akropolis/presentation/ui/components/loader.dart';
 import 'package:akropolis/presentation/ui/themes.dart';
@@ -28,12 +30,14 @@ class NewsFeedTab extends StatefulWidget {
   const NewsFeedTab({
     required this.homeViewModel,
     required this.newsFeedViewModel,
+    required this.userStoriesViewModel,
     required this.currentUser,
     super.key,
   });
 
   final HomeViewModel homeViewModel;
   final NewsFeedViewModel newsFeedViewModel;
+  final UserStoriesViewModel userStoriesViewModel;
   final AppUser currentUser;
 
   @override
@@ -125,19 +129,7 @@ class _NewsFeedTabState extends State<NewsFeedTab> {
                 ),
               ),
               actions: [
-                IconButton(
-                  onPressed: () {
-                    widget.homeViewModel.logout();
-                    Navigator.of(context).pushNamedAndRemoveUntil(
-                      AppRoutes.login.path,
-                      (_) => false,
-                    );
-                  },
-                  icon: const Icon(
-                    Icons.logout_outlined,
-                    color: Colors.red,
-                  ),
-                ),
+
                 IconButton(
                   onPressed: () {
                     Navigator.of(context).pushNamed(
@@ -181,37 +173,9 @@ class _NewsFeedTabState extends State<NewsFeedTab> {
                 ),
                 child: SizedBox(
                   height: 120,
-                  child: ListView(
-                    scrollDirection: Axis.horizontal,
-                    children: [
-                      const Padding(
-                        padding: EdgeInsets.only(
-                          bottom: 22.0,
-                        ),
-                        child: CircleAvatar(
-                          backgroundColor: primaryColor,
-                          radius: 33,
-                          child: Icon(Icons.add),
-                        ),
-                      ),
-                      ...widget.newsFeedViewModel.stories.map(
-                        (i) => Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              CircleAvatar(
-                                backgroundColor: primaryColor,
-                                backgroundImage: CachedNetworkImageProvider(i.url),
-                                radius: 33,
-                              ),
-                              Text(i.title),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
+                  child: UserStoriesScreen(
+                    userStoriesViewModel: widget.userStoriesViewModel,
+                    getMediaUseCase: GetIt.I(),
                   ),
                 ),
               ),

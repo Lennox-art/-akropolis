@@ -239,172 +239,163 @@ class _SignInWithEmailScreenState extends State<SignInWithEmailScreen> {
       appBar: AppBar(
         title: null,
       ),
-      body: Flex(
-        direction: Axis.vertical,
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 25.0),
-            child: Hero(
-              tag: "logo",
-              child: Assets.akropolisLogo.svg(
-                height: 150,
-              ),
-            ),
-          ),
-          Text(
-            "Sign in with email",
-            style: theme.textTheme.headlineSmall,
-          ),
-          Expanded(
-            child: Form(
-              key: formKey,
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    ListTile(
-                      title: const Text("Email"),
-                      subtitle: TextFormField(
-                        controller: emailController,
-                        validator: validateEmail,
-                        autovalidateMode: AutovalidateMode.onUserInteraction,
-                        decoration: const InputDecoration(
-                          hintText: "johndoe@example.abc",
-                        ),
-                      ),
-                    ),
-                    ListTile(
-                      title: const Text("Password"),
-                      subtitle: ValueListenableBuilder(
-                        valueListenable: hidePasswordNotifier,
-                        builder: (_, obscure, __) {
-                          return TextFormField(
-                            controller: passwordController,
-                            validator: validatePassword,
-                            autovalidateMode: AutovalidateMode.onUserInteraction,
-                            obscureText: obscure,
-                            maxLength: 16,
-                            minLines: 1,
-                            decoration: InputDecoration(
-                              hintText: "Enter your password",
-                              suffixIcon: Visibility(
-                                visible: obscure,
-                                replacement: IconButton(
-                                  onPressed: () {
-                                    hidePasswordNotifier.value = !hidePasswordNotifier.value;
-                                  },
-                                  icon: const Icon(
-                                    Icons.visibility_off,
-                                  ),
-                                ),
-                                child: IconButton(
-                                  onPressed: () {
-                                    hidePasswordNotifier.value = !hidePasswordNotifier.value;
-                                  },
-                                  icon: const Icon(
-                                    Icons.visibility,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pushNamed(AppRoutes.forgotPassword.path);
-                        },
-                        child: const Text("Forgot your password ?"),
-                      ),
-                    ),
-                  ],
+      body: Form(
+        key: formKey,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                child: Hero(
+                  tag: "logo",
+                  child: Assets.akropolisLogo.svg(
+                    height: 150,
+                  ),
                 ),
               ),
-            ),
-          ),
-          ListenableBuilder(
-            listenable: widget.authenticationViewModel,
-            builder: (_, __) {
-              return widget.authenticationViewModel.state.map(
-                loading: (_) => const InfiniteLoader(),
-                notAuthenticated: (l) {
-                  return ElevatedButton(
-                    onPressed: () async {
-                      if (!formKey.currentState!.validate()) return;
-
-                      String email = emailController.text;
-                      String password = passwordController.text;
-                      widget.authenticationViewModel.signInWithEmailAndPassword(
-                        email: email,
-                        password: password,
+              Text(
+                "Sign in with email",
+                style: theme.textTheme.headlineSmall,
+              ),
+              ListTile(
+                title: const Text("Email"),
+                subtitle: TextFormField(
+                  controller: emailController,
+                  validator: validateEmail,
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  decoration: const InputDecoration(
+                    hintText: "johndoe@example.abc",
+                  ),
+                ),
+              ),
+              ListTile(
+                title: const Text("Password"),
+                subtitle: ValueListenableBuilder(
+                  valueListenable: hidePasswordNotifier,
+                  builder: (_, obscure, __) {
+                    return TextFormField(
+                      controller: passwordController,
+                      validator: validatePassword,
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      obscureText: obscure,
+                      maxLength: 16,
+                      minLines: 1,
+                      decoration: InputDecoration(
+                        hintText: "Enter your password",
+                        suffixIcon: Visibility(
+                          visible: obscure,
+                          replacement: IconButton(
+                            onPressed: () {
+                              hidePasswordNotifier.value = !hidePasswordNotifier.value;
+                            },
+                            icon: const Icon(
+                              Icons.visibility_off,
+                            ),
+                          ),
+                          child: IconButton(
+                            onPressed: () {
+                              hidePasswordNotifier.value = !hidePasswordNotifier.value;
+                            },
+                            icon: const Icon(
+                              Icons.visibility,
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pushNamed(AppRoutes.forgotPassword.path);
+                  },
+                  child: const Text("Forgot your password ?"),
+                ),
+              ),
+              ListenableBuilder(
+                listenable: widget.authenticationViewModel,
+                builder: (_, __) {
+                  return widget.authenticationViewModel.state.map(
+                    loading: (_) => const InfiniteLoader(),
+                    notAuthenticated: (l) {
+                      return ElevatedButton(
+                        onPressed: () async {
+                          if (!formKey.currentState!.validate()) return;
+          
+                          String email = emailController.text;
+                          String password = passwordController.text;
+                          widget.authenticationViewModel.signInWithEmailAndPassword(
+                            email: email,
+                            password: password,
+                          );
+          
+                          /*if (signedInUser == null) return;
+                          if (!context.mounted) return;
+          
+                          UserCubit userCubit = BlocProvider.of<UserCubit>(context);
+                          AppUser? appUser = await userCubit.findUserById(
+                            signedInUser.uid,
+                          );
+          
+                          if (appUser == null) return;
+                          if (!context.mounted) return;
+          
+                          if (appUser.topics == null || (appUser.topics?.isEmpty ?? true)) {
+                            Navigator.of(context).pushNamedAndRemoveUntil(
+                              AppRoutes.welcomeTopics.path,
+                                  (_) => false,
+                            );
+                            return;
+                          }
+          
+                          Navigator.of(context).pushNamedAndRemoveUntil(
+                            AppRoutes.home.path,
+                                (_) => false,
+                          );*/
+                        },
+                        child: const Text("Sign in"),
                       );
-
-                      /*if (signedInUser == null) return;
-                      if (!context.mounted) return;
-
-                      UserCubit userCubit = BlocProvider.of<UserCubit>(context);
-                      AppUser? appUser = await userCubit.findUserById(
-                        signedInUser.uid,
-                      );
-
-                      if (appUser == null) return;
-                      if (!context.mounted) return;
-
-                      if (appUser.topics == null || (appUser.topics?.isEmpty ?? true)) {
-                        Navigator.of(context).pushNamedAndRemoveUntil(
-                          AppRoutes.welcomeTopics.path,
-                              (_) => false,
-                        );
-                        return;
-                      }
-
-                      Navigator.of(context).pushNamedAndRemoveUntil(
-                        AppRoutes.home.path,
-                            (_) => false,
-                      );*/
                     },
-                    child: const Text("Sign in"),
+                    authenticated: (_) => const Text("Welcome"),
+                    partialSignUp: (_) => const Text("Incomplete sign up"),
                   );
                 },
-                authenticated: (_) => const Text("Welcome"),
-                partialSignUp: (_) => const Text("Incomplete sign up"),
-              );
-            },
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text.rich(
-              TextSpan(
-                text: "Don't have an account? ",
-                children: [
-                  TextSpan(
-                    text: "Sign up",
-                    style: const TextStyle(
-                      color: primaryColor,
-                      decorationColor: primaryColor,
-                      decoration: TextDecoration.underline,
-                    ),
-                    recognizer: TapGestureRecognizer()
-                      ..onTap = () {
-                        Navigator.of(context).pushReplacementNamed(
-                          AppRoutes.signUp.path,
-                        );
-                      },
-                  )
-                ],
               ),
-            ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text.rich(
+                  TextSpan(
+                    text: "Don't have an account? ",
+                    children: [
+                      TextSpan(
+                        text: "Sign up",
+                        style: const TextStyle(
+                          color: primaryColor,
+                          decorationColor: primaryColor,
+                          decoration: TextDecoration.underline,
+                        ),
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = () {
+                            Navigator.of(context).pushReplacementNamed(
+                              AppRoutes.signUp.path,
+                            );
+                          },
+                      )
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(
+                height: 40,
+              ),
+            ],
           ),
-          const SizedBox(
-            height: 40,
-          ),
-        ],
+        ),
       ),
     );
   }

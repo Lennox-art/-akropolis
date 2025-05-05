@@ -1,5 +1,6 @@
 import 'package:akropolis/data/models/remote_models/remote_models.dart';
 import 'package:akropolis/domain/models/thread_model.dart';
+import 'package:akropolis/domain/use_cases/create_user_post_use_case.dart';
 import 'package:akropolis/domain/use_cases/get_media_use_case.dart';
 import 'package:akropolis/domain/use_cases/live_chat_use_case.dart';
 import 'package:akropolis/domain/use_cases/post_reply_use_case.dart';
@@ -19,6 +20,8 @@ import 'package:akropolis/presentation/features/chat/view_model/chat_view_model.
 import 'package:akropolis/presentation/features/chat_settings/view/chat_settings_screen.dart';
 import 'package:akropolis/presentation/features/chat_settings/view_model/chat_settings_view_model.dart';
 import 'package:akropolis/presentation/features/create_post/view/create_post_page.dart';
+import 'package:akropolis/presentation/features/create_user_story/view/create_user_story_post_page.dart';
+import 'package:akropolis/presentation/features/create_user_story/view_model/create_user_story_post_view_model.dart';
 import 'package:akropolis/presentation/features/home/view/home_page.dart';
 import 'package:akropolis/presentation/features/home/view_model/home_view_model.dart';
 import 'package:akropolis/presentation/features/new_thread/view/new_thread_screen.dart';
@@ -41,8 +44,13 @@ import 'package:akropolis/presentation/features/on_boarding/view/welcome_screen.
 import 'package:akropolis/presentation/features/on_boarding/view_model/on_boarding_view_model.dart';
 import 'package:akropolis/presentation/features/profile/view/edit_profile_screen.dart';
 import 'package:akropolis/presentation/features/profile/view_model/edit_profile_view_model.dart';
+import 'package:akropolis/presentation/features/settings/view/settings_screen.dart';
+import 'package:akropolis/presentation/features/settings/view_model/settings_view_model.dart';
 import 'package:akropolis/presentation/features/splash_screen/view/splash_screen.dart';
 import 'package:akropolis/presentation/features/splash_screen/view_model/splash_screen_view_model.dart';
+import 'package:akropolis/presentation/features/story_viewer/model/story_viewer_model.dart';
+import 'package:akropolis/presentation/features/story_viewer/view/story_viewer_screen.dart';
+import 'package:akropolis/presentation/features/story_viewer/view_model/story_viewer_view_model.dart';
 import 'package:akropolis/presentation/features/topics/view/topics_screen.dart';
 import 'package:akropolis/presentation/features/topics/view_model/topics_view_model.dart';
 import 'package:flutter/material.dart';
@@ -73,7 +81,10 @@ enum AppRoutes {
   chat("/chat"),
   chatMessage("/chatMessage"),
   chatMessageSettings("/chatMessageSettings"),
-  notifications("/notifications");
+  notifications("/notifications"),
+  createUserPostPage("/createUserPostPage"),
+  storyViewer("/storyViewer"),
+  settings("/settings");
 
   final String path;
 
@@ -242,6 +253,21 @@ enum AppRoutes {
         AppRoutes.notifications => NotificationsScreen(
             notificationsViewModel: NotificationsViewModel(
               notificationRepository: GetIt.I(),
+            ),
+          ),
+        AppRoutes.createUserPostPage => CreateUserPostPage(
+            createUserPostViewModel: GetIt.I(),
+          ),
+        AppRoutes.storyViewer => StoryViewerScreen(
+            getMediaUseCase: GetIt.I(),
+            storyViewerViewModel: StoryViewerViewModel(
+              userStoryRepository: GetIt.I(),
+              dto: ModalRoute.of(context)!.settings.arguments as StoryViewerDto,
+            ),
+          ),
+        AppRoutes.settings => SettingsScreen(
+            settingsViewModel: SettingsViewModel(
+              authenticationRepository: GetIt.I(),
             ),
           ),
       };

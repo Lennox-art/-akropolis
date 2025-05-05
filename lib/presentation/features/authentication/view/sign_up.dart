@@ -284,174 +284,171 @@ class _SignUpWithEmailScreenState extends State<SignUpWithEmailScreen> {
       appBar: AppBar(
         title: null,
       ),
-      body: Flex(
-        direction: Axis.vertical,
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 25.0),
-            child: Hero(
-              tag: "logo",
-              child: Assets.akropolisLogo.svg(
-                height: 150,
+      body: Form(
+        key: formKey,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                child: Hero(
+                  tag: "logo",
+                  child: Assets.akropolisLogo.svg(
+                    height: 150,
+                  ),
+                ),
               ),
-            ),
-          ),
-          Text(
-            "Sign up with email",
-            style: theme.textTheme.headlineSmall,
-          ),
-          Expanded(
-            child: Form(
-              key: formKey,
-              child: Center(
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      ListTile(
-                        title: const Text("Display Name"),
-                        subtitle: TextFormField(
-                          validator: validateDisplayName,
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                          controller: displayNameController,
-                          decoration: const InputDecoration(hintText: "John Doe"),
+              Text(
+                "Sign up with email",
+                style: theme.textTheme.headlineSmall,
+              ),
+              Form(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ListTile(
+                      title: const Text("Display Name"),
+                      subtitle: TextFormField(
+                        validator: validateDisplayName,
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        controller: displayNameController,
+                        decoration: const InputDecoration(hintText: "John Doe"),
+                      ),
+                    ),
+                    ListTile(
+                      title: const Text("Username"),
+                      subtitle: TextFormField(
+                        controller: usernameController,
+                        validator: validateUsername,
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        decoration: const InputDecoration(
+                          hintText: "@johndoe8734",
                         ),
                       ),
-                      ListTile(
-                        title: const Text("Username"),
-                        subtitle: TextFormField(
-                          controller: usernameController,
-                          validator: validateUsername,
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                          decoration: const InputDecoration(
-                            hintText: "@johndoe8734",
-                          ),
+                    ),
+                    ListTile(
+                      title: const Text("Email"),
+                      subtitle: TextFormField(
+                        controller: emailController,
+                        validator: validateEmail,
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        decoration: const InputDecoration(
+                          hintText: "johndoe@example.abc",
                         ),
                       ),
-                      ListTile(
-                        title: const Text("Email"),
-                        subtitle: TextFormField(
-                          controller: emailController,
-                          validator: validateEmail,
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                          decoration: const InputDecoration(
-                            hintText: "johndoe@example.abc",
-                          ),
-                        ),
-                      ),
-                      ListTile(
-                        title: const Text("Password"),
-                        subtitle: ValueListenableBuilder(
-                          valueListenable: hidePasswordNotifier,
-                          builder: (_, obscure, __) {
-                            return TextFormField(
-                              controller: passwordController,
-                              validator: validatePassword,
-                              autovalidateMode: AutovalidateMode.onUserInteraction,
-                              obscureText: obscure,
-                              maxLength: 16,
-                              minLines: 1,
-                              decoration: InputDecoration(
-                                hintText: "Enter your password",
-                                suffixIcon: Visibility(
-                                  visible: obscure,
-                                  replacement: IconButton(
-                                    onPressed: () {
-                                      hidePasswordNotifier.value = !hidePasswordNotifier.value;
-                                    },
-                                    icon: const Icon(
-                                      Icons.visibility_off,
-                                    ),
+                    ),
+                    ListTile(
+                      title: const Text("Password"),
+                      subtitle: ValueListenableBuilder(
+                        valueListenable: hidePasswordNotifier,
+                        builder: (_, obscure, __) {
+                          return TextFormField(
+                            controller: passwordController,
+                            validator: validatePassword,
+                            autovalidateMode: AutovalidateMode.onUserInteraction,
+                            obscureText: obscure,
+                            maxLength: 16,
+                            minLines: 1,
+                            decoration: InputDecoration(
+                              hintText: "Enter your password",
+                              suffixIcon: Visibility(
+                                visible: obscure,
+                                replacement: IconButton(
+                                  onPressed: () {
+                                    hidePasswordNotifier.value = !hidePasswordNotifier.value;
+                                  },
+                                  icon: const Icon(
+                                    Icons.visibility_off,
                                   ),
-                                  child: IconButton(
-                                    onPressed: () {
-                                      hidePasswordNotifier.value = !hidePasswordNotifier.value;
-                                    },
-                                    icon: const Icon(
-                                      Icons.visibility,
-                                    ),
+                                ),
+                                child: IconButton(
+                                  onPressed: () {
+                                    hidePasswordNotifier.value = !hidePasswordNotifier.value;
+                                  },
+                                  icon: const Icon(
+                                    Icons.visibility,
                                   ),
                                 ),
                               ),
-                            );
-                          },
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              ListenableBuilder(
+                listenable: widget.authenticationViewModel,
+                builder: (_, __) {
+                  return widget.authenticationViewModel.state.map(
+                    loading: (_) => const InfiniteLoader(),
+                    notAuthenticated: (l) {
+                      return ElevatedButton(
+                        onPressed: () async {
+                          if (!formKey.currentState!.validate()) return;
+          
+                          String username = usernameController.text;
+                          String password = passwordController.text;
+                          String displayName = displayNameController.text;
+                          String email = emailController.text;
+          
+                          widget.authenticationViewModel.signUp(
+                            username: username,
+                            email: email,
+                            displayName: displayName,
+                            password: password,
+                          );
+                        },
+                        child: const Text("Sign up"),
+                      );
+                    },
+                    authenticated: (_) => const Text("Welcome"),
+                    partialSignUp: (_) => const Text("Incomplete Sign up"),
+                  );
+                },
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text.rich(
+                  style: theme.textTheme.bodySmall,
+                  TextSpan(
+                    text: "By clicking “Create Account”, you acknowledge that you have read and understood, and agree to Akropolis’ ",
+                    children: [
+                      TextSpan(
+                        text: "Terms & Conditions",
+                        style: const TextStyle(
+                          color: primaryColor,
+                          decorationColor: primaryColor,
+                          decoration: TextDecoration.underline,
                         ),
+                        recognizer: TapGestureRecognizer()..onTap = () {},
+                      ),
+                      const TextSpan(
+                        text: " and ",
+                      ),
+                      TextSpan(
+                        text: "Privacy Policy",
+                        style: const TextStyle(
+                          color: primaryColor,
+                          decorationColor: primaryColor,
+                          decoration: TextDecoration.underline,
+                        ),
+                        recognizer: TapGestureRecognizer()..onTap = () {},
                       ),
                     ],
                   ),
                 ),
               ),
-            ),
-          ),
-          ListenableBuilder(
-            listenable: widget.authenticationViewModel,
-            builder: (_, __) {
-              return widget.authenticationViewModel.state.map(
-                loading: (_) => const InfiniteLoader(),
-                notAuthenticated: (l) {
-                  return ElevatedButton(
-                    onPressed: () async {
-                      if (!formKey.currentState!.validate()) return;
-
-                      String username = usernameController.text;
-                      String password = passwordController.text;
-                      String displayName = displayNameController.text;
-                      String email = emailController.text;
-
-                      widget.authenticationViewModel.signUp(
-                        username: username,
-                        email: email,
-                        displayName: displayName,
-                        password: password,
-                      );
-                    },
-                    child: const Text("Sign up"),
-                  );
-                },
-                authenticated: (_) => const Text("Welcome"),
-                partialSignUp: (_) => const Text("Incomplete Sign up"),
-              );
-            },
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text.rich(
-              style: theme.textTheme.bodySmall,
-              TextSpan(
-                text: "By clicking “Create Account”, you acknowledge that you have read and understood, and agree to Akropolis’ ",
-                children: [
-                  TextSpan(
-                    text: "Terms & Conditions",
-                    style: const TextStyle(
-                      color: primaryColor,
-                      decorationColor: primaryColor,
-                      decoration: TextDecoration.underline,
-                    ),
-                    recognizer: TapGestureRecognizer()..onTap = () {},
-                  ),
-                  const TextSpan(
-                    text: " and ",
-                  ),
-                  TextSpan(
-                    text: "Privacy Policy",
-                    style: const TextStyle(
-                      color: primaryColor,
-                      decorationColor: primaryColor,
-                      decoration: TextDecoration.underline,
-                    ),
-                    recognizer: TapGestureRecognizer()..onTap = () {},
-                  ),
-                ],
+              const SizedBox(
+                height: 40,
               ),
-            ),
+            ],
           ),
-          const SizedBox(
-            height: 40,
-          ),
-        ],
+        ),
       ),
     );
   }

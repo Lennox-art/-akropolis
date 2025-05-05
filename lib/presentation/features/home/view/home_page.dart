@@ -16,6 +16,7 @@ import 'package:akropolis/presentation/features/search/view/search_screen.dart';
 import 'package:akropolis/presentation/features/search/view_model/search_view_model.dart';
 import 'package:akropolis/presentation/features/threads/view/threads_screen.dart';
 import 'package:akropolis/presentation/features/threads/view_model/thread_view_model.dart';
+import 'package:akropolis/presentation/features/user_stories/view_model/user_stories_view_model.dart';
 import 'package:akropolis/presentation/routes/routes.dart';
 import 'package:akropolis/presentation/ui/components/loader.dart';
 import 'package:akropolis/presentation/ui/components/toast/toast.dart';
@@ -41,12 +42,10 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late final StreamSubscription<ToastMessage> toastStreamSubscription;
-  late final StreamSubscription<HomeState> homeStateStreamSubscription;
 
   @override
   void initState() {
     toastStreamSubscription = widget.homeViewModel.toastStream.listen(_onToastMessage);
-    homeStateStreamSubscription = widget.homeViewModel.homeStream.listen(_onStateChange);
     super.initState();
   }
 
@@ -54,18 +53,10 @@ class _HomePageState extends State<HomePage> {
     toast.show();
   }
 
-  void _onStateChange(HomeState state) {
-    state.mapOrNull(initial: (_) {
-      //User has logged out
-      GetIt.I<FetchPostCommentsUseCase>().reset();
-      GetIt.I<CreatePostViewModel>().reset();
-    });
-  }
 
   @override
   void dispose() {
     toastStreamSubscription.cancel();
-    homeStateStreamSubscription.cancel();
     super.dispose();
   }
 
@@ -96,15 +87,19 @@ class _HomePageState extends State<HomePage> {
                         BottomNavigationTabs.newsFeed => NewsFeedTab(
                             currentUser: r.appUser,
                             homeViewModel: widget.homeViewModel,
+                            userStoriesViewModel: UserStoriesViewModel(
+                              userStoryRepository: GetIt.I(),
+                              currentUser: r.appUser,
+                            ),
                             newsFeedViewModel: NewsFeedViewModel(
                               GetIt.I(),
                             ),
                           ),
                         BottomNavigationTabs.search => SearchScreen(
-                          searchViewModel: SearchViewModel(
-                            postRepository: GetIt.I(),
+                            searchViewModel: SearchViewModel(
+                              postRepository: GetIt.I(),
+                            ),
                           ),
-                        ),
                         BottomNavigationTabs.post => const SizedBox.shrink(),
                         BottomNavigationTabs.chat => ThreadsScreen(
                             threadViewModel: ThreadViewModel(

@@ -97,35 +97,6 @@ class HomeViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> logout() async {
-    if (_homeState is LoadingHomeState) return;
-
-    _homeState = const LoadingHomeState();
-    notifyListeners();
-
-    try {
-      Result<void> logoutResult = await _authenticationRepository.logout();
-
-      switch (logoutResult) {
-        case Success<void>():
-          _homeState = const InitialHomeState();
-          _toastStreamController.add(
-            const ToastSuccess(message: "Logged out successfully"),
-          );
-          break;
-
-        case Error<void>():
-          _homeState = ErrorHomeState(failure: logoutResult.failure);
-          _toastStreamController.add(
-            ToastError(message: logoutResult.failure.message),
-          );
-          break;
-      }
-    } finally {
-      _onHomeStateStreamController.add(_homeState);
-      notifyListeners();
-    }
-  }
 
   void changeTab(BottomNavigationTabs tab) {
     _currentTab = tab;

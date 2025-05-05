@@ -76,3 +76,27 @@ const _$MediaTypeEnumMap = {
   MediaType.image: 'image',
   MediaType.video: 'video',
 };
+
+FirebaseApiNotification _$FirebaseApiNotificationFromJson(
+        Map<String, dynamic> json) =>
+    FirebaseApiNotification(
+      notificationId: json['notification_id'] as String,
+      title: json['title'] as String,
+      subtitle: json['subtitle'] as String?,
+      message: json['message'] as String?,
+      groupKey: json['group_key'] as String?,
+      notificationData: json['notification_data'] as String,
+      customData: json['custom_data'] as String,
+    );
+
+Map<String, dynamic> _$FirebaseApiNotificationToJson(
+        FirebaseApiNotification instance) =>
+    <String, dynamic>{
+      'notification_id': instance.notificationId,
+      'title': instance.title,
+      'subtitle': instance.subtitle,
+      'message': instance.message,
+      'group_key': instance.groupKey,
+      'notification_data': instance.notificationData,
+      'custom_data': instance.customData,
+    };

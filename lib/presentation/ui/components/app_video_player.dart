@@ -9,11 +9,15 @@ import 'package:chewie/chewie.dart';
 class CachedVideoPlayer extends StatefulWidget {
   final File file;
   final bool autoPlay;
+  final bool showControls;
+  final Function()? onComplete;
 
   const CachedVideoPlayer({
     super.key,
     required this.file,
     required this.autoPlay,
+    this.showControls = false,
+    this.onComplete,
   });
 
   @override
@@ -23,6 +27,7 @@ class CachedVideoPlayer extends StatefulWidget {
 class _CachedVideoPlayerState extends State<CachedVideoPlayer> {
   VideoPlayerController? _videoController;
   ChewieController? _chewieController;
+  bool _isComplete = false;
   bool _isLoading = true;
 
   @override
@@ -34,8 +39,8 @@ class _CachedVideoPlayerState extends State<CachedVideoPlayer> {
   Future<void> _initializeVideo() async {
     try {
       // Check cache and get the video file
-
       // Initialize the video player
+
       _videoController = VideoPlayerController.file(widget.file);
       await _videoController!.initialize();
 
@@ -45,7 +50,18 @@ class _CachedVideoPlayerState extends State<CachedVideoPlayer> {
         looping: false,
         allowMuting: true,
         allowPlaybackSpeedChanging: true,
+        showControls: widget.showControls,
       );
+      _videoController!.addListener(() {
+        if(_videoController!.value.isCompleted && !_isComplete) {
+          _isComplete = true;
+          widget.onComplete?.call();
+        }
+
+        if(_videoController!.value.isPlaying) {
+          _isComplete = false;
+        }
+      });
 
       setState(() => _isLoading = false);
     } catch (e) {

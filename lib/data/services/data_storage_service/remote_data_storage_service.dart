@@ -146,4 +146,24 @@ abstract class RemoteDataStorageService {
     required String threadId,
     required MessageRemote message,
   });
+
+  Future<Result<UserStory>> createUserStory({
+    required UserStory userStory,
+  });
+
+  Future<Result<void>> addToUserStoryViewers({
+    required String storyId,
+    required String userId,
+  });
+
+  Future<Result<List<UserStory>>> fetchUsersStories({
+    required String userId,
+  });
+
+  Future<Result<List<UserStory>>> fetchOtherUserStories({
+    required String userId,
+    required int pageSize,
+    DateTime? lastFetchedCreatedAt,
+});
+
 }

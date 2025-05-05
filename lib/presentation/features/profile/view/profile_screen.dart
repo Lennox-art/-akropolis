@@ -67,7 +67,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   Icons.settings,
                                   color: Colors.white,
                                 ),
-                                onPressed: () {},
+                                onPressed: () {
+                                  Navigator.of(context).pushNamed(AppRoutes.settings.path);
+                                },
                               ),
                             ],
                           ),

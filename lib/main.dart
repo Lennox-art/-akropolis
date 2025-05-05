@@ -8,6 +8,7 @@ import 'package:akropolis/data/repositories/notification_repository/notification
 import 'package:akropolis/data/repositories/post_repository/post_repository.dart';
 import 'package:akropolis/data/repositories/topics_repository/topics_repository.dart';
 import 'package:akropolis/data/repositories/user_repository/user_repository.dart';
+import 'package:akropolis/data/repositories/user_story_repository/user_story_repository.dart';
 import 'package:akropolis/data/services/data_storage_service/local_data_storage_service.dart';
 import 'package:akropolis/data/services/data_storage_service/remote_data_storage_service.dart';
 import 'package:akropolis/data/services/file_storage_service/local_file_storage_service.dart';
@@ -19,14 +20,17 @@ import 'package:akropolis/domain/repository_impl/notification_repository_impl/no
 import 'package:akropolis/domain/repository_impl/post_respository_impl/post_repository_impl.dart';
 import 'package:akropolis/domain/repository_impl/topic_repository_impl/topic_repository_impl.dart';
 import 'package:akropolis/domain/repository_impl/user_repository_impl/user_repository_impl.dart';
+import 'package:akropolis/domain/repository_impl/user_stories_repository_impl/user_stories_repository_impl.dart';
 import 'package:akropolis/domain/service_impl/data_storage_service_impl/remote_data_storage_service_impl/firestore_remote_storage_service.dart';
 import 'package:akropolis/domain/service_impl/file_storage_service_impl/local_file_storage_service_impl/local_file_system_local_storage_service_impl.dart';
 import 'package:akropolis/domain/service_impl/notification_service_impl/local_app_notification_service_impl.dart';
+import 'package:akropolis/domain/use_cases/create_news_post_use_case.dart';
 import 'package:akropolis/domain/use_cases/create_user_post_use_case.dart';
 import 'package:akropolis/domain/use_cases/fetch_post_comments_use_case.dart';
 import 'package:akropolis/domain/use_cases/get_media_use_case.dart';
 import 'package:akropolis/domain/use_cases/news_card_use_case.dart';
 import 'package:akropolis/presentation/features/create_post/view_model/create_post_view_model.dart';
+import 'package:akropolis/presentation/features/create_user_story/view_model/create_user_story_post_view_model.dart';
 import 'package:akropolis/presentation/features/news_feed/view_models/news_card_view_model.dart';
 import 'package:akropolis/presentation/routes/routes.dart';
 import 'package:akropolis/presentation/ui/themes.dart';
@@ -133,7 +137,7 @@ Future<void> main() async {
       notificationsPlugin: FlutterLocalNotificationsPlugin(),
       settings: InitializationSettings(
         android: const AndroidInitializationSettings("@mipmap/ic_launcher"),
-        iOS:  DarwinInitializationSettings(
+        iOS: DarwinInitializationSettings(
           onDidReceiveLocalNotification: (id, title, body, payload) {
             print("Local Notification received $id");
           },
@@ -144,6 +148,11 @@ Future<void> main() async {
     targetPlatform: defaultTargetPlatform,
   );
   getIt.registerSingleton(notificationRepository);
+
+  UserStoryRepository userStoryRepository = UserStoryRepositoryImpl(
+    remoteDataStorageService: remoteDataStorageService,
+  );
+  getIt.registerSingleton(userStoryRepository);
 
   ///Use cases
   FetchPostCommentsUseCase fetchPostCommentsUseCase = FetchPostCommentsUseCase(
@@ -171,6 +180,19 @@ Future<void> main() async {
     ),
   );
   getIt.registerSingleton(createPostViewModel);
+
+  CreateUserPostViewModel createUserPostViewModel = CreateUserPostViewModel(
+    createPostUseCase: CreateUserPostUseCase(
+      userRepository: userRepository,
+      authenticationRepository: authenticationRepository,
+      userStoryRepository: userStoryRepository,
+      localDataStorageService: localDataStorageService,
+      remoteFileStorageService: remoteFileStorageService,
+      localFileStorageService: localFileStorageService,
+    ),
+  );
+  getIt.registerSingleton(createUserPostViewModel);
+
 
   NewsCardViewModel newsCardViewModel = NewsCardViewModel(
     postRepository: postRepository,

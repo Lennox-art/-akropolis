@@ -125,6 +125,58 @@ class Author {
       };
 }
 
+class UserStory implements Comparable<UserStory>{
+  final String id;
+  final String thumbnailUrl;
+  final String postUrl;
+  final Author author;
+  final DateTime createdAt;
+  final Set<String> viewers;
+
+  UserStory({
+    required this.id,
+    required this.thumbnailUrl,
+    required this.postUrl,
+    required this.author,
+    required this.viewers,
+    required this.createdAt,
+  });
+
+  static String get collection => 'user_stories';
+
+  factory UserStory.fromJson(Map<String, dynamic> json) => UserStory(
+    id: json['id'] as String,
+    thumbnailUrl: json['thumbnailUrl'] as String,
+    postUrl: json['postUrl'] as String,
+    author: Author.fromJson(json['author'] as Map<String, dynamic>),
+    viewers: (json['viewers'] as List<dynamic>).map((e) => e as String).toSet(),
+    createdAt: DateTime.parse(json['createdAt'] as String),
+  );
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'thumbnailUrl': thumbnailUrl,
+    'postUrl': postUrl,
+    'author': author.toJson(),
+    'createdAt': createdAt.toIso8601String(),
+    'viewers': viewers.toList(),
+  };
+
+  @override
+  int get hashCode => id.hashCode;
+
+  @override
+  bool operator ==(Object other) {
+    if (other is! UserStory) return false;
+    return id == other.id;
+  }
+
+  @override
+  int compareTo(UserStory other) {
+    return -createdAt.compareTo(other.createdAt);
+  }
+}
+
 class NewsPost {
   final String id;
   final String thumbnailUrl;
@@ -293,22 +345,22 @@ class ThreadRemote implements Comparable<ThreadRemote> {
   });
 
   factory ThreadRemote.fromJson(Map<String, dynamic> json) => ThreadRemote(
-    id: json['id'] as String,
-    participant1: json['participant1'] as String,
-    participant2: json['participant2'] as String,
-    accepted: json['accepted'] as bool? ?? false,
-    createdAt: DateTime.parse(json['createdAt']),
-    updatedAt: (json['updatedAt'] as Timestamp).toDate(),
-  );
+        id: json['id'] as String,
+        participant1: json['participant1'] as String,
+        participant2: json['participant2'] as String,
+        accepted: json['accepted'] as bool? ?? false,
+        createdAt: DateTime.parse(json['createdAt']),
+        updatedAt: (json['updatedAt'] as Timestamp).toDate(),
+      );
 
   Map<String, dynamic> toJson() => {
-    'id': id,
-    'participant1': participant1,
-    'participant2': participant2,
-    'accepted': accepted,
-    'createdAt': createdAt.toIso8601String(),
-    'updatedAt': Timestamp.fromDate(updatedAt),
-  };
+        'id': id,
+        'participant1': participant1,
+        'participant2': participant2,
+        'accepted': accepted,
+        'createdAt': createdAt.toIso8601String(),
+        'updatedAt': Timestamp.fromDate(updatedAt),
+      };
 
   @override
   int compareTo(ThreadRemote other) {
@@ -317,7 +369,7 @@ class ThreadRemote implements Comparable<ThreadRemote> {
 }
 
 @JsonSerializable()
-class MessageRemote  implements Comparable<MessageRemote> {
+class MessageRemote implements Comparable<MessageRemote> {
   final String id;
   final String sendByUserId;
   final String sendToUserId;
@@ -348,7 +400,6 @@ class MessageRemote  implements Comparable<MessageRemote> {
 
 @JsonSerializable(createToJson: true)
 class FirebaseApiNotification {
-
   @JsonKey(name: 'notification_id')
   final String notificationId;
 

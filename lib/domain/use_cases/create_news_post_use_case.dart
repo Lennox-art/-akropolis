@@ -1,3 +1,4 @@
+
 import 'dart:typed_data';
 
 import 'package:akropolis/data/models/dto_models/dto_models.dart';
@@ -6,7 +7,6 @@ import 'package:akropolis/data/models/remote_models/remote_models.dart';
 import 'package:akropolis/data/repositories/authentication_repository/authentication_repository.dart';
 import 'package:akropolis/data/repositories/post_repository/post_repository.dart';
 import 'package:akropolis/data/repositories/user_repository/user_repository.dart';
-import 'package:akropolis/data/repositories/user_story_repository/user_story_repository.dart';
 import 'package:akropolis/data/services/data_storage_service/local_data_storage_service.dart';
 import 'package:akropolis/data/services/file_storage_service/local_file_storage_service.dart';
 import 'package:akropolis/data/services/file_storage_service/remote_file_storage_service.dart';
@@ -14,34 +14,35 @@ import 'package:common_fn/common_fn.dart';
 import 'package:exception_base/exception_base.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-class CreateUserPostUseCase {
+class CreatePostUseCase {
   final UserRepository _userRepository;
   final AuthenticationRepository _authenticationRepository;
-  final UserStoryRepository _userStoryRepository;
+  final PostRepository _postRepository;
   final LocalDataStorageService _localDataStorageService;
   final RemoteFileStorageService _remoteFileStorageService;
   final LocalFileStorageService _localFileStorageService;
 
-  CreateUserPostUseCase({
+  CreatePostUseCase({
     required UserRepository userRepository,
     required AuthenticationRepository authenticationRepository,
-    required UserStoryRepository userStoryRepository,
+    required PostRepository postRepository,
     required LocalDataStorageService localDataStorageService,
     required RemoteFileStorageService remoteFileStorageService,
     required LocalFileStorageService localFileStorageService,
-  })  : _userStoryRepository = userStoryRepository,
-        _userRepository = userRepository,
-        _authenticationRepository = authenticationRepository,
+  })  : _postRepository = postRepository,
         _localDataStorageService = localDataStorageService,
         _remoteFileStorageService = remoteFileStorageService,
-        _localFileStorageService = localFileStorageService;
+        _localFileStorageService = localFileStorageService,
+        _authenticationRepository = authenticationRepository,
+        _userRepository = userRepository;
 
-  Future<Result<UserStory>> post({
+  Future<Result<NewsPost>> post({
     required Uint8List thumbnailData,
     required Uint8List videoData,
+    required String title,
+    required String description,
     dynamic Function(ProgressModel)? onProgress,
   }) async {
-
     Result<User> currentUserResult = await _authenticationRepository.getCurrentUser();
     late User user;
     switch (currentUserResult) {
@@ -77,7 +78,7 @@ class CreateUserPostUseCase {
         thumbnailUrl = uploadThumbnailResult.data.url;
         //Finish thumbnail cache asynchronously
         _localFileStorageService.cacheLocalFileData(thumbnailData).then(
-          (cacheResult) {
+              (cacheResult) {
             if (cacheResult is Success<Sha1>) {
               _localDataStorageService.setFileCache(localFileCache: uploadThumbnailResult.data);
             }
@@ -100,7 +101,7 @@ class CreateUserPostUseCase {
         videoUrl = uploadVideoResult.data.url;
         //Finish video cache asynchronously
         _localFileStorageService.cacheLocalFileData(videoData).then(
-          (cacheResult) {
+              (cacheResult) {
             if (cacheResult is Success<Sha1>) {
               _localDataStorageService.setFileCache(localFileCache: uploadVideoResult.data);
             }
@@ -115,18 +116,24 @@ class CreateUserPostUseCase {
     _localFileStorageService.cacheLocalFileData(videoData);
 
     //Upload post finally
-    return await _userStoryRepository.createUserStory(
-      userStory: UserStory(
+    return await _postRepository.setPost(
+      newsPost: NewsPost(
         id: generateRandomUuid(),
         thumbnailUrl: thumbnailUrl,
         postUrl: videoUrl,
+        title: title,
+        description: description,
         author: Author(
-          id: appUser.id,
+          id: user.uid,
           name: appUser.displayName,
           type: AuthorType.user,
         ),
         viewers: {},
-        createdAt: DateTime.now(),
+        publishedAt: DateTime.now(),
+        reaction: PostReaction(
+          log: {},
+          emp: {},
+        ),
       ),
     );
   }

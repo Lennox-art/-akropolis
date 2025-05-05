@@ -7,7 +7,6 @@ import 'package:exception_base/exception_base.dart';
 import 'package:logging_service/logging_service.dart';
 
 class FirestoreRemoteStorageService extends RemoteDataStorageService {
-
   final CollectionReference userCollectionRef = FirebaseFirestore.instance.collection(AppUser.collection).withConverter<AppUser>(
         fromFirestore: (snapshot, _) => AppUser.fromJson(snapshot.data()!),
         toFirestore: (model, _) => model.toJson(),
@@ -23,6 +22,11 @@ class FirestoreRemoteStorageService extends RemoteDataStorageService {
             fromFirestore: (snapshot, _) => NewsPost.fromJson(snapshot.data()!),
             toFirestore: (model, _) => model.toJson(),
           );
+
+  CollectionReference get userStoryCollectionRef => FirebaseFirestore.instance.collection(UserStory.collection).withConverter<UserStory>(
+        fromFirestore: (snapshot, _) => UserStory.fromJson(snapshot.data()!),
+        toFirestore: (model, _) => model.toJson(),
+      );
 
   CollectionReference get worldNewsPostsCollectionRef =>
       FirebaseFirestore.instance.collection(NewsChannel.worldNews.collection).withConverter<NewsPost>(
@@ -477,7 +481,7 @@ class FirestoreRemoteStorageService extends RemoteDataStorageService {
   }) async {
     try {
       await messagesCollectionRef(threadId: threadId).doc(message.id).set(message);
-      await threadCollectionRef.doc(threadId).update({'updatedAt' : DateTime.now()});
+      await threadCollectionRef.doc(threadId).update({'updatedAt': DateTime.now()});
       return Result.success(data: message);
     } catch (e, trace) {
       return Result.error(
@@ -581,8 +585,8 @@ class FirestoreRemoteStorageService extends RemoteDataStorageService {
   @override
   Future<Result<void>> acceptThread({required String threadId}) async {
     try {
-      ThreadRemote? remoteThread  = (await threadCollectionRef.doc(threadId).get()).data() as ThreadRemote?;
-      if(remoteThread == null) {
+      ThreadRemote? remoteThread = (await threadCollectionRef.doc(threadId).get()).data() as ThreadRemote?;
+      if (remoteThread == null) {
         return Result.error(
           failure: AppFailure(
             message: "Thread doesn't exist",
@@ -591,7 +595,7 @@ class FirestoreRemoteStorageService extends RemoteDataStorageService {
         );
       }
 
-      if(remoteThread.accepted) {
+      if (remoteThread.accepted) {
         return Result.error(
           failure: AppFailure(
             message: "Thread already accepted",
@@ -600,7 +604,7 @@ class FirestoreRemoteStorageService extends RemoteDataStorageService {
         );
       }
 
-      await threadCollectionRef.doc(threadId).update({'accepted' : true});
+      await threadCollectionRef.doc(threadId).update({'accepted': true});
 
       return const Success(data: null);
     } catch (e, trace) {
@@ -616,8 +620,8 @@ class FirestoreRemoteStorageService extends RemoteDataStorageService {
   @override
   Future<Result<void>> declineThread({required String threadId}) async {
     try {
-      ThreadRemote? remoteThread  = (await threadCollectionRef.doc(threadId).get()).data() as ThreadRemote?;
-      if(remoteThread == null) {
+      ThreadRemote? remoteThread = (await threadCollectionRef.doc(threadId).get()).data() as ThreadRemote?;
+      if (remoteThread == null) {
         return Result.error(
           failure: AppFailure(
             message: "Thread doesn't exist",
@@ -626,7 +630,7 @@ class FirestoreRemoteStorageService extends RemoteDataStorageService {
         );
       }
 
-      if(remoteThread.accepted) {
+      if (remoteThread.accepted) {
         return Result.error(
           failure: AppFailure(
             message: "Thread already accepted",
@@ -650,15 +654,121 @@ class FirestoreRemoteStorageService extends RemoteDataStorageService {
 
   @override
   Stream<MessageRemote> watchThread({required String threadId}) {
-   return messagesCollectionRef(threadId: threadId)
-       .orderBy("createdAt", descending: true)
-       .snapshots(includeMetadataChanges: false)
-       .asyncExpand(
-         (querySnapshot) => Stream.fromIterable(
-       querySnapshot.docs.map((doc) => doc.data() as MessageRemote),
-     ),
-   );
+    return messagesCollectionRef(threadId: threadId).orderBy("createdAt", descending: true).snapshots(includeMetadataChanges: false).asyncExpand(
+          (querySnapshot) => Stream.fromIterable(
+            querySnapshot.docs.map((doc) => doc.data() as MessageRemote),
+          ),
+        );
   }
 
+  @override
+  Future<Result<UserStory>> createUserStory({required UserStory userStory}) async {
+    try {
+      await userStoryCollectionRef.doc(userStory.id).set(userStory);
+      return Success(data: userStory);
+    } catch (e, trace) {
+      return Result.error(
+        failure: AppFailure(
+          message: e.toString(),
+          trace: trace,
+        ),
+      );
+    }
+  }
 
+  @override
+  Future<Result<List<UserStory>>> fetchOtherUserStories({
+    required String userId,
+    required int pageSize,
+    DateTime? lastFetchedCreatedAt,
+  }) async {
+    try {
+      var query = userStoryCollectionRef /*.orderBy('createdAt', descending: true)*/ .limit(pageSize);
+      //if (lastFetchedCreatedAt != null) query = query.startAfter([lastFetchedCreatedAt]);
+
+      var results = await query
+          .where('author.id',
+              isNotEqualTo:
+                  userId) /*.where(
+        'createdAt',
+        isGreaterThanOrEqualTo: Timestamp.fromDate(
+          DateTime.now().subtract(const Duration(hours: 24)),
+        ),
+      )*/
+          .get();
+      List<UserStory> data = results.docs.map((e) => e.data() as UserStory).toList();
+      return Success(data: data);
+    } catch (e, trace) {
+      return Result.error(
+        failure: AppFailure(
+          message: e.toString(),
+          trace: trace,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Result<List<UserStory>>> fetchUsersStories({required String userId}) async {
+    try {
+      var query = userStoryCollectionRef /*.orderBy('createdAt', descending: true)*/ .where('author.id',
+              isEqualTo:
+                  userId) /*.where(
+            'createdAt',
+            isGreaterThanOrEqualTo: Timestamp.fromDate(
+              DateTime.now().subtract(const Duration(hours: 24)),
+            ),
+          )*/
+          ;
+      var results = await query.get();
+      List<UserStory> data = results.docs.map((e) => e.data() as UserStory).toList();
+      return Success(data: data);
+    } catch (e, trace) {
+      return Result.error(
+        failure: AppFailure(
+          message: e.toString(),
+          trace: trace,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Result<void>> addToUserStoryViewers({required String storyId, required String userId}) async {
+    try {
+      var results = await userStoryCollectionRef.doc(storyId).get();
+      if (!results.exists) {
+        return Result.error(
+          failure: AppFailure(
+            message: "Story not found",
+            trace: results,
+            failureType: FailureType.illegalStateFailure,
+          ),
+        );
+      }
+      UserStory data = results.data() as UserStory;
+      if (data.viewers.contains(userId)) {
+        return Result.error(
+          failure: AppFailure(
+            message: "User already viewed",
+            trace: results,
+            failureType: FailureType.illegalStateFailure,
+          ),
+        );
+      }
+
+      userPostsCollectionRef.doc(storyId).update({
+        'viewers': FieldValue.arrayUnion([userId])
+      });
+
+      return const Success(data: null);
+    } catch (e, trace) {
+      return Result.error(
+        failure: AppFailure(
+          message: e.toString(),
+          trace: trace,
+        ),
+      );
+    }
+  }
 }
