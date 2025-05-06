@@ -189,7 +189,6 @@ class _ForYouContentState extends State<ForYouContent> {
             ListenableBuilder(
               listenable: widget.forYouViewModel,
               builder: (_, __) {
-
                 return ListView.builder(
                   shrinkWrap: true,
                   controller: _scrollController,

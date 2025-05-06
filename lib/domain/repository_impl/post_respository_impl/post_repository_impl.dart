@@ -2,6 +2,7 @@ import 'package:akropolis/data/models/dto_models/dto_models.dart';
 import 'package:akropolis/data/models/remote_models/remote_models.dart';
 import 'package:akropolis/data/repositories/post_repository/post_repository.dart';
 import 'package:akropolis/data/services/data_storage_service/remote_data_storage_service.dart';
+import 'package:akropolis/presentation/features/news_feed/models/models.dart';
 
 class PostRepositoryImpl extends PostRepository {
   final RemoteDataStorageService _remoteDataStorageService;
@@ -157,10 +158,16 @@ class PostRepositoryImpl extends PostRepository {
         userId: userId,
       );
 
-
-
   @override
   Future<Result<int>> countUserPosts({required String userId}) async {
     return _remoteDataStorageService.countUserPosts(userId: userId);
   }
+
+  @override
+  Future<Result<List<NewsPost>>> fetchPostsWithIds({
+    required Map<String, NewsChannel> ids,
+  }) {
+    return _remoteDataStorageService.fetchPostsWithIds(ids: ids);
+  }
+
 }

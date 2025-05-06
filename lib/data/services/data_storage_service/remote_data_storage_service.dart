@@ -1,5 +1,6 @@
 import 'package:akropolis/data/models/dto_models/dto_models.dart';
 import 'package:akropolis/data/models/remote_models/remote_models.dart';
+import 'package:akropolis/presentation/features/news_feed/models/models.dart';
 
 abstract class RemoteDataStorageService {
   /// Function:
@@ -42,18 +43,15 @@ abstract class RemoteDataStorageService {
   /// Possible Failures:
   Future<Result<List<NewsPost>>> fetchUserPostsNews({required int pageSize, required List<String> keywords});
 
-
   /// Function:
   /// Returns:
   /// Possible Failures:
   Future<Result<List<NewsPost>>> fetchWorldNews({required int pageSize, String? country, required List<String> keywords});
 
-
   /// Function:
   /// Returns:
   /// Possible Failures:
   Future<Result<List<PostComment>>> fetchPostComments({required int pageSize, required String collection, required String postId});
-
 
   /// Function:
   /// Returns:
@@ -96,6 +94,10 @@ abstract class RemoteDataStorageService {
   });
 
   Future<Result<int>> countUserPosts({required String userId});
+
+  Future<Result<List<NewsPost>>> fetchPostsWithIds({
+    required Map<String, NewsChannel> ids,
+  });
 
   /// Fetch comments
   Future<Result<List<Topic>>> fetchTopics();
@@ -164,6 +166,22 @@ abstract class RemoteDataStorageService {
     required String userId,
     required int pageSize,
     DateTime? lastFetchedCreatedAt,
-});
+  });
 
+  Future<Result<Bookmark>> addBookmarks({
+    required String userId,
+    required String postId,
+    required NewsChannel channel,
+  });
+
+  Future<Result<void>> removeBookmarks({
+    required String userId,
+    required String postId,
+  });
+
+  Future<Result<List<Bookmark>>> fetchBookmarks({
+    required String userId,
+    required int pageSize,
+    DateTime? lastFetchedCreatedAt,
+  });
 }

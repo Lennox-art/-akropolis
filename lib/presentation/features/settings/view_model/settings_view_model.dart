@@ -1,22 +1,30 @@
 import 'dart:async';
 
 import 'package:akropolis/data/models/dto_models/dto_models.dart';
+import 'package:akropolis/data/models/remote_models/remote_models.dart';
 import 'package:akropolis/data/repositories/authentication_repository/authentication_repository.dart';
 import 'package:akropolis/presentation/features/settings/model/settings_state.dart';
 import 'package:akropolis/presentation/ui/components/toast/toast.dart';
 import 'package:flutter/material.dart';
 
 class SettingsViewModel extends ChangeNotifier {
-
   final AuthenticationRepository _authenticationRepository;
+  final AppUser _currentUser;
 
   final StreamController<ToastMessage> _toastStreamController = StreamController.broadcast();
 
   SettingsState _settingsState = const LoadedSettingsState();
 
-  SettingsViewModel({required AuthenticationRepository authenticationRepository}) : _authenticationRepository = authenticationRepository;
+  SettingsViewModel({
+    required AuthenticationRepository authenticationRepository,
+    required AppUser currentUser,
+  })  : _authenticationRepository = authenticationRepository,
+        _currentUser = currentUser;
 
   SettingsState get settingsState => _settingsState;
+
+  AppUser get currentUser => _currentUser;
+
 
   Future<void> logout() async {
     if (_settingsState is LoadingSettingsState) return;
@@ -46,5 +54,4 @@ class SettingsViewModel extends ChangeNotifier {
       notifyListeners();
     }
   }
-
 }

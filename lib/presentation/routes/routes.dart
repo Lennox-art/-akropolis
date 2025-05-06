@@ -14,6 +14,7 @@ import 'package:akropolis/presentation/features/authentication/view/sign_up.dart
 import 'package:akropolis/presentation/features/authentication/view_model/authentication_view_model.dart';
 import 'package:akropolis/presentation/features/blocked/view/blocked_screen.dart';
 import 'package:akropolis/presentation/features/bookmarked/view/bookmarked_screen.dart';
+import 'package:akropolis/presentation/features/bookmarked/view_model/bookmarked_view_model.dart';
 import 'package:akropolis/presentation/features/chat/model/chat_models.dart';
 import 'package:akropolis/presentation/features/chat/view/chat_message_screen.dart';
 import 'package:akropolis/presentation/features/chat/view/chat_screen.dart';
@@ -278,11 +279,18 @@ enum AppRoutes {
         AppRoutes.settings => SettingsScreen(
             settingsViewModel: SettingsViewModel(
               authenticationRepository: GetIt.I(),
+              currentUser: ModalRoute.of(context)!.settings.arguments as AppUser,
             ),
           ),
         AppRoutes.notificationSettings => const NotificationScreen(),
         AppRoutes.prNotificationSettings => const PostAndReplyNotificationScreen(),
-        AppRoutes.bookmarks => const BookmarkedScreen(),
+        AppRoutes.bookmarks => BookmarkedScreen(
+            bookmarkedViewModel: BookmarkedViewModel(
+              bookmarkRepository: GetIt.I(),
+              postRepository: GetIt.I(),
+              currentUser: ModalRoute.of(context)!.settings.arguments as AppUser,
+            ),
+          ),
         AppRoutes.watchLater => const WatchLaterScreen(),
         AppRoutes.blocked => const BlockedScreen(),
       };

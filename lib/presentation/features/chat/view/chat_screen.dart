@@ -197,7 +197,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 8.0),
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
                           child: GestureDetector(
                             onTap: () async {
                               XFile? videoData = await getIt<ImagePicker>().pickVideo(

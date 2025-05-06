@@ -68,14 +68,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   color: Colors.white,
                                 ),
                                 onPressed: () {
-                                  Navigator.of(context).pushNamed(AppRoutes.settings.path);
+                                  Navigator.of(context).pushNamed(
+                                    AppRoutes.settings.path,
+                                    arguments: currentUser,
+                                  );
                                 },
                               ),
                             ],
                           ),
                         ),
                       ),
-
                       SliverToBoxAdapter(
                         child: Padding(
                           padding: const EdgeInsets.all(16.0),

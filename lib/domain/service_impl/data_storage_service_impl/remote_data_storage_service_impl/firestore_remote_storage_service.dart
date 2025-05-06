@@ -7,10 +7,16 @@ import 'package:exception_base/exception_base.dart';
 import 'package:logging_service/logging_service.dart';
 
 class FirestoreRemoteStorageService extends RemoteDataStorageService {
-  final CollectionReference userCollectionRef = FirebaseFirestore.instance.collection(AppUser.collection).withConverter<AppUser>(
+  CollectionReference get userCollectionRef => FirebaseFirestore.instance.collection(AppUser.collection).withConverter<AppUser>(
         fromFirestore: (snapshot, _) => AppUser.fromJson(snapshot.data()!),
         toFirestore: (model, _) => model.toJson(),
       );
+
+  CollectionReference bookmarkCollectionRef({required String userId}) =>
+      userCollectionRef.doc(userId).collection(Bookmark.collection).withConverter<Bookmark>(
+            fromFirestore: (snapshot, _) => Bookmark.fromJson(snapshot.data()!),
+            toFirestore: (model, _) => model.toJson(),
+          );
 
   CollectionReference get userPostsCollectionRef => FirebaseFirestore.instance.collection(NewsChannel.userPosts.collection).withConverter<NewsPost>(
         fromFirestore: (snapshot, _) => NewsPost.fromJson(snapshot.data()!),
@@ -762,6 +768,103 @@ class FirestoreRemoteStorageService extends RemoteDataStorageService {
       });
 
       return const Success(data: null);
+    } catch (e, trace) {
+      return Result.error(
+        failure: AppFailure(
+          message: e.toString(),
+          trace: trace,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Result<Bookmark>> addBookmarks({
+    required String userId,
+    required String postId,
+    required NewsChannel channel,
+  }) async {
+    try {
+      Bookmark bookmark = Bookmark(
+        postId: postId,
+        channel: channel,
+        createdAt: DateTime.timestamp(),
+      );
+      await bookmarkCollectionRef(userId: userId).doc(postId).set(bookmark);
+      return Success(data: bookmark);
+    } catch (e, trace) {
+      return Result.error(
+        failure: AppFailure(
+          message: e.toString(),
+          trace: trace,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Result<List<Bookmark>>> fetchBookmarks({
+    required String userId,
+    required int pageSize,
+    DateTime? lastFetchedCreatedAt,
+  }) async {
+    try {
+      var query = bookmarkCollectionRef(userId: userId).limit(pageSize) /*.orderBy('createdAt', descending: true)*/;
+      if (lastFetchedCreatedAt == null) {
+        query = query.startAfter([lastFetchedCreatedAt]);
+      }
+      var results = await query.get();
+      List<Bookmark> bookmarks = results.docs.map((e) => e.data() as Bookmark).toList();
+      return Success(data: bookmarks);
+    } catch (e, trace) {
+      return Result.error(
+        failure: AppFailure(
+          message: e.toString(),
+          trace: trace,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Result<void>> removeBookmarks({
+    required String userId,
+    required String postId,
+  }) async {
+    try {
+      await bookmarkCollectionRef(userId: userId).doc(postId).delete();
+      return const Success(data: null);
+    } catch (e, trace) {
+      return Result.error(
+        failure: AppFailure(
+          message: e.toString(),
+          trace: trace,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Result<List<NewsPost>>> fetchPostsWithIds({
+    required Map<String, NewsChannel> ids,
+  }) async {
+    try {
+      var worldNewsQuery = worldNewsPostsCollectionRef.where(FieldPath.documentId,
+          whereIn: ids.entries.where((e) => e.value == NewsChannel.worldNews).map((e) => e.key));
+      var userPostsQuery = worldNewsPostsCollectionRef.where(FieldPath.documentId,
+          whereIn: ids.entries.where((e) => e.value == NewsChannel.userPosts).map((e) => e.key));
+      var newsHeadlinesQuery = worldNewsPostsCollectionRef.where(FieldPath.documentId,
+          whereIn: ids.entries.where((e) => e.value == NewsChannel.newsHeadlines).map((e) => e.key));
+
+      var results = await Future.wait(
+        [
+          worldNewsQuery.get(),
+          userPostsQuery.get(),
+          newsHeadlinesQuery.get(),
+        ],
+      );
+      List<NewsPost> posts = results.expand((e) => e.docs).map((e) => e.data() as NewsPost).toList();
+      return Success(data: posts);
     } catch (e, trace) {
       return Result.error(
         failure: AppFailure(

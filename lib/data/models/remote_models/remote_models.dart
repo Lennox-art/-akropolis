@@ -1,4 +1,5 @@
 import 'package:akropolis/data/models/dto_models/dto_models.dart';
+import 'package:akropolis/presentation/features/news_feed/models/models.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
@@ -457,23 +458,32 @@ class FirebaseApiNotification {
 
 @JsonSerializable(createToJson: true)
 class Bookmark implements Comparable<Bookmark> {
-  final String id;
+  final String postId;
+  final NewsChannel channel;
   final DateTime createdAt;
 
-  Bookmark({required this.id, required this.createdAt});
+  Bookmark({
+    required this.postId,
+    required this.channel,
+    required this.createdAt,
+  });
+
+  static String get collection => 'bookmarks';
 
   factory Bookmark.fromJson(Map<String, dynamic> json) => Bookmark(
-        id: json['id'] as String,
+        postId: json['id'] as String,
+        channel: NewsChannel.newsChannelEnumMap[(json['channel'] as String)]!,
         createdAt: (json['createdAt'] as Timestamp).toDate(),
       );
 
   Map<String, dynamic> toJson() => {
-        'id': id,
+        'postId': postId,
+        'channel': channel.collection,
         'createdAt': Timestamp.fromDate(createdAt),
       };
 
   @override
   int compareTo(Bookmark other) {
-    return createdAt.compareTo(other.createdAt);
+    return -createdAt.compareTo(other.createdAt);
   }
 }

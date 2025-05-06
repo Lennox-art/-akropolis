@@ -74,6 +74,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             onTap: () {
               Navigator.of(context).pushNamed(
                 AppRoutes.bookmarks.path,
+                arguments: widget.settingsViewModel.currentUser,
               );
             },
             leading: const Icon(Icons.bookmark_border),

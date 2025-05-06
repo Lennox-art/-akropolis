@@ -100,3 +100,21 @@ Map<String, dynamic> _$FirebaseApiNotificationToJson(
       'notification_data': instance.notificationData,
       'custom_data': instance.customData,
     };
+
+Bookmark _$BookmarkFromJson(Map<String, dynamic> json) => Bookmark(
+      postId: json['postId'] as String,
+      channel: $enumDecode(_$NewsChannelEnumMap, json['channel']),
+      createdAt: DateTime.parse(json['createdAt'] as String),
+    );
+
+Map<String, dynamic> _$BookmarkToJson(Bookmark instance) => <String, dynamic>{
+      'postId': instance.postId,
+      'channel': _$NewsChannelEnumMap[instance.channel]!,
+      'createdAt': instance.createdAt.toIso8601String(),
+    };
+
+const _$NewsChannelEnumMap = {
+  NewsChannel.worldNews: 'worldNews',
+  NewsChannel.userPosts: 'userPosts',
+  NewsChannel.newsHeadlines: 'newsHeadlines',
+};

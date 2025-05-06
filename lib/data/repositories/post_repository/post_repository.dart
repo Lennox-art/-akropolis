@@ -1,5 +1,6 @@
 import 'package:akropolis/data/models/dto_models/dto_models.dart';
 import 'package:akropolis/data/models/remote_models/remote_models.dart';
+import 'package:akropolis/presentation/features/news_feed/models/models.dart';
 
 abstract class PostRepository {
   Future<Result<NewsPost>> setPost({
@@ -9,6 +10,10 @@ abstract class PostRepository {
   Future<Result<PostComment>> setPostComment({
     required String collection,
     required PostComment comment,
+  });
+
+  Future<Result<List<NewsPost>>> fetchPostsWithIds({
+    required Map<String, NewsChannel> ids,
   });
 
   Future<Result<List<NewsPost>>> fetchUserPostsNews({
