@@ -4,7 +4,6 @@ import 'dart:typed_data';
 import 'package:akropolis/data/models/dto_models/dto_models.dart';
 import 'package:akropolis/data/models/local_models/local_models.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:network_service/network_service.dart';
 
 abstract class AppNotificationService {
 

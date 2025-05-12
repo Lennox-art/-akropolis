@@ -2,7 +2,6 @@ import 'package:akropolis/data/models/dto_models/dto_models.dart';
 import 'package:akropolis/presentation/ui/themes.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:network_service/network_service.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 

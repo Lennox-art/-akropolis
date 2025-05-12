@@ -5,7 +5,6 @@ import 'package:akropolis/data/models/dto_models/dto_models.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import 'package:flutter/material.dart';
-import 'package:network_service/network_service.dart';
 
 part 'create_post_models.freezed.dart';
 

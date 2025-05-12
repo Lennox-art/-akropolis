@@ -43,7 +43,6 @@ import 'package:get_it/get_it.dart';
 import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:logging_service/logging_service.dart';
-import 'package:network_service/network_service.dart';
 import 'package:path_provider/path_provider.dart';
 import 'data/utils/crypto_functions.dart';
 import 'domain/service_impl/data_storage_service_impl/local_data_storage_service_impl/local_data_storage_service_impl.dart';
@@ -52,7 +51,6 @@ import 'firebase_options.dart';
 import 'package:path/path.dart' as path;
 
 final GetIt getIt = GetIt.I;
-final NetworkService ns = getIt<NetworkService>();
 final LoggingService log = getIt<LoggingService>();
 final ImagePicker picker = getIt<ImagePicker>();
 late final Directory temporaryDirectory;
@@ -79,9 +77,6 @@ Future<void> main() async {
     ),
   );
   getIt.registerSingleton(log);
-
-  NetworkService ns = NetworkServiceImpl(log);
-  getIt.registerSingleton(ns);
 
   final ImagePicker picker = ImagePicker();
   getIt.registerSingleton(picker);

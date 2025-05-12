@@ -289,11 +289,9 @@ packages:
   common_fn:
     dependency: "direct main"
     description:
-      path: "."
-      ref: main
-      resolved-ref: "7f1c7dd90925a728a5c6b0aa0a7a576931aa2988"
-      url: "https://bruc3balo:glpat-45CSRAxm48QD31nbADxz@gitlab.com/flutter_starter/common_fn.git"
-    source: git
+      path: common_fn
+      relative: true
+    source: path
     version: "1.0.0"
   convert:
     dependency: transitive
@@ -386,11 +384,9 @@ packages:
   exception_base:
     dependency: "direct main"
     description:
-      path: "."
-      ref: main
-      resolved-ref: "9ee723354a9d824bc8263a66411ba27ccf6c3f17"
-      url: "https://bruc3balo:glpat-45CSRAxm48QD31nbADxz@gitlab.com/flutter_starter/exception_base.git"
-    source: git
+      path: exception_base
+      relative: true
+    source: path
     version: "1.0.0"
   fake_async:
     dependency: transitive
@@ -411,7 +407,7 @@ packages:
   ffmpeg_kit_flutter_full_gpl:
     dependency: "direct main"
     description:
-      path: "../ffmpeg_kit_flutter_full_gpl-6.0.3"
+      path: "ffmpeg_kit_flutter_full_gpl-6.0.3"
       relative: true
     source: path
     version: "6.0.3"
@@ -1038,14 +1034,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.9.0"
-  jwt_decoder:
-    dependency: transitive
-    description:
-      name: jwt_decoder
-      sha256: "54774aebf83f2923b99e6416b4ea915d47af3bde56884eb622de85feabbc559f"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.0.1"
   leak_tracker:
     dependency: transitive
     description:
@@ -1105,11 +1093,9 @@ packages:
   logging_service:
     dependency: "direct main"
     description:
-      path: "."
-      ref: main
-      resolved-ref: "39539acf2b8bab9a76414b2040f40b5017546c0f"
-      url: "https://bruc3balo:glpat-45CSRAxm48QD31nbADxz@gitlab.com/flutter_starter/logging_service.git"
-    source: git
+      path: logging_service
+      relative: true
+    source: path
     version: "1.0.0"
   macros:
     dependency: transitive
@@ -1158,15 +1144,6 @@ packages:
       sha256: "03bac4c528c64c95c722ec99280375a6f2fc708eec17c7b3f07253b626cd2a20"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.0"
-  network_service:
-    dependency: "direct main"
-    description:
-      path: "."
-      ref: main
-      resolved-ref: "65b1c515b11f9a3a2107486d3730b47dfe569b43"
-      url: "https://bruc3balo:glpat-45CSRAxm48QD31nbADxz@gitlab.com/flutter_starter/network_service.git"
-    source: git
     version: "1.0.0"
   octo_image:
     dependency: transitive

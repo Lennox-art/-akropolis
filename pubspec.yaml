@@ -21,23 +21,13 @@ dependencies:
   google_sign_in:
   get_it:
   percent_indicator: ^4.2.5
-  network_service:
-    git:
-      url: https://bruc3balo:glpat-45CSRAxm48QD31nbADxz@gitlab.com/flutter_starter/network_service.git
-      ref: main
   logging_service:
-    git:
-      url: https://bruc3balo:glpat-45CSRAxm48QD31nbADxz@gitlab.com/flutter_starter/logging_service.git
-      ref: main
+    path: logging_service
   common_fn:
-    git:
-      url: https://bruc3balo:glpat-45CSRAxm48QD31nbADxz@gitlab.com/flutter_starter/common_fn.git
-      ref: main
+    path: common_fn
   infinite_scroll_pagination: ^4.1.0
   exception_base:
-    git:
-      url: https://bruc3balo:glpat-45CSRAxm48QD31nbADxz@gitlab.com/flutter_starter/exception_base.git
-      ref: main
+    path: exception_base
   camera: ^0.11.1
   video_player:
   chewie:
@@ -48,7 +38,7 @@ dependencies:
   firebase_messaging:
   dio:
   ffmpeg_kit_flutter_full_gpl:
-    path: ../ffmpeg_kit_flutter_full_gpl-6.0.3
+    path: ffmpeg_kit_flutter_full_gpl-6.0.3
   cached_network_image: ^3.3.1
   flutter_cache_manager:
   intl:

@@ -6,7 +6,6 @@ import 'package:akropolis/presentation/features/create_post/models/create_post_m
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import 'package:flutter/material.dart';
-import 'package:network_service/network_service.dart';
 
 part 'create_user_story_post_models.freezed.dart';
 
